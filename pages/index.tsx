@@ -415,7 +415,6 @@ const styles: { [key: string]: React.CSSProperties } = {
   grantRecipient: {
     fontWeight: '500',
   },
-  grantDate: {},
   grantTags: {
     display: 'flex',
     gap: '8px',
