@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import { Grant, AggregatedData } from '../types/grants';
 import { format, parseISO } from 'date-fns';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function Home() {
   const [data, setData] = useState<AggregatedData | null>(null);
@@ -122,6 +123,10 @@ export default function Home() {
       </Head>
       <main style={styles.main}>
         <header style={styles.header}>
+          <nav style={styles.nav}>
+            <Link href="/" style={styles.navLink}>Home</Link>
+            <Link href="/about" style={styles.navLink}>About</Link>
+          </nav>
           <h1 style={styles.title}>EA Grants Database</h1>
           <p style={styles.subtitle}>
             Aggregating grants from {data?.sources.length} major EA grantmakers
@@ -149,16 +154,14 @@ export default function Home() {
           <h2 style={styles.sectionTitle}>Grants Over Time</h2>
           <div style={styles.chartContainer}>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={chartData}>
+              <BarChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="month" />
-                <YAxis yAxisId="left" label={{ value: 'Count', angle: -90, position: 'insideLeft' }} />
-                <YAxis yAxisId="right" orientation="right" label={{ value: 'Amount ($M)', angle: 90, position: 'insideRight' }} />
+                <YAxis label={{ value: 'Amount ($M)', angle: -90, position: 'insideLeft' }} />
                 <Tooltip />
                 <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="count" stroke="#8884d8" name="Number of Grants" />
-                <Line yAxisId="right" type="monotone" dataKey="total" stroke="#82ca9d" name="Total Amount ($M)" />
-              </LineChart>
+                <Bar dataKey="total" fill="#10b981" name="Total Amount ($M)" />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         </section>
@@ -288,6 +291,21 @@ const styles: { [key: string]: React.CSSProperties } = {
     textAlign: 'center',
     marginBottom: '40px',
     paddingTop: '40px',
+  },
+  nav: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '30px',
+    marginBottom: '30px',
+  },
+  navLink: {
+    fontSize: '16px',
+    fontWeight: '500',
+    color: '#3b82f6',
+    textDecoration: 'none',
+    padding: '8px 16px',
+    borderRadius: '4px',
+    transition: 'background-color 0.2s',
   },
   title: {
     fontSize: '48px',
