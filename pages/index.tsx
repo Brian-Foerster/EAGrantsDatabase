@@ -1,34 +1,37 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Grant, AggregatedData } from '../types/grants';
+import { Grant, AggregatedData, GrantSource } from '../types/grants';
 import { format, parseISO } from 'date-fns';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { aggregateAllGrants } from '../lib/aggregator';
+import { GetStaticProps } from 'next';
 
-export default function Home() {
-  const [data, setData] = useState<AggregatedData | null>(null);
-  const [loading, setLoading] = useState(true);
+const sources: GrantSource[] = [
+  {
+    name: 'EA Funds',
+    url: 'https://funds.effectivealtruism.org/grants'
+  },
+  {
+    name: 'GiveWell',
+    url: 'https://www.givewell.org/research/all-grants'
+  },
+  {
+    name: 'Coefficient Giving',
+    url: 'https://coefficientgiving.org/funds/'
+  }
+];
+
+interface HomeProps {
+  data: AggregatedData;
+}
+
+export default function Home({ data }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrantmaker, setSelectedGrantmaker] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-
-  useEffect(() => {
-    fetchGrants();
-  }, []);
-
-  const fetchGrants = async () => {
-    try {
-      const response = await fetch('/api/grants');
-      const result = await response.json();
-      setData(result);
-    } catch (error) {
-      console.error('Error fetching grants:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const filteredAndSortedGrants = useMemo(() => {
     if (!data) return [];
@@ -105,14 +108,6 @@ export default function Home() {
       maximumFractionDigits: 0,
     }).format(amount);
   };
-
-  if (loading) {
-    return (
-      <div style={styles.loadingContainer}>
-        <div style={styles.loader}>Loading grants data...</div>
-      </div>
-    );
-  }
 
   return (
     <>
@@ -484,4 +479,23 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '14px',
     fontWeight: '500',
   },
+};
+
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
+  const grants = await aggregateAllGrants();
+  const totalAmount = grants.reduce((sum, grant) => sum + grant.amount, 0);
+  
+  const data: AggregatedData = {
+    grants,
+    sources,
+    totalGrants: grants.length,
+    totalAmount,
+    lastUpdated: new Date().toISOString()
+  };
+
+  return {
+    props: {
+      data,
+    },
+  };
 };

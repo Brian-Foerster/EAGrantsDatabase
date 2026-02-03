@@ -54,6 +54,30 @@ npm run dev
 
 ### Building for Production
 
+#### Static Export (for GitHub Pages, Netlify, etc.)
+
+The application is configured to generate a static export that can be deployed to any static hosting service:
+
+```bash
+npm run build
+```
+
+This creates a static export in the `out/` directory that can be deployed to:
+- GitHub Pages (automatically via GitHub Actions)
+- Netlify
+- Vercel
+- Any static file hosting service
+
+To test the static export locally:
+```bash
+# Serve the out directory on port 8000
+cd out && python3 -m http.server 8000
+```
+
+#### Traditional Node.js Server
+
+You can also run as a traditional Next.js server:
+
 ```bash
 npm run build
 npm start
@@ -117,6 +141,32 @@ Returns aggregated grants data from all sources.
 - **Date Handling**: date-fns
 - **HTTP Client**: Axios
 - **Web Scraping**: Cheerio (for future implementation)
+
+## Deployment
+
+### GitHub Pages (Automatic)
+
+This repository is configured with GitHub Actions to automatically deploy to GitHub Pages when you push to the `main` branch.
+
+**Setup Steps:**
+
+1. Go to your repository's Settings > Pages
+2. Under "Build and deployment", select "GitHub Actions" as the source
+3. Push to the `main` branch - the site will automatically build and deploy
+4. Your site will be available at `https://[username].github.io/[repository-name]`
+
+The deployment workflow is configured in `.github/workflows/deploy.yml`.
+
+### Vercel (Recommended)
+1. Push to GitHub
+2. Import to Vercel
+3. Deploy automatically
+
+### Other Platforms
+- Netlify
+- AWS Amplify
+- Railway
+- Render
 
 ## Current Implementation
 

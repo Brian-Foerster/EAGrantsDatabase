@@ -175,6 +175,27 @@ export async function cacheGrants(grants: Grant[]): Promise<void> {
 
 ## Deployment
 
+### GitHub Pages (Recommended for Static Sites)
+
+The application is configured to automatically deploy to GitHub Pages using GitHub Actions:
+
+1. **Enable GitHub Pages**:
+   - Go to repository Settings > Pages
+   - Under "Build and deployment", select "GitHub Actions" as the source
+
+2. **Automatic Deployment**:
+   - Push changes to the `main` branch
+   - GitHub Actions will automatically build and deploy the static site
+   - Your site will be available at `https://[username].github.io/[repository-name]`
+
+3. **Manual Build**:
+   ```bash
+   npm run build
+   # The static files will be in the out/ directory
+   ```
+
+The workflow is defined in `.github/workflows/deploy.yml`.
+
 ### Vercel (Recommended)
 1. Push to GitHub
 2. Import to Vercel
