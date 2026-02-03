@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { Grant, AggregatedData, GrantSource } from '../types/grants';
@@ -32,6 +32,7 @@ export default function Home({ data }: HomeProps) {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   const filteredAndSortedGrants = useMemo(() => {
     if (!data) return [];
@@ -134,6 +135,7 @@ export default function Home({ data }: HomeProps) {
           <div style={styles.filtersContainer}>
             <div style={styles.searchContainer}>
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Search grants..."
                 value={searchTerm}
@@ -149,7 +151,7 @@ export default function Home({ data }: HomeProps) {
               <button
                 onClick={() => {
                   // Search is reactive, this button is mainly for visual feedback
-                  document.querySelector<HTMLInputElement>('input[type="text"]')?.focus();
+                  searchInputRef.current?.focus();
                 }}
                 style={styles.searchButton}
               >
