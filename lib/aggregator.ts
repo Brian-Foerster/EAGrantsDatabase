@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { Grant } from '../types/grants';
 
 /**

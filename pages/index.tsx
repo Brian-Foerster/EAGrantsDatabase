@@ -128,40 +128,7 @@ export default function Home({ data }: HomeProps) {
           </p>
         </header>
 
-        {/* Statistics */}
-        <div style={styles.statsContainer}>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{data?.totalGrants}</div>
-            <div style={styles.statLabel}>Total Grants</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{formatCurrency(data?.totalAmount ?? 0)}</div>
-            <div style={styles.statLabel}>Total Amount</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{filteredAndSortedGrants.length}</div>
-            <div style={styles.statLabel}>Filtered Results</div>
-          </div>
-        </div>
-
-        {/* Charts */}
-        <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Grants Over Time</h2>
-          <div style={styles.chartContainer}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis label={{ value: 'Amount ($M)', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="total" fill="#10b981" name="Total Amount ($M)" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </section>
-
-        {/* Filters */}
+        {/* Search and Filter */}
         <section style={styles.section}>
           <h2 style={styles.sectionTitle}>Search and Filter</h2>
           <div style={styles.filtersContainer}>
@@ -208,6 +175,39 @@ export default function Home({ data }: HomeProps) {
                 {sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending'}
               </button>
             </div>
+          </div>
+        </section>
+
+        {/* Statistics */}
+        <div style={styles.statsContainer}>
+          <div style={styles.statCard}>
+            <div style={styles.statValue}>{data?.totalGrants}</div>
+            <div style={styles.statLabel}>Total Grants</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statValue}>{formatCurrency(data?.totalAmount ?? 0)}</div>
+            <div style={styles.statLabel}>Total Amount</div>
+          </div>
+          <div style={styles.statCard}>
+            <div style={styles.statValue}>{filteredAndSortedGrants.length}</div>
+            <div style={styles.statLabel}>Filtered Results</div>
+          </div>
+        </div>
+
+        {/* Charts */}
+        <section style={styles.section}>
+          <h2 style={styles.sectionTitle}>Grants Over Time</h2>
+          <div style={styles.chartContainer}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis label={{ value: 'Amount ($M)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey="total" fill="#10b981" name="Total Amount ($M)" />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </section>
 
