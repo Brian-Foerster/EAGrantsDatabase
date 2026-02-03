@@ -132,13 +132,30 @@ export default function Home({ data }: HomeProps) {
         <section style={styles.section}>
           <h2 style={styles.sectionTitle}>Search and Filter</h2>
           <div style={styles.filtersContainer}>
-            <input
-              type="text"
-              placeholder="Search grants..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              style={styles.searchInput}
-            />
+            <div style={styles.searchContainer}>
+              <input
+                type="text"
+                placeholder="Search grants..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    // Search is already reactive, but this provides feedback
+                    (e.target as HTMLInputElement).blur();
+                  }
+                }}
+                style={styles.searchInput}
+              />
+              <button
+                onClick={() => {
+                  // Search is reactive, this button is mainly for visual feedback
+                  document.querySelector<HTMLInputElement>('input[type="text"]')?.focus();
+                }}
+                style={styles.searchButton}
+              >
+                🔍 Search
+              </button>
+            </div>
             <div style={styles.filterRow}>
               <select
                 value={selectedGrantmaker}
@@ -160,20 +177,6 @@ export default function Home({ data }: HomeProps) {
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'date' | 'amount')}
-                style={styles.select}
-              >
-                <option value="date">Sort by Date</option>
-                <option value="amount">Sort by Amount</option>
-              </select>
-              <button
-                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                style={styles.sortButton}
-              >
-                {sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending'}
-              </button>
             </div>
           </div>
         </section>
@@ -213,7 +216,25 @@ export default function Home({ data }: HomeProps) {
 
         {/* Grants List */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Grants ({filteredAndSortedGrants.length})</h2>
+          <div style={styles.grantsHeader}>
+            <h2 style={styles.sectionTitle}>Grants ({filteredAndSortedGrants.length})</h2>
+            <div style={styles.sortControls}>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'date' | 'amount')}
+                style={styles.select}
+              >
+                <option value="date">Sort by Date</option>
+                <option value="amount">Sort by Amount</option>
+              </select>
+              <button
+                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                style={styles.sortButton}
+              >
+                {sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending'}
+              </button>
+            </div>
+          </div>
           <div style={styles.grantsList}>
             {filteredAndSortedGrants.map(grant => (
               <div key={grant.id} style={styles.grantCard}>
@@ -358,13 +379,28 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
+  searchContainer: {
+    display: 'flex',
+    gap: '10px',
+    marginBottom: '15px',
+  },
   searchInput: {
-    width: '100%',
+    flex: 1,
     padding: '12px',
     fontSize: '16px',
     border: '1px solid #ddd',
     borderRadius: '4px',
-    marginBottom: '15px',
+  },
+  searchButton: {
+    padding: '12px 24px',
+    fontSize: '16px',
+    fontWeight: '500',
+    border: '1px solid #3b82f6',
+    borderRadius: '4px',
+    backgroundColor: '#3b82f6',
+    color: 'white',
+    transition: 'all 0.2s',
+    whiteSpace: 'nowrap',
   },
   filterRow: {
     display: 'flex',
@@ -387,6 +423,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '4px',
     backgroundColor: 'white',
     transition: 'all 0.2s',
+  },
+  grantsHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '15px',
+  },
+  sortControls: {
+    display: 'flex',
+    gap: '10px',
+    alignItems: 'center',
   },
   grantsList: {
     display: 'grid',
