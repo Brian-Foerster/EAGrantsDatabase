@@ -31,3 +31,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# old backup
+index-old.tsx
+
+# data directories (source data, not built artifacts)
+/data/source/
+/data/processed/

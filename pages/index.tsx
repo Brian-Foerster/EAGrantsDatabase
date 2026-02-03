@@ -1,56 +1,143 @@
-import React, { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
-import { Grant, AggregatedData, GrantSource } from '../types/grants';
 import { format, parseISO } from 'date-fns';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { aggregateAllGrants } from '../lib/aggregator';
+import MiniSearch from 'minisearch';
+import ReactECharts from 'echarts-for-react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import { GetStaticProps } from 'next';
+import * as fs from 'fs';
+import * as path from 'path';
 
-const sources: GrantSource[] = [
-  {
-    name: 'EA Funds',
-    url: 'https://funds.effectivealtruism.org/grants'
-  },
-  {
-    name: 'GiveWell',
-    url: 'https://www.givewell.org/research/all-grants'
-  },
-  {
-    name: 'Coefficient Giving',
-    url: 'https://coefficientgiving.org/funds/'
-  }
-];
-
-interface HomeProps {
-  data: AggregatedData;
+interface MinGrant {
+  id: string;
+  title: string;
+  recipient: string;
+  amount: number;
+  currency: string;
+  date: string;
+  grantmaker: string;
+  category?: string;
+  url?: string;
 }
 
-export default function Home({ data }: HomeProps) {
+interface Metadata {
+  totalGrants: number;
+  totalAmount: number;
+  grantmakers: string[];
+  categories: string[];
+  dateRange: {
+    earliest: string;
+    latest: string;
+  };
+  lastUpdated: string;
+}
+
+interface AggByYear {
+  year: number;
+  count: number;
+  total: number;
+  average: number;
+}
+
+interface AggByYearMonth {
+  yearMonth: string;
+  count: number;
+  total: number;
+  average: number;
+}
+
+interface AggByFunder {
+  funder: string;
+  count: number;
+  total: number;
+  average: number;
+}
+
+interface AggByCategory {
+  category: string;
+  count: number;
+  total: number;
+  average: number;
+}
+
+interface HomeProps {
+  grants: MinGrant[];
+  metadata: Metadata;
+  searchIndexData: any;
+  aggByYear: AggByYear[];
+  aggByYearMonth: AggByYearMonth[];
+  aggByFunder: AggByFunder[];
+  aggByCategory: AggByCategory[];
+}
+
+export default function Home({ 
+  grants, 
+  metadata, 
+  searchIndexData,
+  aggByYear,
+  aggByYearMonth,
+  aggByFunder,
+  aggByCategory 
+}: HomeProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrantmaker, setSelectedGrantmaker] = useState<string>('all');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const [miniSearch, setMiniSearch] = useState<MiniSearch | null>(null);
+  const [searchResults, setSearchResults] = useState<string[]>([]);
+  const [chartView, setChartView] = useState<'year' | 'month' | 'funder' | 'category'>('month');
+  
+  const parentRef = useRef<HTMLDivElement>(null);
 
-  const filteredAndSortedGrants = useMemo(() => {
-    if (!data) return [];
-
-    let filtered = data.grants.filter(grant => {
-      const matchesSearch = 
-        grant.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        grant.recipient.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (grant.description?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
-      
-      const matchesGrantmaker = selectedGrantmaker === 'all' || grant.grantmaker === selectedGrantmaker;
-      const matchesCategory = selectedCategory === 'all' || grant.category === selectedCategory;
-      
-      return matchesSearch && matchesGrantmaker && matchesCategory;
+  // Initialize MiniSearch
+  useEffect(() => {
+    const ms = MiniSearch.loadJS(searchIndexData, {
+      fields: ['title', 'recipient', 'description', 'category', 'grantmaker'],
+      storeFields: ['id'],
+      searchOptions: {
+        boost: { title: 2, recipient: 1.5, description: 1 },
+        fuzzy: 0.2,
+        prefix: true,
+      }
     });
+    setMiniSearch(ms);
+  }, [searchIndexData]);
+
+  // Perform search
+  useEffect(() => {
+    if (!miniSearch || !searchTerm.trim()) {
+      setSearchResults([]);
+      return;
+    }
+    
+    const results = miniSearch.search(searchTerm);
+    setSearchResults(results.map(r => r.id).slice(0, 1000));
+  }, [miniSearch, searchTerm]);
+
+  // Filter and sort grants
+  const filteredAndSortedGrants = useMemo(() => {
+    let filtered = grants;
+
+    // Apply search filter
+    if (searchTerm.trim() && searchResults.length > 0) {
+      const resultIds = new Set(searchResults);
+      filtered = filtered.filter(grant => resultIds.has(grant.id));
+    }
+
+    // Apply grantmaker filter
+    if (selectedGrantmaker !== 'all') {
+      filtered = filtered.filter(grant => grant.grantmaker === selectedGrantmaker);
+    }
+
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      filtered = filtered.filter(grant => grant.category === selectedCategory);
+    }
 
     // Sort grants
-    filtered.sort((a, b) => {
+    const sorted = [...filtered].sort((a, b) => {
       if (sortBy === 'date') {
         const dateA = new Date(a.date).getTime();
         const dateB = new Date(b.date).getTime();
@@ -60,46 +147,16 @@ export default function Home({ data }: HomeProps) {
       }
     });
 
-    return filtered;
-  }, [data, searchTerm, selectedGrantmaker, selectedCategory, sortBy, sortOrder]);
+    return sorted;
+  }, [grants, searchTerm, searchResults, selectedGrantmaker, selectedCategory, sortBy, sortOrder]);
 
-  const chartData = useMemo(() => {
-    if (!data) return [];
-
-    // Group grants by month
-    const groupedByMonth: { [key: string]: { count: number; total: number } } = {};
-    
-    data.grants.forEach(grant => {
-      const monthKey = format(parseISO(grant.date), 'MMM yyyy');
-      if (!groupedByMonth[monthKey]) {
-        groupedByMonth[monthKey] = { count: 0, total: 0 };
-      }
-      groupedByMonth[monthKey].count += 1;
-      groupedByMonth[monthKey].total += grant.amount;
-    });
-
-    return Object.entries(groupedByMonth)
-      .map(([month, data]) => ({
-        month,
-        count: data.count,
-        total: data.total / 1000000 // Convert to millions
-      }))
-      .sort((a, b) => {
-        const dateA = parseISO('01 ' + a.month);
-        const dateB = parseISO('01 ' + b.month);
-        return dateA.getTime() - dateB.getTime();
-      });
-  }, [data]);
-
-  const grantmakers = useMemo(() => {
-    if (!data) return [];
-    return Array.from(new Set(data.grants.map(g => g.grantmaker)));
-  }, [data]);
-
-  const categories = useMemo(() => {
-    if (!data) return [];
-    return Array.from(new Set(data.grants.map(g => g.category).filter(Boolean) as string[]));
-  }, [data]);
+  // Virtualization
+  const rowVirtualizer = useVirtualizer({
+    count: filteredAndSortedGrants.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => 180,
+    overscan: 5,
+  });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -108,6 +165,172 @@ export default function Home({ data }: HomeProps) {
       minimumFractionDigits: 0,
       maximumFractionDigits: 0,
     }).format(amount);
+  };
+
+  // ECharts options
+  const getChartOption = () => {
+    switch (chartView) {
+      case 'year':
+        return {
+          title: {
+            text: 'Grants by Year',
+            left: 'center',
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            },
+            formatter: (params: any) => {
+              const data = params[0];
+              return `${data.name}<br/>Count: ${data.value.toLocaleString()}<br/>Total: $${(aggByYear[data.dataIndex].total / 1000000).toFixed(2)}M`;
+            }
+          },
+          xAxis: {
+            type: 'category',
+            data: aggByYear.map(d => d.year),
+          },
+          yAxis: {
+            type: 'value',
+            name: 'Number of Grants',
+          },
+          series: [{
+            name: 'Grants',
+            type: 'bar',
+            data: aggByYear.map(d => d.count),
+            itemStyle: {
+              color: '#10b981',
+            },
+          }],
+          grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '15%',
+          },
+        };
+
+      case 'month':
+        return {
+          title: {
+            text: 'Grants Over Time',
+            left: 'center',
+          },
+          tooltip: {
+            trigger: 'axis',
+            formatter: (params: any) => {
+              const data = params[0];
+              const monthData = aggByYearMonth[data.dataIndex];
+              return `${data.name}<br/>Total: $${(monthData.total / 1000000).toFixed(2)}M<br/>Count: ${monthData.count}`;
+            }
+          },
+          xAxis: {
+            type: 'category',
+            data: aggByYearMonth.map(d => d.yearMonth),
+            axisLabel: {
+              rotate: 45,
+              interval: Math.floor(aggByYearMonth.length / 12),
+            },
+          },
+          yAxis: {
+            type: 'value',
+            name: 'Total Amount ($M)',
+          },
+          series: [{
+            name: 'Amount',
+            type: 'line',
+            smooth: true,
+            data: aggByYearMonth.map(d => (d.total / 1000000).toFixed(2)),
+            itemStyle: {
+              color: '#3b82f6',
+            },
+            areaStyle: {
+              color: 'rgba(59, 130, 246, 0.2)',
+            },
+          }],
+          grid: {
+            left: '10%',
+            right: '10%',
+            bottom: '20%',
+          },
+        };
+
+      case 'funder':
+        return {
+          title: {
+            text: 'Top Grantmakers',
+            left: 'center',
+          },
+          tooltip: {
+            trigger: 'axis',
+            axisPointer: {
+              type: 'shadow'
+            },
+            formatter: (params: any) => {
+              const data = params[0];
+              const funder = aggByFunder[data.dataIndex];
+              return `${data.name}<br/>Total: $${(funder.total / 1000000).toFixed(2)}M<br/>Count: ${funder.count}<br/>Avg: ${formatCurrency(funder.average)}`;
+            }
+          },
+          xAxis: {
+            type: 'value',
+            name: 'Total Amount ($M)',
+          },
+          yAxis: {
+            type: 'category',
+            data: aggByFunder.map(d => d.funder),
+          },
+          series: [{
+            name: 'Total',
+            type: 'bar',
+            data: aggByFunder.map(d => (d.total / 1000000).toFixed(2)),
+            itemStyle: {
+              color: '#8b5cf6',
+            },
+          }],
+          grid: {
+            left: '20%',
+            right: '10%',
+            bottom: '10%',
+          },
+        };
+
+      case 'category':
+        return {
+          title: {
+            text: 'Grants by Category',
+            left: 'center',
+          },
+          tooltip: {
+            trigger: 'item',
+            formatter: (params: any) => {
+              return `${params.name}<br/>Count: ${params.data.count}<br/>Total: $${(params.value / 1000000).toFixed(2)}M`;
+            }
+          },
+          series: [{
+            name: 'Category',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: true,
+            itemStyle: {
+              borderRadius: 10,
+              borderColor: '#fff',
+              borderWidth: 2
+            },
+            label: {
+              show: true,
+              formatter: '{b}: {d}%'
+            },
+            data: aggByCategory.map(d => ({
+              name: d.category,
+              value: d.total,
+              count: d.count,
+            })),
+          }],
+        };
+
+      default:
+        return {};
+    }
   };
 
   return (
@@ -125,7 +348,7 @@ export default function Home({ data }: HomeProps) {
           </nav>
           <h1 style={styles.title}>EA Grants Database</h1>
           <p style={styles.subtitle}>
-            Aggregating grants from {data?.sources.length} major EA grantmakers
+            Aggregating {metadata.totalGrants.toLocaleString()} grants from {metadata.grantmakers.length} major EA grantmakers
           </p>
         </header>
 
@@ -135,28 +358,12 @@ export default function Home({ data }: HomeProps) {
           <div style={styles.filtersContainer}>
             <div style={styles.searchContainer}>
               <input
-                ref={searchInputRef}
                 type="text"
-                placeholder="Search grants..."
+                placeholder="Search grants... (powered by MiniSearch)"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    // Search is already reactive, but this provides feedback
-                    (e.target as HTMLInputElement).blur();
-                  }
-                }}
                 style={styles.searchInput}
               />
-              <button
-                onClick={() => {
-                  // Search is reactive, this button is mainly for visual feedback
-                  searchInputRef.current?.focus();
-                }}
-                style={styles.searchButton}
-              >
-                🔍 Search
-              </button>
             </div>
             <div style={styles.filterRow}>
               <select
@@ -165,7 +372,7 @@ export default function Home({ data }: HomeProps) {
                 style={styles.select}
               >
                 <option value="all">All Grantmakers</option>
-                {grantmakers.map(gm => (
+                {metadata.grantmakers.map(gm => (
                   <option key={gm} value={gm}>{gm}</option>
                 ))}
               </select>
@@ -175,7 +382,7 @@ export default function Home({ data }: HomeProps) {
                 style={styles.select}
               >
                 <option value="all">All Categories</option>
-                {categories.map(cat => (
+                {metadata.categories.map(cat => (
                   <option key={cat} value={cat}>{cat}</option>
                 ))}
               </select>
@@ -186,40 +393,75 @@ export default function Home({ data }: HomeProps) {
         {/* Statistics */}
         <div style={styles.statsContainer}>
           <div style={styles.statCard}>
-            <div style={styles.statValue}>{data?.totalGrants}</div>
+            <div style={styles.statValue}>{metadata.totalGrants.toLocaleString()}</div>
             <div style={styles.statLabel}>Total Grants</div>
           </div>
           <div style={styles.statCard}>
-            <div style={styles.statValue}>{formatCurrency(data?.totalAmount ?? 0)}</div>
+            <div style={styles.statValue}>{formatCurrency(metadata.totalAmount)}</div>
             <div style={styles.statLabel}>Total Amount</div>
           </div>
           <div style={styles.statCard}>
-            <div style={styles.statValue}>{filteredAndSortedGrants.length}</div>
+            <div style={styles.statValue}>{filteredAndSortedGrants.length.toLocaleString()}</div>
             <div style={styles.statLabel}>Filtered Results</div>
           </div>
         </div>
 
         {/* Charts */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Grants Over Time</h2>
+          <div style={styles.chartHeader}>
+            <h2 style={styles.sectionTitle}>Visualizations</h2>
+            <div style={styles.chartTabs}>
+              <button
+                onClick={() => setChartView('month')}
+                style={{
+                  ...styles.chartTab,
+                  ...(chartView === 'month' ? styles.chartTabActive : {}),
+                }}
+              >
+                Timeline
+              </button>
+              <button
+                onClick={() => setChartView('year')}
+                style={{
+                  ...styles.chartTab,
+                  ...(chartView === 'year' ? styles.chartTabActive : {}),
+                }}
+              >
+                By Year
+              </button>
+              <button
+                onClick={() => setChartView('funder')}
+                style={{
+                  ...styles.chartTab,
+                  ...(chartView === 'funder' ? styles.chartTabActive : {}),
+                }}
+              >
+                By Funder
+              </button>
+              <button
+                onClick={() => setChartView('category')}
+                style={{
+                  ...styles.chartTab,
+                  ...(chartView === 'category' ? styles.chartTabActive : {}),
+                }}
+              >
+                By Category
+              </button>
+            </div>
+          </div>
           <div style={styles.chartContainer}>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="month" />
-                <YAxis label={{ value: 'Amount ($M)', angle: -90, position: 'insideLeft' }} />
-                <Tooltip />
-                <Legend />
-                <Bar dataKey="total" fill="#10b981" name="Total Amount ($M)" />
-              </BarChart>
-            </ResponsiveContainer>
+            <ReactECharts 
+              option={getChartOption()} 
+              style={{ height: '400px', width: '100%' }}
+              opts={{ renderer: 'canvas' }}
+            />
           </div>
         </section>
 
-        {/* Grants List */}
+        {/* Grants List with Virtualization */}
         <section style={styles.section}>
           <div style={styles.grantsHeader}>
-            <h2 style={styles.sectionTitle}>Grants ({filteredAndSortedGrants.length})</h2>
+            <h2 style={styles.sectionTitle}>Grants ({filteredAndSortedGrants.length.toLocaleString()})</h2>
             <div style={styles.sortControls}>
               <select
                 value={sortBy}
@@ -237,52 +479,67 @@ export default function Home({ data }: HomeProps) {
               </button>
             </div>
           </div>
-          <div style={styles.grantsList}>
-            {filteredAndSortedGrants.map(grant => (
-              <div key={grant.id} style={styles.grantCard}>
-                <div style={styles.grantHeader}>
-                  <h3 style={styles.grantTitle}>{grant.title}</h3>
-                  <div style={styles.grantAmount}>{formatCurrency(grant.amount)}</div>
-                </div>
-                <div style={styles.grantMeta}>
-                  <span style={styles.grantRecipient}>{grant.recipient}</span>
-                  <span style={styles.grantDate}>
-                    {format(parseISO(grant.date), 'MMM d, yyyy')}
-                  </span>
-                </div>
-                <div style={styles.grantTags}>
-                  <span style={styles.tag}>{grant.grantmaker}</span>
-                  {grant.category && <span style={styles.tag}>{grant.category}</span>}
-                </div>
-                {grant.description && (
-                  <p style={styles.grantDescription}>{grant.description}</p>
-                )}
-                {grant.url && (
-                  <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantLink}>
-                    View Details →
-                  </a>
-                )}
-              </div>
-            ))}
+          
+          <div 
+            ref={parentRef}
+            style={styles.virtualListContainer}
+          >
+            <div
+              style={{
+                height: `${rowVirtualizer.getTotalSize()}px`,
+                width: '100%',
+                position: 'relative',
+              }}
+            >
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const grant = filteredAndSortedGrants[virtualRow.index];
+                return (
+                  <div
+                    key={virtualRow.key}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      width: '100%',
+                      transform: `translateY(${virtualRow.start}px)`,
+                    }}
+                  >
+                    <div style={styles.grantCard}>
+                      <div style={styles.grantHeader}>
+                        <h3 style={styles.grantTitle}>{grant.title}</h3>
+                        <div style={styles.grantAmount}>{formatCurrency(grant.amount)}</div>
+                      </div>
+                      <div style={styles.grantMeta}>
+                        <span style={styles.grantRecipient}>{grant.recipient}</span>
+                        <span style={styles.grantDate}>
+                          {format(parseISO(grant.date), 'MMM d, yyyy')}
+                        </span>
+                      </div>
+                      <div style={styles.grantTags}>
+                        <span style={styles.tag}>{grant.grantmaker}</span>
+                        {grant.category && <span style={styles.tag}>{grant.category}</span>}
+                      </div>
+                      {grant.url && (
+                        <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantLink}>
+                          View Details →
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </section>
 
-        {/* Sources */}
+        {/* Footer */}
         <footer style={styles.footer}>
-          <h3 style={styles.footerTitle}>Data Sources</h3>
-          <div style={styles.sourcesList}>
-            {data?.sources.map(source => (
-              <a
-                key={source.name}
-                href={source.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={styles.sourceLink}
-              >
-                {source.name}
-              </a>
-            ))}
-          </div>
+          <p style={styles.footerText}>
+            Last updated: {format(parseISO(metadata.lastUpdated), 'MMM d, yyyy')}
+          </p>
+          <p style={styles.footerText}>
+            Built with Next.js • Static Export • Pre-computed Analytics • Client-side Search
+          </p>
         </footer>
       </main>
     </>
@@ -290,16 +547,6 @@ export default function Home({ data }: HomeProps) {
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
-  loadingContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-  },
-  loader: {
-    fontSize: '18px',
-    color: '#666',
-  },
   main: {
     maxWidth: '1200px',
     margin: '0 auto',
@@ -375,6 +622,33 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
+  chartHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '20px',
+    flexWrap: 'wrap',
+    gap: '15px',
+  },
+  chartTabs: {
+    display: 'flex',
+    gap: '8px',
+    flexWrap: 'wrap',
+  },
+  chartTab: {
+    padding: '8px 16px',
+    fontSize: '14px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    transition: 'all 0.2s',
+  },
+  chartTabActive: {
+    backgroundColor: '#3b82f6',
+    color: 'white',
+    borderColor: '#3b82f6',
+  },
   filtersContainer: {
     backgroundColor: 'white',
     padding: '20px',
@@ -392,17 +666,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '16px',
     border: '1px solid #ddd',
     borderRadius: '4px',
-  },
-  searchButton: {
-    padding: '12px 24px',
-    fontSize: '16px',
-    fontWeight: '500',
-    border: '1px solid #3b82f6',
-    borderRadius: '4px',
-    backgroundColor: '#3b82f6',
-    color: 'white',
-    transition: 'all 0.2s',
-    whiteSpace: 'nowrap',
   },
   filterRow: {
     display: 'flex',
@@ -424,6 +687,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: '1px solid #ddd',
     borderRadius: '4px',
     backgroundColor: 'white',
+    cursor: 'pointer',
     transition: 'all 0.2s',
   },
   grantsHeader: {
@@ -439,16 +703,20 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '10px',
     alignItems: 'center',
   },
-  grantsList: {
-    display: 'grid',
-    gap: '20px',
+  virtualListContainer: {
+    height: '800px',
+    overflow: 'auto',
+    backgroundColor: 'white',
+    borderRadius: '8px',
+    padding: '10px',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
   grantCard: {
-    backgroundColor: 'white',
-    padding: '24px',
+    backgroundColor: '#f9fafb',
+    padding: '20px',
+    marginBottom: '10px',
     borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    transition: 'transform 0.2s, box-shadow 0.2s',
+    border: '1px solid #e5e7eb',
   },
   grantHeader: {
     display: 'flex',
@@ -458,13 +726,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '15px',
   },
   grantTitle: {
-    fontSize: '20px',
+    fontSize: '18px',
     fontWeight: 'bold',
     color: '#1a202c',
     flex: 1,
+    margin: 0,
   },
   grantAmount: {
-    fontSize: '20px',
+    fontSize: '18px',
     fontWeight: 'bold',
     color: '#10b981',
     whiteSpace: 'nowrap',
@@ -478,6 +747,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   grantRecipient: {
     fontWeight: '500',
+  },
+  grantDate: {
+    color: '#666',
   },
   grantTags: {
     display: 'flex',
@@ -493,12 +765,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '12px',
     color: '#374151',
   },
-  grantDescription: {
-    fontSize: '14px',
-    color: '#4b5563',
-    lineHeight: '1.6',
-    marginBottom: '12px',
-  },
   grantLink: {
     display: 'inline-block',
     color: '#3b82f6',
@@ -512,41 +778,34 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderTop: '1px solid #e5e7eb',
     textAlign: 'center',
   },
-  footerTitle: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    marginBottom: '15px',
-    color: '#1a202c',
-  },
-  sourcesList: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '20px',
-    flexWrap: 'wrap',
-  },
-  sourceLink: {
-    color: '#3b82f6',
-    textDecoration: 'none',
+  footerText: {
     fontSize: '14px',
-    fontWeight: '500',
+    color: '#666',
+    marginBottom: '10px',
   },
 };
 
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
-  const grants = await aggregateAllGrants();
-  const totalAmount = grants.reduce((sum, grant) => sum + grant.amount, 0);
+  const dataDir = path.join(process.cwd(), 'public', 'data');
+  const aggDir = path.join(dataDir, 'agg');
   
-  const data: AggregatedData = {
-    grants,
-    sources,
-    totalGrants: grants.length,
-    totalAmount,
-    lastUpdated: new Date().toISOString()
-  };
+  const grants = JSON.parse(fs.readFileSync(path.join(dataDir, 'grants.min.json'), 'utf-8'));
+  const metadata = JSON.parse(fs.readFileSync(path.join(dataDir, 'metadata.json'), 'utf-8'));
+  const searchIndexData = JSON.parse(fs.readFileSync(path.join(dataDir, 'search-index.json'), 'utf-8'));
+  const aggByYear = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_year.json'), 'utf-8'));
+  const aggByYearMonth = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_year_month.json'), 'utf-8'));
+  const aggByFunder = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_funder.json'), 'utf-8'));
+  const aggByCategory = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_category.json'), 'utf-8'));
 
   return {
     props: {
-      data,
+      grants,
+      metadata,
+      searchIndexData,
+      aggByYear,
+      aggByYearMonth,
+      aggByFunder,
+      aggByCategory,
     },
   };
 };
