@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build:data": "tsx scripts/build-data.ts",
+    "build": "npm run build:data && next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -13,13 +14,20 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@tanstack/react-virtual": "^3.13.18",
     "@types/node": "^25.2.0",
     "@types/react": "^19.2.10",
     "date-fns": "^4.1.0",
+    "echarts": "^6.0.0",
+    "echarts-for-react": "^3.0.6",
+    "minisearch": "^7.2.0",
     "next": "^16.1.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "recharts": "^3.7.0",
     "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0"
   }
 }
