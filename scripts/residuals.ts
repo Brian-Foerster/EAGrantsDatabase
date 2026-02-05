@@ -50,18 +50,21 @@ export function computeResiduals(grants: Grant[]): { residuals: Grant[]; stats: 
   const residuals: Grant[] = [];
   const byGrantmaker: Record<string, { years: number; totalResidual: number }> = {};
 
-  const totalsData = annualTotals as Record<string, Record<string, number>>;
+  const totalsData = annualTotals as Record<string, unknown>;
 
   for (const [grantmakerKey, yearTotals] of Object.entries(totalsData)) {
     if (grantmakerKey.startsWith('_')) continue; // skip comments
+    if (typeof yearTotals !== 'object' || yearTotals === null) continue; // skip non-object values
 
     const known = knownTotals.get(grantmakerKey) || new Map<string, number>();
 
     let yearsWithResidual = 0;
     let totalResidual = 0;
 
-    for (const [year, publishedTotal] of Object.entries(yearTotals)) {
+    const yearTotalsRecord = yearTotals as Record<string, unknown>;
+    for (const [year, publishedTotal] of Object.entries(yearTotalsRecord)) {
       if (year.startsWith('_')) continue; // skip comments
+      if (typeof publishedTotal !== 'number') continue; // skip non-numeric values
       const knownTotal = known.get(year) || 0;
       const residualAmount = publishedTotal - knownTotal;
 
