@@ -1,24 +1,18 @@
 {
-  "totalGrants": 4705,
-  "totalAmount": 5876025653.52,
+  "totalGrants": 5,
+  "totalAmount": 35900000,
   "grantmakers": [
-    "GiveWell",
     "EA Funds",
-    "SFF",
-    "Open Philanthropy",
-    "ACE",
-    "Founders Pledge"
+    "GiveWell"
   ],
   "categories": [
-    "GH",
     "LTXR",
-    "Meta",
-    "AW",
-    "Other"
+    "GH",
+    "AW"
   ],
   "dateRange": {
-    "earliest": "2012-07-01",
-    "latest": "2025-12-04"
+    "earliest": "2024-01-01",
+    "latest": "2024-03-10"
   },
-  "lastUpdated": "2026-02-05T01:22:56.855Z"
+  "lastUpdated": "2026-02-05T03:11:55.283Z"
 }

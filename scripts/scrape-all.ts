@@ -106,7 +106,7 @@ async function main() {
     ym.set(year, (ym.get(year) || 0) + g.amount);
   }
 
-  const totals = annualTotals as Record<string, Record<string, number>>;
+  const totals = annualTotals as Record<string, unknown>;
   const years = ['2019', '2020', '2021', '2022', '2023', '2024'];
 
   // Print comparison table
@@ -119,11 +119,14 @@ async function main() {
 
   for (const gm of ['Open Philanthropy', 'GiveWell', 'SFF', 'EA Funds', 'ACE', 'Founders Pledge']) {
     const gmData = byGM.get(gm) || new Map();
-    const published = totals[gm] || {};
+    const published = totals[gm];
+    if (!published || typeof published !== 'object' || Array.isArray(published)) continue;
 
     const yearCells = years.map(y => {
       const scraped = gmData.get(y) || 0;
-      const pub = (published as Record<string, number>)[y] || 0;
+      const pub = typeof (published as Record<string, unknown>)[y] === 'number' 
+        ? ((published as Record<string, unknown>)[y] as number) 
+        : 0;
       if (pub === 0 && scraped === 0) return padL('-', 10);
       const pct = pub > 0 ? Math.round((scraped / pub) * 100) : 0;
       return padL(`${fmtM(scraped)}`, 10);
