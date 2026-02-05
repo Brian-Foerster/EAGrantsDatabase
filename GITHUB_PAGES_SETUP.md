@@ -18,7 +18,8 @@ GitHub Pages must be configured to use **GitHub Actions** as its deployment sour
 ### Step-by-Step Fix
 
 1. **Navigate to Repository Settings**
-   - Go to: https://github.com/Brian-Foerster/EAGrantsDatabase/settings/pages
+   - Go to: `https://github.com/[username]/[repository-name]/settings/pages`
+   - For this repository: https://github.com/Brian-Foerster/EAGrantsDatabase/settings/pages
 
 2. **Change the Source**
    - Under **"Build and deployment"** section
@@ -34,7 +35,8 @@ GitHub Pages must be configured to use **GitHub Actions** as its deployment sour
 
 If you want to trigger a deployment immediately after changing the settings:
 
-1. Go to: https://github.com/Brian-Foerster/EAGrantsDatabase/actions/workflows/deploy.yml
+1. Go to: `https://github.com/[username]/[repository-name]/actions/workflows/deploy.yml`
+   - For this repository: https://github.com/Brian-Foerster/EAGrantsDatabase/actions/workflows/deploy.yml
 2. Click the **"Run workflow"** button
 3. Select the **"main"** branch
 4. Click **"Run workflow"**
@@ -42,7 +44,8 @@ If you want to trigger a deployment immediately after changing the settings:
 ### Verification
 
 After the workflow completes successfully:
-- Visit https://brian-foerster.github.io/EAGrantsDatabase/
+- Visit `https://[username].github.io/[repository-name]/`
+- For this repository: https://brian-foerster.github.io/EAGrantsDatabase/
 - The site should display the grant database with real data
 - You should see 4,715 grants from GiveWell in the database
 
@@ -79,7 +82,8 @@ If GitHub Pages is already set to use GitHub Actions and the site still doesn't 
    - Hard refresh the page (Ctrl+Shift+R or Cmd+Shift+R)
 
 2. Verify the latest deployment:
-   - Go to: https://github.com/Brian-Foerster/EAGrantsDatabase/actions
+   - Go to: `https://github.com/[username]/[repository-name]/actions`
+   - For this repository: https://github.com/Brian-Foerster/EAGrantsDatabase/actions
    - Check that the latest "Deploy to GitHub Pages" workflow completed successfully
    - Check the deployment URL in the workflow output
 
