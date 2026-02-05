@@ -186,14 +186,21 @@ The architecture can scale to 10,000+ grants without significant performance deg
 
 This repository is configured with GitHub Actions to automatically deploy to GitHub Pages when you push to the `main` branch.
 
+**⚠️ IMPORTANT: Configuration Required**
+
+For your changes to appear on the live site, GitHub Pages **must** be configured to use GitHub Actions as the deployment source:
+
 **Setup Steps:**
 
-1. Go to your repository's Settings > Pages
-2. Under "Build and deployment", select "GitHub Actions" as the source
-3. Push to the `main` branch - the site will automatically build and deploy
-4. Your site will be available at `https://[username].github.io/[repository-name]`
+1. Go to your repository's **Settings > Pages**
+2. Under "Build and deployment", find the **"Source"** dropdown
+3. Select **"GitHub Actions"** (NOT "Deploy from a branch")
+4. Push to the `main` branch - the site will automatically build and deploy
+5. Your site will be available at `https://[username].github.io/[repository-name]`
 
 The deployment workflow is configured in `.github/workflows/deploy.yml`.
+
+**Troubleshooting:** If your changes don't appear after pushing to main, verify that GitHub Pages is set to "GitHub Actions" source. See `GITHUB_PAGES_SETUP.md` for detailed troubleshooting steps.
 
 ### Vercel (Recommended)
 1. Push to GitHub

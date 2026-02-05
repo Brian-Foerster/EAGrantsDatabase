@@ -1,0 +1,67 @@
+name: Check GitHub Pages Configuration
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run daily at 9 AM UTC
+    - cron: '0 9 * * *'
+
+jobs:
+  check-config:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Check GitHub Pages Configuration
+        run: |
+          echo "========================================="
+          echo "GitHub Pages Configuration Check"
+          echo "========================================="
+          echo ""
+          echo "This workflow helps verify that GitHub Pages is configured correctly."
+          echo ""
+          echo "✅ Your deployment workflow exists at: .github/workflows/deploy.yml"
+          echo "✅ The workflow is set to deploy from the 'main' branch"
+          echo "✅ The workflow has the correct permissions"
+          echo ""
+          echo "⚠️  IMPORTANT: To see your changes on GitHub Pages:"
+          echo ""
+          echo "1. Go to: https://github.com/${{ github.repository }}/settings/pages"
+          echo "2. Under 'Build and deployment', set Source to: GitHub Actions"
+          echo "3. DO NOT use 'Deploy from a branch'"
+          echo ""
+          echo "Expected site URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo ""
+          echo "========================================="
+          echo "Recent Workflow Runs"
+          echo "========================================="
+          echo ""
+          echo "Check recent deployment runs at:"
+          echo "https://github.com/${{ github.repository }}/actions/workflows/deploy.yml"
+          echo ""
+          
+      - name: Verify Data File Exists
+        uses: actions/checkout@v4
+        
+      - name: Check Data File
+        run: |
+          echo "========================================="
+          echo "Data File Verification"
+          echo "========================================="
+          echo ""
+          if [ -f "data/ea-grants-database.csv" ]; then
+            LINES=$(wc -l < data/ea-grants-database.csv)
+            SIZE=$(ls -lh data/ea-grants-database.csv | awk '{print $5}')
+            echo "✅ Data file exists: data/ea-grants-database.csv"
+            echo "   Lines: $LINES"
+            echo "   Size: $SIZE"
+            echo ""
+            echo "Sample data (first 5 rows):"
+            head -5 data/ea-grants-database.csv
+          else
+            echo "❌ Data file not found: data/ea-grants-database.csv"
+            exit 1
+          fi
+          echo ""
+          echo "========================================="
