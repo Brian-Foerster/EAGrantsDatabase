@@ -83,7 +83,7 @@ function main() {
   
   console.log(`   Converted ${validGrants.length} valid grants`);
   
-  // Save to JSON
+  // Save to JSON (compact format for smaller file size)
   fs.writeFileSync(JSON_OUTPUT, JSON.stringify(validGrants));
   
   const fileSize = fs.statSync(JSON_OUTPUT).size;
