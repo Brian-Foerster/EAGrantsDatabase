@@ -18,7 +18,10 @@ interface MinGrant {
   date: string;
   grantmaker: string;
   category?: string;
+  focus_area?: string;
+  fund?: string;
   url?: string;
+  is_residual?: boolean;
 }
 
 interface Metadata {
@@ -33,61 +36,28 @@ interface Metadata {
   lastUpdated: string;
 }
 
-interface AggByYear {
-  year: number;
-  count: number;
-  total: number;
-  average: number;
-}
-
-interface AggByYearMonth {
-  yearMonth: string;
-  count: number;
-  total: number;
-  average: number;
-}
-
-interface AggByFunder {
-  funder: string;
-  count: number;
-  total: number;
-  average: number;
-}
-
-interface AggByCategory {
-  category: string;
-  count: number;
-  total: number;
-  average: number;
-}
-
 interface HomeProps {
   grants: MinGrant[];
   metadata: Metadata;
   searchIndexData: any;
-  aggByYear: AggByYear[];
-  aggByYearMonth: AggByYearMonth[];
-  aggByFunder: AggByFunder[];
-  aggByCategory: AggByCategory[];
 }
 
-export default function Home({ 
-  grants, 
-  metadata, 
-  searchIndexData,
-  aggByYear,
-  aggByYearMonth,
-  aggByFunder,
-  aggByCategory 
-}: HomeProps) {
+export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedGrantmaker, setSelectedGrantmaker] = useState<string>('all');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<'date' | 'amount'>('date');
+  const [selectedGrantmakers, setSelectedGrantmakers] = useState<string[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
+  const [selectedYears, setSelectedYears] = useState<number[]>([]);
+  const [amountMin, setAmountMin] = useState('');
+  const [amountMax, setAmountMax] = useState('');
+  const [expandedFilters, setExpandedFilters] = useState<{ [key: string]: boolean }>({});
+  const [sortBy, setSortBy] = useState<'date' | 'amount' | 'grantmaker' | 'recipient' | 'category'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
   const [miniSearch, setMiniSearch] = useState<MiniSearch | null>(null);
   const [searchResults, setSearchResults] = useState<string[]>([]);
-  const [chartView, setChartView] = useState<'year' | 'month' | 'funder' | 'category'>('month');
+  const [chartView, setChartView] = useState<'year' | 'month'>('year');
+  const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
+  const [adjustInflation, setAdjustInflation] = useState(false);
   
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -121,40 +91,233 @@ export default function Home({
     let filtered = grants;
 
     // Apply search filter
-    if (searchTerm.trim() && searchResults.length > 0) {
-      const resultIds = new Set(searchResults);
-      filtered = filtered.filter(grant => resultIds.has(grant.id));
+    if (searchTerm.trim()) {
+      if (searchResults.length === 0) {
+        filtered = [];
+      } else {
+        const resultIds = new Set(searchResults);
+        filtered = filtered.filter(grant => resultIds.has(grant.id));
+      }
     }
 
     // Apply grantmaker filter
-    if (selectedGrantmaker !== 'all') {
-      filtered = filtered.filter(grant => grant.grantmaker === selectedGrantmaker);
+    if (selectedGrantmakers.length > 0) {
+      filtered = filtered.filter(grant => selectedGrantmakers.includes(grant.grantmaker));
     }
 
     // Apply category filter
-    if (selectedCategory !== 'all') {
-      filtered = filtered.filter(grant => grant.category === selectedCategory);
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter(grant => grant.category != null && selectedCategories.includes(grant.category));
+    }
+
+    // Apply subcategory filter
+    if (selectedSubcategories.length > 0) {
+      filtered = filtered.filter(grant => grant.focus_area != null && selectedSubcategories.includes(grant.focus_area));
+    }
+
+    // Apply year filter
+    if (selectedYears.length > 0) {
+      filtered = filtered.filter(grant => selectedYears.includes(new Date(grant.date).getFullYear()));
+    }
+
+    // Apply amount filter
+    const minAmt = amountMin ? parseFloat(amountMin) : null;
+    const maxAmt = amountMax ? parseFloat(amountMax) : null;
+    if (minAmt != null && !isNaN(minAmt)) {
+      filtered = filtered.filter(grant => grant.amount >= minAmt);
+    }
+    if (maxAmt != null && !isNaN(maxAmt)) {
+      filtered = filtered.filter(grant => grant.amount <= maxAmt);
     }
 
     // Sort grants
     const sorted = [...filtered].sort((a, b) => {
+      let cmp = 0;
       if (sortBy === 'date') {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
-      } else {
-        return sortOrder === 'asc' ? a.amount - b.amount : b.amount - a.amount;
+        cmp = new Date(a.date).getTime() - new Date(b.date).getTime();
+      } else if (sortBy === 'amount') {
+        cmp = a.amount - b.amount;
+      } else if (sortBy === 'grantmaker') {
+        cmp = a.grantmaker.localeCompare(b.grantmaker)
+          || (a.fund || '').localeCompare(b.fund || '');
+      } else if (sortBy === 'recipient') {
+        cmp = a.recipient.localeCompare(b.recipient);
+      } else if (sortBy === 'category') {
+        cmp = (a.category || '').localeCompare(b.category || '')
+          || (a.focus_area || '').localeCompare(b.focus_area || '');
       }
+      return sortOrder === 'asc' ? cmp : -cmp;
     });
 
     return sorted;
-  }, [grants, searchTerm, searchResults, selectedGrantmaker, selectedCategory, sortBy, sortOrder]);
+  }, [grants, searchTerm, searchResults, selectedGrantmakers, selectedCategories, selectedSubcategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+
+  const availableSubcategories = useMemo(() => {
+    const subs = new Set(grants.map(g => g.focus_area).filter(Boolean) as string[]);
+    return Array.from(subs).sort();
+  }, [grants]);
+
+  const availableYears = useMemo(() => {
+    const years = new Set(grants.map(g => new Date(g.date).getFullYear()));
+    return Array.from(years).sort((a, b) => b - a);
+  }, [grants]);
+
+  const toggleFilter = (filterName: string) => {
+    setExpandedFilters(prev => ({ ...prev, [filterName]: !prev[filterName] }));
+  };
+
+  const toggleGrantmaker = (gm: string) => {
+    setSelectedGrantmakers(prev =>
+      prev.includes(gm) ? prev.filter(g => g !== gm) : [...prev, gm]
+    );
+  };
+
+  const toggleCategory = (cat: string) => {
+    setSelectedCategories(prev =>
+      prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat]
+    );
+  };
+
+  const toggleSubcategory = (sub: string) => {
+    setSelectedSubcategories(prev =>
+      prev.includes(sub) ? prev.filter(s => s !== sub) : [...prev, sub]
+    );
+  };
+
+  const toggleYear = (year: number) => {
+    setSelectedYears(prev =>
+      prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]
+    );
+  };
+
+  // Color constants
+  const CHART_COLORS = [
+    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+    '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#14b8a6',
+    '#9ca3af',
+  ];
+
+  const GRANTMAKER_COLORS: { [key: string]: string } = {
+    'EA Funds': '#0a7b8a',
+    'GiveWell': '#c44a2d',
+    'Open Philanthropy': '#5b6abf',
+    'SFF': '#8b5cf6',
+    'Founders Pledge': '#06b6d4',
+    'ACE': '#f59e0b',
+  };
+
+  const CATEGORY_DISPLAY: Record<string, string> = {
+    'LTXR': 'Long-Term & Existential Risk',
+    'GH': 'Global Health & Development',
+    'AW': 'Animal Welfare',
+    'Meta': 'Community & Infrastructure',
+    'Other': 'Other',
+  };
+
+  const GRANTMAKER_DISPLAY: Record<string, string> = {
+    'EA Funds': 'Effective Altruism Funds',
+    'SFF': 'Survival and Flourishing Fund',
+    'ACE': 'Animal Charity Evaluators',
+  };
+
+  const displayCategory = (code?: string): string => code ? (CATEGORY_DISPLAY[code] || code) : '';
+  const displayGrantmaker = (name: string): string => GRANTMAKER_DISPLAY[name] || name;
+
+  const categoryColorMap = useMemo(() => {
+    const cats = Array.from(new Set(grants.map(g => g.category).filter(Boolean))) as string[];
+    const map: { [key: string]: string } = {};
+    cats.forEach((c, i) => { map[c] = CHART_COLORS[i % CHART_COLORS.length]; });
+    return map;
+  }, [grants]);
+
+  const chartData = useMemo(() => {
+    const data = filteredAndSortedGrants;
+
+    const byYearMap: { [y: string]: { count: number; total: number } } = {};
+    const byMonthMap: { [ym: string]: { count: number; total: number } } = {};
+    const byFunderMap: { [f: string]: { count: number; total: number } } = {};
+    const byCatMap: { [c: string]: { count: number; total: number } } = {};
+
+    data.forEach(g => {
+      const d = new Date(g.date);
+      const year = d.getFullYear().toString();
+      const ym = `${year}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const funder = displayGrantmaker(g.grantmaker);
+      const cat = displayCategory(g.category) || 'Uncategorized';
+
+      if (!byYearMap[year]) byYearMap[year] = { count: 0, total: 0 };
+      byYearMap[year].count += 1;
+      byYearMap[year].total += g.amount;
+
+      if (!byMonthMap[ym]) byMonthMap[ym] = { count: 0, total: 0 };
+      byMonthMap[ym].count += 1;
+      byMonthMap[ym].total += g.amount;
+
+      if (!byFunderMap[funder]) byFunderMap[funder] = { count: 0, total: 0 };
+      byFunderMap[funder].count += 1;
+      byFunderMap[funder].total += g.amount;
+
+      if (!byCatMap[cat]) byCatMap[cat] = { count: 0, total: 0 };
+      byCatMap[cat].count += 1;
+      byCatMap[cat].total += g.amount;
+    });
+
+    const byFunder = Object.entries(byFunderMap)
+      .map(([f, d]) => ({ funder: f, count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
+      .sort((a, b) => b.total - a.total);
+    const byCategory = Object.entries(byCatMap)
+      .map(([c, d]) => ({ category: c, count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
+      .sort((a, b) => b.total - a.total);
+
+    // Show all orgs and categories as individual series
+    const funderGroups = byFunder.map(f => f.funder);
+    const categoryGroups = byCategory.map(c => c.category);
+
+    // Cross-tabulations: time x group
+    const yearFunder: { [y: string]: { [g: string]: number } } = {};
+    const yearCategory: { [y: string]: { [g: string]: number } } = {};
+    const monthFunder: { [ym: string]: { [g: string]: number } } = {};
+    const monthCategory: { [ym: string]: { [g: string]: number } } = {};
+
+    data.forEach(g => {
+      const d = new Date(g.date);
+      const year = d.getFullYear().toString();
+      const ym = `${year}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const fg = displayGrantmaker(g.grantmaker);
+      const cg = displayCategory(g.category) || 'Uncategorized';
+
+      if (!yearFunder[year]) yearFunder[year] = {};
+      yearFunder[year][fg] = (yearFunder[year][fg] || 0) + g.amount;
+
+      if (!yearCategory[year]) yearCategory[year] = {};
+      yearCategory[year][cg] = (yearCategory[year][cg] || 0) + g.amount;
+
+      if (!monthFunder[ym]) monthFunder[ym] = {};
+      monthFunder[ym][fg] = (monthFunder[ym][fg] || 0) + g.amount;
+
+      if (!monthCategory[ym]) monthCategory[ym] = {};
+      monthCategory[ym][cg] = (monthCategory[ym][cg] || 0) + g.amount;
+    });
+
+    const byYear = Object.entries(byYearMap)
+      .map(([y, d]) => ({ year: parseInt(y), count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
+      .sort((a, b) => a.year - b.year);
+    const byYearMonth = Object.entries(byMonthMap)
+      .map(([ym, d]) => ({ yearMonth: ym, count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
+      .sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
+
+    return {
+      byYear, byYearMonth, byFunder, byCategory,
+      funderGroups, categoryGroups,
+      yearFunder, yearCategory, monthFunder, monthCategory,
+    };
+  }, [filteredAndSortedGrants]);
 
   // Virtualization
   const rowVirtualizer = useVirtualizer({
     count: filteredAndSortedGrants.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 180,
+    estimateSize: () => 90,
     overscan: 5,
   });
 
@@ -167,166 +330,192 @@ export default function Home({
     }).format(amount);
   };
 
-  // ECharts options
+
+  // US CPI-U annual averages, indexed so that the most recent full year = 1.0
+  // Source: Bureau of Labor Statistics, CPI-U All Items, adjusted to 2024 base
+  const CPI_MULTIPLIERS: { [year: string]: number } = {
+    '2012': 1.38, '2013': 1.36, '2014': 1.34, '2015': 1.34,
+    '2016': 1.32, '2017': 1.29, '2018': 1.26, '2019': 1.23,
+    '2020': 1.22, '2021': 1.16, '2022': 1.08, '2023': 1.04, '2024': 1.00, '2025': 1.00,
+  };
+
+  const inflationMultiplier = (yearOrYm: string): number => {
+    const year = yearOrYm.slice(0, 4);
+    return adjustInflation ? (CPI_MULTIPLIERS[year] ?? 1.0) : 1.0;
+  };
+
+  // Build stacked series for time x group breakdowns
+  const buildStackedSeries = (
+    timeLabels: string[],
+    crossTab: { [time: string]: { [group: string]: number } },
+    groups: string[],
+  ) => {
+    return groups.map((group, i) => ({
+      name: group,
+      type: 'bar' as const,
+      stack: 'total',
+      data: timeLabels.map(t => {
+        const val = crossTab[t]?.[group] || 0;
+        return parseFloat((val * inflationMultiplier(t) / 1000000).toFixed(2));
+      }),
+      itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] },
+    }));
+  };
+
+  // ECharts options (computed from filtered data)
   const getChartOption = () => {
+    const {
+      byYear, byYearMonth,
+      funderGroups, categoryGroups,
+      yearFunder, yearCategory, monthFunder, monthCategory,
+    } = chartData;
+
+    const gridYear = { left: '7%', right: '20%', top: '55px', bottom: '15%' };
+    const gridMonth = { left: '7%', right: '20%', top: '55px', bottom: '20%' };
+
+    const filteredTotal = filteredAndSortedGrants.reduce((s, g) => s + g.amount, 0);
+    const totalGraphic = [{
+      type: 'text' as const,
+      right: 14,
+      bottom: 6,
+      style: {
+        text: `Total: $${(filteredTotal / 1000000).toFixed(2)}M`,
+        fontSize: 13,
+        fontWeight: 'bold' as const,
+        fill: '#666',
+      },
+    }];
+
+    const breakdownTooltip = {
+      trigger: 'axis' as const,
+      axisPointer: { type: 'shadow' as const },
+      formatter: (params: any) => {
+        const items = Array.isArray(params) ? params : [params];
+        let total = 0;
+        let lines = items
+          .filter((p: any) => p.value > 0)
+          .map((p: any) => {
+            total += p.value;
+            return `${p.marker} ${p.seriesName}: $${p.value.toFixed(2)}M`;
+          });
+        return `${items[0].name}<br/>${lines.join('<br/>')}<br/><b>Total: $${total.toFixed(2)}M</b>`;
+      },
+    };
+
     switch (chartView) {
-      case 'year':
+      case 'year': {
+        const yearLabels = byYear.map(d => String(d.year));
+
+        if (timeBreakdown === 'byFunder') {
+          return {
+            animation: false,
+            title: { text: 'Grants by Year (by Funder)', left: 'center', top: 8 },
+            tooltip: breakdownTooltip,
+            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
+            xAxis: { type: 'category', data: yearLabels },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            series: buildStackedSeries(yearLabels, yearFunder, funderGroups),
+            grid: gridYear,
+            graphic: totalGraphic,
+          };
+        }
+        if (timeBreakdown === 'byCategory') {
+          return {
+            animation: false,
+            title: { text: 'Grants by Year (by Category)', left: 'center', top: 8 },
+            tooltip: breakdownTooltip,
+            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
+            xAxis: { type: 'category', data: yearLabels },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            series: buildStackedSeries(yearLabels, yearCategory, categoryGroups),
+            grid: gridYear,
+            graphic: totalGraphic,
+          };
+        }
         return {
-          title: {
-            text: 'Grants by Year',
-            left: 'center',
-          },
+          animation: false,
+          title: { text: 'Grants by Year', left: 'center', top: 8 },
           tooltip: {
             trigger: 'axis',
-            axisPointer: {
-              type: 'shadow'
-            },
+            axisPointer: { type: 'shadow' },
             formatter: (params: any) => {
-              const data = params[0];
-              return `${data.name}<br/>Count: ${data.value.toLocaleString()}<br/>Total: $${(aggByYear[data.dataIndex].total / 1000000).toFixed(2)}M`;
+              const d = params[0];
+              const item = byYear[d.dataIndex];
+              return `${d.name}<br/>Total: $${d.value}M<br/>Count: ${item.count}`;
+            }
+          },
+          xAxis: { type: 'category', data: yearLabels },
+          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+          series: [{
+            name: 'Amount', type: 'bar',
+            data: byYear.map(d => parseFloat((d.total * inflationMultiplier(String(d.year)) / 1000000).toFixed(2))),
+            itemStyle: { color: '#10b981' },
+          }],
+          grid: gridYear,
+          graphic: totalGraphic,
+        };
+      }
+
+      case 'month': {
+        const monthLabels = byYearMonth.map(d => d.yearMonth);
+
+        if (timeBreakdown === 'byFunder') {
+          return {
+            animation: false,
+            title: { text: 'Grants by Month (by Funder)', left: 'center', top: 8 },
+            tooltip: breakdownTooltip,
+            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
+            xAxis: {
+              type: 'category', data: monthLabels,
+              axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
+            },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            series: buildStackedSeries(monthLabels, monthFunder, funderGroups),
+            grid: gridMonth,
+            graphic: totalGraphic,
+          };
+        }
+        if (timeBreakdown === 'byCategory') {
+          return {
+            animation: false,
+            title: { text: 'Grants by Month (by Category)', left: 'center', top: 8 },
+            tooltip: breakdownTooltip,
+            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
+            xAxis: {
+              type: 'category', data: monthLabels,
+              axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
+            },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            series: buildStackedSeries(monthLabels, monthCategory, categoryGroups),
+            grid: gridMonth,
+            graphic: totalGraphic,
+          };
+        }
+        return {
+          animation: false,
+          title: { text: 'Grants by Month', left: 'center', top: 8 },
+          tooltip: {
+            trigger: 'axis',
+            formatter: (params: any) => {
+              const d = params[0];
+              const item = byYearMonth[d.dataIndex];
+              return `${d.name}<br/>Total: $${(item.total * inflationMultiplier(item.yearMonth) / 1000000).toFixed(2)}M<br/>Count: ${item.count}`;
             }
           },
           xAxis: {
-            type: 'category',
-            data: aggByYear.map(d => d.year),
+            type: 'category', data: monthLabels,
+            axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
           },
-          yAxis: {
-            type: 'value',
-            name: 'Number of Grants',
-          },
+          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
           series: [{
-            name: 'Grants',
-            type: 'bar',
-            data: aggByYear.map(d => d.count),
-            itemStyle: {
-              color: '#10b981',
-            },
+            name: 'Amount', type: 'bar',
+            data: byYearMonth.map(d => (d.total * inflationMultiplier(d.yearMonth) / 1000000).toFixed(2)),
+            itemStyle: { color: '#3b82f6' },
           }],
-          grid: {
-            left: '10%',
-            right: '10%',
-            bottom: '15%',
-          },
+          grid: gridMonth,
+          graphic: totalGraphic,
         };
-
-      case 'month':
-        return {
-          title: {
-            text: 'Grants Over Time',
-            left: 'center',
-          },
-          tooltip: {
-            trigger: 'axis',
-            formatter: (params: any) => {
-              const data = params[0];
-              const monthData = aggByYearMonth[data.dataIndex];
-              return `${data.name}<br/>Total: $${(monthData.total / 1000000).toFixed(2)}M<br/>Count: ${monthData.count}`;
-            }
-          },
-          xAxis: {
-            type: 'category',
-            data: aggByYearMonth.map(d => d.yearMonth),
-            axisLabel: {
-              rotate: 45,
-              interval: Math.floor(aggByYearMonth.length / 12),
-            },
-          },
-          yAxis: {
-            type: 'value',
-            name: 'Total Amount ($M)',
-          },
-          series: [{
-            name: 'Amount',
-            type: 'line',
-            smooth: true,
-            data: aggByYearMonth.map(d => (d.total / 1000000).toFixed(2)),
-            itemStyle: {
-              color: '#3b82f6',
-            },
-            areaStyle: {
-              color: 'rgba(59, 130, 246, 0.2)',
-            },
-          }],
-          grid: {
-            left: '10%',
-            right: '10%',
-            bottom: '20%',
-          },
-        };
-
-      case 'funder':
-        return {
-          title: {
-            text: 'Top Grantmakers',
-            left: 'center',
-          },
-          tooltip: {
-            trigger: 'axis',
-            axisPointer: {
-              type: 'shadow'
-            },
-            formatter: (params: any) => {
-              const data = params[0];
-              const funder = aggByFunder[data.dataIndex];
-              return `${data.name}<br/>Total: $${(funder.total / 1000000).toFixed(2)}M<br/>Count: ${funder.count}<br/>Avg: ${formatCurrency(funder.average)}`;
-            }
-          },
-          xAxis: {
-            type: 'value',
-            name: 'Total Amount ($M)',
-          },
-          yAxis: {
-            type: 'category',
-            data: aggByFunder.map(d => d.funder),
-          },
-          series: [{
-            name: 'Total',
-            type: 'bar',
-            data: aggByFunder.map(d => (d.total / 1000000).toFixed(2)),
-            itemStyle: {
-              color: '#8b5cf6',
-            },
-          }],
-          grid: {
-            left: '20%',
-            right: '10%',
-            bottom: '10%',
-          },
-        };
-
-      case 'category':
-        return {
-          title: {
-            text: 'Grants by Category',
-            left: 'center',
-          },
-          tooltip: {
-            trigger: 'item',
-            formatter: (params: any) => {
-              return `${params.name}<br/>Count: ${params.data.count}<br/>Total: $${(params.value / 1000000).toFixed(2)}M`;
-            }
-          },
-          series: [{
-            name: 'Category',
-            type: 'pie',
-            radius: ['40%', '70%'],
-            avoidLabelOverlap: true,
-            itemStyle: {
-              borderRadius: 10,
-              borderColor: '#fff',
-              borderWidth: 2
-            },
-            label: {
-              show: true,
-              formatter: '{b}: {d}%'
-            },
-            data: aggByCategory.map(d => ({
-              name: d.category,
-              value: d.total,
-              count: d.count,
-            })),
-          }],
-        };
+      }
 
       default:
         return {};
@@ -359,67 +548,156 @@ export default function Home({
             <div style={styles.searchContainer}>
               <input
                 type="text"
-                placeholder="Search grants... (powered by MiniSearch)"
+                placeholder="Search grants..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={styles.searchInput}
               />
             </div>
-            <div style={styles.filterRow}>
-              <select
-                value={selectedGrantmaker}
-                onChange={(e) => setSelectedGrantmaker(e.target.value)}
-                style={styles.select}
-              >
-                <option value="all">All Grantmakers</option>
-                {metadata.grantmakers.map(gm => (
-                  <option key={gm} value={gm}>{gm}</option>
-                ))}
-              </select>
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                style={styles.select}
-              >
-                <option value="all">All Categories</option>
-                {metadata.categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
+            <div style={styles.resultCount}>
+              {filteredAndSortedGrants.length === grants.length
+                ? `${grants.length.toLocaleString()} grants`
+                : `${filteredAndSortedGrants.length.toLocaleString()} of ${grants.length.toLocaleString()} grants`}
+            </div>
+            <div style={styles.filterAccordion}>
+              <div style={styles.filterSection}>
+                <button
+                  onClick={() => toggleFilter('grantmaker')}
+                  style={styles.filterHeader}
+                >
+                  <span style={styles.filterHeaderLabel}>Grantmaker</span>
+                  <span style={styles.filterHeaderIcon}>{expandedFilters.grantmaker ? '\u2212' : '+'}</span>
+                </button>
+                {expandedFilters.grantmaker && (
+                  <div style={styles.filterOptions}>
+                    {metadata.grantmakers.map(gm => (
+                      <label key={gm} style={styles.filterOption}>
+                        <input
+                          type="checkbox"
+                          checked={selectedGrantmakers.includes(gm)}
+                          onChange={() => toggleGrantmaker(gm)}
+                          style={styles.checkbox}
+                        />
+                        {displayGrantmaker(gm)}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={styles.filterSection}>
+                <button
+                  onClick={() => toggleFilter('category')}
+                  style={styles.filterHeader}
+                >
+                  <span style={styles.filterHeaderLabel}>Category</span>
+                  <span style={styles.filterHeaderIcon}>{expandedFilters.category ? '\u2212' : '+'}</span>
+                </button>
+                {expandedFilters.category && (
+                  <div style={styles.filterOptions}>
+                    {metadata.categories.map(cat => (
+                      <label key={cat} style={styles.filterOption}>
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(cat)}
+                          onChange={() => toggleCategory(cat)}
+                          style={styles.checkbox}
+                        />
+                        {displayCategory(cat)}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={styles.filterSection}>
+                <button
+                  onClick={() => toggleFilter('subcategory')}
+                  style={styles.filterHeader}
+                >
+                  <span style={styles.filterHeaderLabel}>Sub-Category</span>
+                  <span style={styles.filterHeaderIcon}>{expandedFilters.subcategory ? '\u2212' : '+'}</span>
+                </button>
+                {expandedFilters.subcategory && (
+                  <div style={styles.filterOptions}>
+                    {availableSubcategories.map(sub => (
+                      <label key={sub} style={styles.filterOption}>
+                        <input
+                          type="checkbox"
+                          checked={selectedSubcategories.includes(sub)}
+                          onChange={() => toggleSubcategory(sub)}
+                          style={styles.checkbox}
+                        />
+                        {sub}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={styles.filterSection}>
+                <button
+                  onClick={() => toggleFilter('year')}
+                  style={styles.filterHeader}
+                >
+                  <span style={styles.filterHeaderLabel}>Funding Year</span>
+                  <span style={styles.filterHeaderIcon}>{expandedFilters.year ? '\u2212' : '+'}</span>
+                </button>
+                {expandedFilters.year && (
+                  <div style={styles.filterOptions}>
+                    {availableYears.map(year => (
+                      <label key={year} style={styles.filterOption}>
+                        <input
+                          type="checkbox"
+                          checked={selectedYears.includes(year)}
+                          onChange={() => toggleYear(year)}
+                          style={styles.checkbox}
+                        />
+                        {year}
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={styles.filterSection}>
+                <button
+                  onClick={() => toggleFilter('amount')}
+                  style={styles.filterHeader}
+                >
+                  <span style={styles.filterHeaderLabel}>Grant Size</span>
+                  <span style={styles.filterHeaderIcon}>{expandedFilters.amount ? '\u2212' : '+'}</span>
+                </button>
+                {expandedFilters.amount && (
+                  <div style={styles.amountFilterRow}>
+                    <div style={styles.amountInputGroup}>
+                      <label style={styles.amountLabel}>Min ($)</label>
+                      <input
+                        type="number"
+                        value={amountMin}
+                        onChange={(e) => setAmountMin(e.target.value)}
+                        placeholder="0"
+                        style={styles.amountInput}
+                      />
+                    </div>
+                    <span style={styles.amountSeparator}>to</span>
+                    <div style={styles.amountInputGroup}>
+                      <label style={styles.amountLabel}>Max ($)</label>
+                      <input
+                        type="number"
+                        value={amountMax}
+                        onChange={(e) => setAmountMax(e.target.value)}
+                        placeholder="No limit"
+                        style={styles.amountInput}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
 
-        {/* Statistics */}
-        <div style={styles.statsContainer}>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{metadata.totalGrants.toLocaleString()}</div>
-            <div style={styles.statLabel}>Total Grants</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{formatCurrency(metadata.totalAmount)}</div>
-            <div style={styles.statLabel}>Total Amount</div>
-          </div>
-          <div style={styles.statCard}>
-            <div style={styles.statValue}>{filteredAndSortedGrants.length.toLocaleString()}</div>
-            <div style={styles.statLabel}>Filtered Results</div>
-          </div>
-        </div>
-
         {/* Charts */}
         <section style={styles.section}>
-          <div style={styles.chartHeader}>
-            <h2 style={styles.sectionTitle}>Visualizations</h2>
-            <div style={styles.chartTabs}>
-              <button
-                onClick={() => setChartView('month')}
-                style={{
-                  ...styles.chartTab,
-                  ...(chartView === 'month' ? styles.chartTabActive : {}),
-                }}
-              >
-                Timeline
-              </button>
+          <h2 style={styles.sectionTitle}>Visualizations</h2>
+          <div style={styles.chartControlsRow}>
               <button
                 onClick={() => setChartView('year')}
                 style={{
@@ -430,28 +708,62 @@ export default function Home({
                 By Year
               </button>
               <button
-                onClick={() => setChartView('funder')}
+                onClick={() => setChartView('month')}
                 style={{
                   ...styles.chartTab,
-                  ...(chartView === 'funder' ? styles.chartTabActive : {}),
+                  ...(chartView === 'month' ? styles.chartTabActive : {}),
+                }}
+              >
+                By Month
+              </button>
+              <span style={styles.controlsDivider} />
+              <span style={styles.breakdownLabel}>Break down by:</span>
+              <button
+                onClick={() => setTimeBreakdown('total')}
+                style={{
+                  ...styles.breakdownTab,
+                  ...(timeBreakdown === 'total' ? styles.breakdownTabActive : {}),
+                }}
+              >
+                Total
+              </button>
+              <button
+                onClick={() => setTimeBreakdown('byFunder')}
+                style={{
+                  ...styles.breakdownTab,
+                  ...(timeBreakdown === 'byFunder' ? styles.breakdownTabActive : {}),
                 }}
               >
                 By Funder
               </button>
               <button
-                onClick={() => setChartView('category')}
+                onClick={() => setTimeBreakdown('byCategory')}
                 style={{
-                  ...styles.chartTab,
-                  ...(chartView === 'category' ? styles.chartTabActive : {}),
+                  ...styles.breakdownTab,
+                  ...(timeBreakdown === 'byCategory' ? styles.breakdownTabActive : {}),
                 }}
               >
                 By Category
               </button>
+              <span style={styles.controlsDivider} />
+              <label style={styles.inflationToggle}>
+                <input
+                  type="checkbox"
+                  checked={adjustInflation}
+                  onChange={() => setAdjustInflation(!adjustInflation)}
+                  style={{ cursor: 'pointer' }}
+                />
+                Adjust for inflation (constant 2024 dollars)
+              </label>
             </div>
+          <div style={styles.chartDisclaimer}>
+            2025 data is partial and reflects only grants published to date.
           </div>
           <div style={styles.chartContainer}>
-            <ReactECharts 
-              option={getChartOption()} 
+            <ReactECharts
+              option={getChartOption()}
+              notMerge={true}
+              lazyUpdate={true}
               style={{ height: '400px', width: '100%' }}
               opts={{ renderer: 'canvas' }}
             />
@@ -461,15 +773,18 @@ export default function Home({
         {/* Grants List with Virtualization */}
         <section style={styles.section}>
           <div style={styles.grantsHeader}>
-            <h2 style={styles.sectionTitle}>Grants ({filteredAndSortedGrants.length.toLocaleString()})</h2>
+            <h2 style={styles.sectionTitle}>Grants</h2>
             <div style={styles.sortControls}>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'date' | 'amount')}
+                onChange={(e) => setSortBy(e.target.value as 'date' | 'amount' | 'grantmaker' | 'recipient' | 'category')}
                 style={styles.select}
               >
                 <option value="date">Sort by Date</option>
                 <option value="amount">Sort by Amount</option>
+                <option value="grantmaker">Sort by Grantmaker</option>
+                <option value="recipient">Sort by Grantee</option>
+                <option value="category">Sort by Category</option>
               </select>
               <button
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
@@ -480,9 +795,18 @@ export default function Home({
             </div>
           </div>
           
-          <div 
+          <div style={styles.virtualListContainer}>
+            <div style={styles.listHeaderRow}>
+              <div style={styles.listHeaderCell}>Grantee</div>
+              <div style={styles.listHeaderCell}>Grantmaker</div>
+              <div />
+              <div style={styles.listHeaderCell}>Category</div>
+              <div style={{ ...styles.listHeaderCell, textAlign: 'right' }}>Amount</div>
+              <div style={{ ...styles.listHeaderCell, textAlign: 'right' }}>Date</div>
+            </div>
+          <div
             ref={parentRef}
-            style={styles.virtualListContainer}
+            style={styles.virtualListScroll}
           >
             <div
               style={{
@@ -504,31 +828,56 @@ export default function Home({
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                   >
-                    <div style={styles.grantCard}>
-                      <div style={styles.grantHeader}>
-                        <h3 style={styles.grantTitle}>{grant.title}</h3>
-                        <div style={styles.grantAmount}>{formatCurrency(grant.amount)}</div>
+                    <div style={styles.grantRow}>
+                      <div style={styles.grantLeft}>
+                        <h3 style={styles.grantTitle}>
+                          {grant.url
+                            ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
+                            : grant.recipient}
+                        </h3>
+                        {grant.title && grant.title !== grant.recipient && (
+                          <p style={styles.grantDesc}>{grant.title}</p>
+                        )}
                       </div>
-                      <div style={styles.grantMeta}>
-                        <span style={styles.grantRecipient}>{grant.recipient}</span>
-                        <span style={styles.grantDate}>
-                          {format(parseISO(grant.date), 'MMM d, yyyy')}
-                        </span>
+                      <div style={styles.grantFunderCol}>
+                        <span style={{
+                          ...styles.tagColored,
+                          borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+                          color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+                        }}>{displayGrantmaker(grant.grantmaker)}</span>
+                        {grant.fund && (
+                          <span style={{
+                            ...styles.subTag,
+                            borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
+                            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+                          }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
+                        )}
                       </div>
-                      <div style={styles.grantTags}>
-                        <span style={styles.tag}>{grant.grantmaker}</span>
-                        {grant.category && <span style={styles.tag}>{grant.category}</span>}
+                      <div />
+                      <div style={styles.grantCategoryCol}>
+                        {grant.category && (
+                          <span style={{
+                            ...styles.tagColored,
+                            borderColor: categoryColorMap[grant.category] || '#999',
+                            color: categoryColorMap[grant.category] || '#999',
+                          }}>{displayCategory(grant.category)}</span>
+                        )}
+                        {grant.focus_area && grant.focus_area !== grant.category && (
+                          <span style={{
+                            ...styles.subTag,
+                            borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
+                            color: categoryColorMap[grant.category || ''] || '#999',
+                          }}>{grant.focus_area}</span>
+                        )}
                       </div>
-                      {grant.url && (
-                        <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantLink}>
-                          View Details →
-                        </a>
-                      )}
+                      <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
+                      <div style={styles.grantDateCol}>{format(parseISO(grant.date), 'MM/dd/yyyy')}</div>
                     </div>
                   </div>
                 );
               })}
             </div>
+          </div>
           </div>
         </section>
 
@@ -536,9 +885,6 @@ export default function Home({
         <footer style={styles.footer}>
           <p style={styles.footerText}>
             Last updated: {format(parseISO(metadata.lastUpdated), 'MMM d, yyyy')}
-          </p>
-          <p style={styles.footerText}>
-            Built with Next.js • Static Export • Pre-computed Analytics • Client-side Search
           </p>
         </footer>
       </main>
@@ -548,9 +894,9 @@ export default function Home({
 
 const styles: { [key: string]: React.CSSProperties } = {
   main: {
-    maxWidth: '1200px',
+    maxWidth: '1400px',
     margin: '0 auto',
-    padding: '20px',
+    padding: '20px 80px',
   },
   header: {
     textAlign: 'center',
@@ -582,30 +928,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '18px',
     color: '#666',
   },
-  statsContainer: {
-    display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-    gap: '20px',
-    marginBottom: '40px',
-  },
-  statCard: {
-    backgroundColor: 'white',
-    padding: '30px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-    textAlign: 'center',
-  },
-  statValue: {
-    fontSize: '32px',
-    fontWeight: 'bold',
-    color: '#1a202c',
-    marginBottom: '8px',
-  },
-  statLabel: {
-    fontSize: '14px',
-    color: '#666',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
+  resultCount: {
+    fontSize: '13px',
+    color: '#888',
+    marginTop: '6px',
   },
   section: {
     marginBottom: '40px',
@@ -618,22 +944,22 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   chartContainer: {
     backgroundColor: 'white',
-    padding: '20px',
+    padding: '6px 0',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
-  chartHeader: {
+  chartControlsRow: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '20px',
-    flexWrap: 'wrap',
-    gap: '15px',
-  },
-  chartTabs: {
-    display: 'flex',
     gap: '8px',
+    marginBottom: '12px',
     flexWrap: 'wrap',
+  },
+  controlsDivider: {
+    width: '1px',
+    height: '24px',
+    backgroundColor: '#ddd',
+    margin: '0 6px',
   },
   chartTab: {
     padding: '8px 16px',
@@ -648,6 +974,40 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#3b82f6',
     color: 'white',
     borderColor: '#3b82f6',
+  },
+  breakdownLabel: {
+    fontSize: '14px',
+    color: '#666',
+    marginRight: '4px',
+  },
+  breakdownTab: {
+    padding: '7px 16px',
+    fontSize: '14px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    backgroundColor: 'white',
+    cursor: 'pointer',
+    color: '#333',
+  },
+  breakdownTabActive: {
+    backgroundColor: '#1a202c',
+    color: 'white',
+    borderColor: '#1a202c',
+  },
+  inflationToggle: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    fontSize: '13px',
+    color: '#555',
+    cursor: 'pointer',
+    userSelect: 'none',
+  },
+  chartDisclaimer: {
+    fontSize: '12px',
+    color: '#999',
+    fontStyle: 'italic',
+    marginBottom: '6px',
   },
   filtersContainer: {
     backgroundColor: 'white',
@@ -667,13 +1027,84 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: '1px solid #ddd',
     borderRadius: '4px',
   },
-  filterRow: {
+  filterAccordion: {
     display: 'flex',
-    gap: '10px',
+    flexDirection: 'column',
+  },
+  filterSection: {
+    borderBottom: '1px solid #e5e7eb',
+  },
+  filterHeader: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+    padding: '20px 0',
+    fontSize: '17px',
+    fontWeight: '500',
+    color: '#1a202c',
+    background: 'none',
+    border: 'none',
+    cursor: 'pointer',
+    textAlign: 'left',
+  },
+  filterHeaderLabel: {
+    fontSize: '17px',
+  },
+  filterHeaderIcon: {
+    fontSize: '22px',
+    lineHeight: '1',
+    color: '#666',
+  },
+  filterOptions: {
+    display: 'flex',
     flexWrap: 'wrap',
+    gap: '8px 20px',
+    paddingBottom: '16px',
+  },
+  filterOption: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    fontSize: '15px',
+    color: '#333',
+    cursor: 'pointer',
+  },
+  checkbox: {
+    width: '18px',
+    height: '18px',
+    cursor: 'pointer',
+    accentColor: '#3b82f6',
+  },
+  amountFilterRow: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    paddingBottom: '16px',
+  },
+  amountInputGroup: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    flex: 1,
+  },
+  amountLabel: {
+    fontSize: '12px',
+    color: '#666',
+  },
+  amountInput: {
+    padding: '8px 12px',
+    fontSize: '14px',
+    border: '1px solid #ddd',
+    borderRadius: '4px',
+    width: '100%',
+  },
+  amountSeparator: {
+    fontSize: '14px',
+    color: '#666',
+    marginTop: '18px',
   },
   select: {
-    flex: '1',
     minWidth: '150px',
     padding: '10px',
     fontSize: '14px',
@@ -704,73 +1135,118 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
   },
   virtualListContainer: {
-    height: '800px',
-    overflow: 'auto',
     backgroundColor: 'white',
     borderRadius: '8px',
-    padding: '10px',
+    padding: '0 16px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
-  grantCard: {
-    backgroundColor: '#f9fafb',
-    padding: '20px',
-    marginBottom: '10px',
-    borderRadius: '8px',
-    border: '1px solid #e5e7eb',
+  virtualListScroll: {
+    height: '800px',
+    overflow: 'auto',
   },
-  grantHeader: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: '12px',
-    gap: '15px',
+  listHeaderRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 200px 10px 250px 110px 100px',
+    gap: '10px',
+    padding: '12px 0',
+    borderBottom: '2px solid #e5e7eb',
+    position: 'sticky',
+    top: 0,
+    backgroundColor: 'white',
+    zIndex: 1,
+  },
+  listHeaderCell: {
+    fontSize: '12px',
+    fontWeight: '600',
+    color: '#888',
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
+  grantRow: {
+    display: 'grid',
+    gridTemplateColumns: '1fr 200px 10px 250px 110px 100px',
+    alignItems: 'start',
+    gap: '10px',
+    padding: '16px 0',
+    borderBottom: '1px solid #e5e7eb',
+  },
+  grantLeft: {
+    minWidth: 0,
   },
   grantTitle: {
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 'bold',
     color: '#1a202c',
-    flex: 1,
     margin: 0,
+    lineHeight: '1.3',
   },
-  grantAmount: {
-    fontSize: '18px',
-    fontWeight: 'bold',
-    color: '#10b981',
+  grantTitleLink: {
+    color: '#1a202c',
+    textDecoration: 'none',
+  },
+  grantDesc: {
+    margin: '3px 0 0 0',
+    fontSize: '14px',
+    color: '#1a202c',
+    lineHeight: '1.3',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  grantMeta: {
+  grantTagCol: {
     display: 'flex',
-    justifyContent: 'space-between',
-    marginBottom: '12px',
-    fontSize: '14px',
-    color: '#666',
+    justifyContent: 'flex-start',
+    paddingTop: '2px',
   },
-  grantRecipient: {
-    fontWeight: '500',
-  },
-  grantDate: {
-    color: '#666',
-  },
-  grantTags: {
+  grantFunderCol: {
     display: 'flex',
-    gap: '8px',
-    marginBottom: '12px',
-    flexWrap: 'wrap',
+    flexDirection: 'column',
+    gap: '4px',
+    alignItems: 'flex-start',
+    paddingTop: '2px',
   },
-  tag: {
+  grantCategoryCol: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+    alignItems: 'flex-start',
+    paddingTop: '2px',
+  },
+  tagColored: {
     display: 'inline-block',
-    padding: '4px 12px',
+    padding: '4px 10px',
+    fontSize: '13.5px',
+    fontWeight: '700',
+    border: '1.5px solid',
+    borderRadius: '4px',
+    maxWidth: '100%',
+    lineHeight: '1.3',
+  },
+  subTag: {
+    display: 'inline-block',
+    padding: '3px 8px',
     fontSize: '12px',
-    backgroundColor: '#e5e7eb',
-    borderRadius: '12px',
-    color: '#374151',
+    fontWeight: '600',
+    border: '1px solid',
+    borderRadius: '4px',
+    whiteSpace: 'nowrap',
   },
-  grantLink: {
-    display: 'inline-block',
-    color: '#3b82f6',
-    fontSize: '14px',
+  grantAmountCol: {
+    fontSize: '16px',
+    fontWeight: '700',
+    color: '#1a202c',
+    whiteSpace: 'nowrap',
+    textAlign: 'right',
+    paddingTop: '1px',
+  },
+  grantDateCol: {
+    fontSize: '15px',
     fontWeight: '500',
-    textDecoration: 'none',
+    color: '#1a202c',
+    whiteSpace: 'nowrap',
+    textAlign: 'right',
+    minWidth: '80px',
+    paddingTop: '2px',
   },
   footer: {
     marginTop: '60px',
@@ -787,25 +1263,16 @@ const styles: { [key: string]: React.CSSProperties } = {
 
 export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   const dataDir = path.join(process.cwd(), 'public', 'data');
-  const aggDir = path.join(dataDir, 'agg');
   
   const grants = JSON.parse(fs.readFileSync(path.join(dataDir, 'grants.min.json'), 'utf-8'));
   const metadata = JSON.parse(fs.readFileSync(path.join(dataDir, 'metadata.json'), 'utf-8'));
   const searchIndexData = JSON.parse(fs.readFileSync(path.join(dataDir, 'search-index.json'), 'utf-8'));
-  const aggByYear = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_year.json'), 'utf-8'));
-  const aggByYearMonth = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_year_month.json'), 'utf-8'));
-  const aggByFunder = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_funder.json'), 'utf-8'));
-  const aggByCategory = JSON.parse(fs.readFileSync(path.join(aggDir, 'by_category.json'), 'utf-8'));
 
   return {
     props: {
       grants,
       metadata,
       searchIndexData,
-      aggByYear,
-      aggByYearMonth,
-      aggByFunder,
-      aggByCategory,
     },
   };
 };

@@ -27,20 +27,27 @@ function ensureDirectories() {
 
 // Normalize grant data at build time
 function normalizeGrant(grant: Grant): Grant {
+  // Preserve YYYY-MM-DD dates, only convert if it's a different format
+  let date = grant.date;
+  if (date && !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const parsed = new Date(date);
+    if (!isNaN(parsed.getTime())) {
+      date = parsed.toISOString().slice(0, 10);
+    }
+  }
+
   return {
     ...grant,
-    // Ensure consistent date format
-    date: new Date(grant.date).toISOString(),
-    // Normalize currency to USD (in real implementation, convert currencies)
+    date,
     amount: grant.amount,
     currency: 'USD',
-    // Clean up strings
     title: grant.title.trim(),
     recipient: grant.recipient.trim(),
     grantmaker: grant.grantmaker.trim(),
     description: grant.description?.trim() || '',
     category: grant.category?.trim() || '',
     focus_area: grant.focus_area?.trim() || '',
+    fund: grant.fund?.trim() || '',
   };
 }
 
@@ -222,7 +229,10 @@ function createMinimizedGrants(grants: Grant[]) {
     date: grant.date,
     grantmaker: grant.grantmaker,
     category: grant.category,
+    focus_area: grant.focus_area,
+    fund: grant.fund,
     url: grant.url,
+    ...(grant.is_residual ? { is_residual: true } : {}),
   }));
 }
 

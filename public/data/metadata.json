@@ -1,21 +1,24 @@
 {
-  "totalGrants": 8,
-  "totalAmount": 42650000,
+  "totalGrants": 4705,
+  "totalAmount": 5876025653.52,
   "grantmakers": [
-    "EA Funds",
     "GiveWell",
-    "Coefficient Giving"
+    "EA Funds",
+    "SFF",
+    "Open Philanthropy",
+    "ACE",
+    "Founders Pledge"
   ],
   "categories": [
-    "AI Safety",
-    "Global Health",
-    "Animal Welfare",
-    "Climate",
-    "Biosecurity"
+    "GH",
+    "LTXR",
+    "Meta",
+    "AW",
+    "Other"
   ],
   "dateRange": {
-    "earliest": "2024-01-01T00:00:00.000Z",
-    "latest": "2024-03-10T00:00:00.000Z"
+    "earliest": "2012-07-01",
+    "latest": "2025-12-04"
   },
-  "lastUpdated": "2026-02-03T03:23:14.986Z"
+  "lastUpdated": "2026-02-05T01:22:56.855Z"
 }
