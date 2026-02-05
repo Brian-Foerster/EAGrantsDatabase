@@ -120,13 +120,12 @@ async function main() {
   for (const gm of ['Open Philanthropy', 'GiveWell', 'SFF', 'EA Funds', 'ACE', 'Founders Pledge']) {
     const gmData = byGM.get(gm) || new Map();
     const published = totals[gm];
-    if (!published || typeof published !== 'object' || Array.isArray(published)) continue;
+    if (!published || typeof published !== 'object') continue;
 
     const yearCells = years.map(y => {
       const scraped = gmData.get(y) || 0;
-      const pub = typeof (published as Record<string, unknown>)[y] === 'number' 
-        ? ((published as Record<string, unknown>)[y] as number) 
-        : 0;
+      const publishedValue = (published as Record<string, unknown>)[y];
+      const pub = typeof publishedValue === 'number' ? publishedValue : 0;
       if (pub === 0 && scraped === 0) return padL('-', 10);
       const pct = pub > 0 ? Math.round((scraped / pub) * 100) : 0;
       return padL(`${fmtM(scraped)}`, 10);
