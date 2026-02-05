@@ -886,6 +886,11 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
           <p style={styles.footerText}>
             Last updated: {format(parseISO(metadata.lastUpdated), 'MMM d, yyyy')}
           </p>
+          <p style={styles.footerLinks}>
+            <a href="https://github.com/Brian-Foerster/EAGrantsDatabase" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>GitHub</a>
+            {' · '}
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSceNe8T97Z36LvBmepyid68MYbyairBvZucnZFlREGROSBOZA/viewform" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>Feedback</a>
+          </p>
         </footer>
       </main>
     </>
@@ -1258,6 +1263,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '14px',
     color: '#666',
     marginBottom: '10px',
+  },
+  footerLinks: {
+    fontSize: '14px',
+    color: '#666',
+    marginBottom: '10px',
+  },
+  footerLink: {
+    color: '#3b82f6',
+    textDecoration: 'none',
   },
 };
 
