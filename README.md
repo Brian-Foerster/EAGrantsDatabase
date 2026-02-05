@@ -52,6 +52,38 @@ npm run dev
 
 4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
+### Data Workflow
+
+The application supports multiple ways to load grant data:
+
+#### Option 1: Import from CSV (Recommended for existing data)
+
+If you have grant data in CSV format (e.g., `data/ea-grants-database.csv`):
+
+```bash
+# Convert CSV to JSON format
+npm run import-csv
+
+# Then build the site
+npm run build
+```
+
+#### Option 2: Scrape from Sources
+
+To fetch fresh data from grantmaker websites:
+
+```bash
+# Scrape data from all sources
+npm run scrape
+
+# Then build the site
+npm run build
+```
+
+#### Option 3: Use Mock Data
+
+The application will automatically use mock data if no real data is available. This is useful for development and testing.
+
 ### Building for Production
 
 #### Static Export (for GitHub Pages, Netlify, etc.)

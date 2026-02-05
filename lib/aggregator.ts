@@ -21,7 +21,9 @@ export async function aggregateAllGrants(): Promise<Grant[]> {
   }
 
   console.log('No scraped data found, using mock data');
-  console.log('Run "npm run scrape" to fetch real grant data');
+  console.log('To use real data:');
+  console.log('  - If you have a CSV file in data/ea-grants-database.csv, run: npm run import-csv');
+  console.log('  - Or scrape fresh data by running: npm run scrape');
   return getMockGrants();
 }
 
