@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "scrape": "tsx scripts/scrape-all.ts",
+    "import-csv": "tsx scripts/import-csv.ts",
     "export-csv": "tsx scripts/export-csv.ts",
     "build:data": "tsx scripts/build-data.ts",
     "build": "npm run build:data && next build",
