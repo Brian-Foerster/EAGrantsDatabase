@@ -95,7 +95,6 @@ export async function scrapeEAFunds(): Promise<ScrapeResult> {
       grantmaker: 'EA Funds',
       description: descText,
       category: mapFundToCategory(r.fund),
-      focus_area: r.fund,
       fund: r.fund,
       source_id: r.id,
     };

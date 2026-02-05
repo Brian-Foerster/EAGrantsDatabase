@@ -116,7 +116,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
       amount,
       currency: 'USD',
       date,
-      grantmaker: 'Open Philanthropy',
+      grantmaker: 'Coefficient Giving',
       description,
       category,
       focus_area: focusArea,

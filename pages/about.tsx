@@ -38,7 +38,7 @@ export default function About() {
 
             <h2 style={styles.sectionTitle}>Data sources with individual grants</h2>
 
-            <h3 style={styles.subheading}>Open Philanthropy</h3>
+            <h3 style={styles.subheading}>Coefficient Giving (formerly Open Philanthropy)</h3>
             <p style={styles.paragraph}>
               Approximately 2,361 grants (2012 through October 2024), sourced from a{' '}
               <a href="https://github.com/rufuspollock/open-philanthropy-grants" target="_blank" rel="noopener noreferrer" style={styles.link}>
@@ -111,7 +111,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Deduplication</h3>
             <p style={styles.paragraph}>
-              Two deduplication layers are applied. First, approximately 147 Open Philanthropy
+              Two deduplication layers are applied. First, approximately 147 Coefficient Giving
               grants labeled as funding to GiveWell-recommended charities are excluded to
               avoid double-counting with GiveWell's own records. Second, cross-source fuzzy
               matching identifies grants to the same recipient in the same year with amounts
@@ -135,7 +135,7 @@ export default function About() {
             <h2 style={styles.sectionTitle}>Limitations</h2>
             <ul style={styles.list}>
               <li style={styles.listItem}>
-                Open Philanthropy data ends October 2024. No new data source has been
+                Coefficient Giving data ends October 2024. No new data source has been
                 identified for Coefficient Giving grants after that date.
               </li>
               <li style={styles.listItem}>

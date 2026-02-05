@@ -18,7 +18,7 @@ interface ResidualStats {
 // Map grantmaker names to their keys in annual-totals.json
 const GRANTMAKER_KEYS: Record<string, string> = {
   'EA Funds': 'EA Funds',
-  'Open Philanthropy': 'Open Philanthropy',
+  'Coefficient Giving': 'Coefficient Giving',
   'GiveWell': 'GiveWell',
   'SFF': 'SFF',
   'ACE': 'ACE',
@@ -71,20 +71,21 @@ export function computeResiduals(grants: Grant[]): { residuals: Grant[]; stats: 
       // Only create a residual if there's a meaningful gap (>$100k and >5%)
       if (residualAmount > 100000 && residualAmount / publishedTotal > 0.05) {
         const category = RESIDUAL_CATEGORIES[grantmakerKey] || 'Other';
-        const pctCovered = ((knownTotal / publishedTotal) * 100).toFixed(1);
+        const pctNotItemized = ((residualAmount / publishedTotal) * 100).toFixed(0);
 
         const grant: Grant = {
           id: `residual-${grantmakerKey.toLowerCase().replace(/\s+/g, '-')}-${year}`,
-          title: `${grantmakerKey} — Unpublished Grants (${year})`,
-          recipient: `Various (${grantmakerKey})`,
+          title: `Unitemized ${year} Grants`,
+          recipient: `Various recipients`,
           amount: residualAmount,
           currency: 'USD',
           date: `${year}-07-01`,
           grantmaker: grantmakerKey,
+          description: `${pctNotItemized}% of ${grantmakerKey}'s ${year} grantmaking ($${(publishedTotal / 1e6).toFixed(1)}M published total) is not available as individual grant records.`,
           category,
-          focus_area: `Residual (${pctCovered}% itemized)`,
+          fund: `${grantmakerKey} (Unitemized)`,
           is_residual: true,
-          residual_note: `Published total: $${(publishedTotal / 1e6).toFixed(1)}M, Itemized: $${(knownTotal / 1e6).toFixed(1)}M (${pctCovered}%), Residual: $${(residualAmount / 1e6).toFixed(1)}M`,
+          residual_note: `Published total: $${(publishedTotal / 1e6).toFixed(1)}M, Unitemized: $${(residualAmount / 1e6).toFixed(1)}M (${pctNotItemized}%)`,
         };
 
         residuals.push(grant);

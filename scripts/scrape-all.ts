@@ -117,7 +117,7 @@ async function main() {
   console.log(padR('Grantmaker', 20) + years.map(y => padL(y, 10)).join(''));
   console.log('-'.repeat(20 + years.length * 10));
 
-  for (const gm of ['Open Philanthropy', 'GiveWell', 'SFF', 'EA Funds', 'ACE', 'Founders Pledge']) {
+  for (const gm of ['Coefficient Giving', 'GiveWell', 'SFF', 'EA Funds', 'ACE', 'Founders Pledge']) {
     const gmData = byGM.get(gm) || new Map();
     const published = totals[gm];
     if (!published || typeof published !== 'object') continue;

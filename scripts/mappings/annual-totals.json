@@ -1,7 +1,7 @@
 {
   "_comment": "Published annual totals in nominal USD. Used for residual computation and validation.",
-  "Open Philanthropy": {
-    "_sources": "2014-2023: EA historical grantmaking spreadsheet. 2024: Good Ventures 2024 report ($593M via OP recommendations incl $113M to GiveWell charities) + Coefficient Giving/Inside Philanthropy (>$100M from non-Good Ventures donors). Conservative estimate $650M. See DATA_SOURCES.md.",
+  "Coefficient Giving": {
+    "_sources": "2014-2023: EA historical grantmaking spreadsheet (as Open Philanthropy). 2024: Good Ventures 2024 report ($593M via OP recommendations incl $113M to GiveWell charities) + Coefficient Giving/Inside Philanthropy (>$100M from non-Good Ventures donors). Conservative estimate $650M. Open Philanthropy rebranded to Coefficient Giving in 2025. See DATA_SOURCES.md.",
     "2014": 87700000,
     "2015": 105700000,
     "2016": 156700000,

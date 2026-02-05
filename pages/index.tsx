@@ -45,6 +45,7 @@ interface HomeProps {
 export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrantmakers, setSelectedGrantmakers] = useState<string[]>([]);
+  const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
@@ -105,6 +106,11 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
       filtered = filtered.filter(grant => selectedGrantmakers.includes(grant.grantmaker));
     }
 
+    // Apply fund (sub-grantmaker) filter
+    if (selectedFunds.length > 0) {
+      filtered = filtered.filter(grant => grant.fund != null && selectedFunds.includes(grant.fund));
+    }
+
     // Apply category filter
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(grant => grant.category != null && selectedCategories.includes(grant.category));
@@ -150,7 +156,32 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     });
 
     return sorted;
-  }, [grants, searchTerm, searchResults, selectedGrantmakers, selectedCategories, selectedSubcategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+  }, [grants, searchTerm, searchResults, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubcategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+
+  const fundsByGrantmaker = useMemo(() => {
+    const gmDisplayNames: Record<string, string> = {
+      'EA Funds': 'Effective Altruism Funds',
+      'SFF': 'Survival and Flourishing Fund',
+      'ACE': 'Animal Charity Evaluators',
+    };
+    const byGm: Record<string, Set<string>> = {};
+    grants.forEach(g => {
+      if (g.fund) {
+        if (!byGm[g.grantmaker]) byGm[g.grantmaker] = new Set();
+        byGm[g.grantmaker].add(g.fund);
+      }
+    });
+    // Convert to sorted arrays and sort grantmakers by their display name
+    const result: { grantmaker: string; displayName: string; funds: string[] }[] = [];
+    for (const gm of Object.keys(byGm).sort()) {
+      result.push({
+        grantmaker: gm,
+        displayName: gmDisplayNames[gm] || gm,
+        funds: Array.from(byGm[gm]).sort(),
+      });
+    }
+    return result;
+  }, [grants]);
 
   const availableSubcategories = useMemo(() => {
     const subs = new Set(grants.map(g => g.focus_area).filter(Boolean) as string[]);
@@ -169,6 +200,12 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const toggleGrantmaker = (gm: string) => {
     setSelectedGrantmakers(prev =>
       prev.includes(gm) ? prev.filter(g => g !== gm) : [...prev, gm]
+    );
+  };
+
+  const toggleFund = (fund: string) => {
+    setSelectedFunds(prev =>
+      prev.includes(fund) ? prev.filter(f => f !== fund) : [...prev, fund]
     );
   };
 
@@ -200,7 +237,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const GRANTMAKER_COLORS: { [key: string]: string } = {
     'EA Funds': '#0a7b8a',
     'GiveWell': '#c44a2d',
-    'Open Philanthropy': '#5b6abf',
+    'Coefficient Giving': '#5b6abf',
     'SFF': '#8b5cf6',
     'Founders Pledge': '#06b6d4',
     'ACE': '#f59e0b',
@@ -586,6 +623,37 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
               </div>
               <div style={styles.filterSection}>
                 <button
+                  onClick={() => toggleFilter('fund')}
+                  style={styles.filterHeader}
+                >
+                  <span style={styles.filterHeaderLabel}>Fund</span>
+                  <span style={styles.filterHeaderIcon}>{expandedFilters.fund ? '\u2212' : '+'}</span>
+                </button>
+                {expandedFilters.fund && (
+                  <div style={styles.filterOptionsGrouped}>
+                    {fundsByGrantmaker.map(group => (
+                      <div key={group.grantmaker} style={styles.fundGroup}>
+                        <div style={styles.fundGroupHeader}>{group.displayName}</div>
+                        <div style={styles.fundGroupOptions}>
+                          {group.funds.map(fund => (
+                            <label key={fund} style={styles.filterOption}>
+                              <input
+                                type="checkbox"
+                                checked={selectedFunds.includes(fund)}
+                                onChange={() => toggleFund(fund)}
+                                style={styles.checkbox}
+                              />
+                              {fund}
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div style={styles.filterSection}>
+                <button
                   onClick={() => toggleFilter('category')}
                   style={styles.filterHeader}
                 >
@@ -613,7 +681,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                   onClick={() => toggleFilter('subcategory')}
                   style={styles.filterHeader}
                 >
-                  <span style={styles.filterHeaderLabel}>Sub-Category</span>
+                  <span style={styles.filterHeaderLabel}>Focus Area</span>
                   <span style={styles.filterHeaderIcon}>{expandedFilters.subcategory ? '\u2212' : '+'}</span>
                 </button>
                 {expandedFilters.subcategory && (
@@ -1066,6 +1134,27 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexWrap: 'wrap',
     gap: '8px 20px',
     paddingBottom: '16px',
+  },
+  filterOptionsGrouped: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '16px',
+    paddingBottom: '16px',
+  },
+  fundGroup: {
+    borderLeft: '3px solid #e5e7eb',
+    paddingLeft: '12px',
+  },
+  fundGroupHeader: {
+    fontSize: '14px',
+    fontWeight: '600',
+    color: '#374151',
+    marginBottom: '8px',
+  },
+  fundGroupOptions: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '6px 16px',
   },
   filterOption: {
     display: 'flex',

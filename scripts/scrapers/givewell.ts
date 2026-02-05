@@ -86,8 +86,11 @@ export async function scrapeGiveWell(): Promise<ScrapeResult> {
     }
 
     // Parse funders list (comma-separated)
+    // Rename "Open Philanthropy" to clarify these are grants funded by Coefficient Giving but disbursed via GiveWell
     const funders = r.Funders
-      ? r.Funders.split(',').map(f => f.trim()).filter(Boolean)
+      ? r.Funders.split(',').map(f => f.trim()).filter(Boolean).map(f =>
+          f === 'Open Philanthropy' ? 'Coefficient Giving (via GiveWell)' : f
+        )
       : undefined;
 
     // Parse topics list

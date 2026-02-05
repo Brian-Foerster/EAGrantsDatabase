@@ -34,7 +34,7 @@ The EA Grants Database aggregates individual grant data from the major Effective
 
 ---
 
-### 2. Open Philanthropy
+### 2. Coefficient Giving (formerly Open Philanthropy)
 
 | Field | Value |
 |-------|-------|
@@ -192,7 +192,7 @@ Not all grantmakers publish individual grant data. The database has full itemiza
 | EA Funds | ~100% | Full individual grant data via API |
 | GiveWell | ~90%+ | Full for 2019+, sparse for earlier years; Airtable CSV may not include all historical grants |
 | SFF | ~100% | Full via HTML table |
-| Open Philanthropy | ~58% for 2024 | GitHub archive ends Oct 2024. The original grants page now redirects to coefficientgiving.org with no public database. Earlier years are well-covered. |
+| Coefficient Giving | ~58% for 2024 | GitHub archive ends Oct 2024. The original grants page now redirects to coefficientgiving.org with no public database. Earlier years are well-covered. |
 | Founders Pledge | 0% | No public grant-level data with amounts. 100% residual. |
 | ACE | 0% | No public grant-level data. 100% residual. |
 
@@ -208,7 +208,9 @@ These fields are empty because the upstream sources don't provide them, not beca
 
 ### Open Phil data freshness
 
-The Open Phil archive at `github.com/rufuspollock/open-philanthropy-grants` was last updated December 2024 with data through October 2024. Open Philanthropy rebranded to Coefficient Giving and their grants page now redirects without a public database. New Open Phil/Coefficient grants after October 2024 will not appear until a new data source is identified.
+### Coefficient Giving data freshness
+
+The Coefficient Giving archive at `github.com/rufuspollock/open-philanthropy-grants` was last updated December 2024 with data through October 2024. Open Philanthropy rebranded to Coefficient Giving in 2025 and their grants page now redirects without a public database. New Coefficient Giving grants after October 2024 will not appear until a new data source is identified.
 
 ### Founders Pledge category assignment
 
