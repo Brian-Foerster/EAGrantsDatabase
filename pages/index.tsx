@@ -496,11 +496,11 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        return 180; // Expanded mobile row
+        return 160; // Expanded mobile row
       }
-      return 85; // Collapsed mobile row
+      return 70; // Collapsed mobile row
     }
-    return 110; // Desktop row (taller for wrapped text)
+    return 85; // Desktop row
   };
 
   const rowVirtualizer = useVirtualizer({
@@ -1633,8 +1633,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   listHeaderRow: {
     display: 'grid',
     gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
-    gap: '10px',
-    padding: '12px 0',
+    gap: '8px',
+    padding: '10px 0',
     borderBottom: '2px solid #e5e7eb',
     position: 'sticky',
     top: 0,
@@ -1652,15 +1652,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'grid',
     gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
     alignItems: 'start',
-    gap: '10px',
-    padding: '16px 0',
+    gap: '8px',
+    padding: '10px 0',
     borderBottom: '1px solid #e5e7eb',
   },
   grantRowMobile: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '6px',
-    padding: '12px 0',
+    gap: '4px',
+    padding: '8px 0',
     borderBottom: '1px solid #e5e7eb',
     cursor: 'pointer',
   },
