@@ -9,6 +9,9 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 // Build timestamp for cache busting (set at build time)
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 
+// Base path for GitHub Pages deployment
+const BASE_PATH = process.env.NODE_ENV === 'production' ? '/EAGrantsDatabase' : '';
+
 // Funds/focus areas that are excluded by default (not generally considered core EA)
 // These grants are only shown when explicitly selected in the Fund filter
 const NON_CORE_EA_FUNDS: Record<string, string> = {
@@ -102,7 +105,7 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoadingProgress('Loading grants data...');
-        const grantsRes = await fetch(`/data/grants.min.json?v=${BUILD_VERSION}`);
+        const grantsRes = await fetch(`${BASE_PATH}/data/grants.min.json?v=${BUILD_VERSION}`);
         if (!grantsRes.ok) {
           throw new Error(`Failed to fetch grants: ${grantsRes.status}`);
         }
@@ -113,7 +116,7 @@ export default function Home() {
         setGrants(grantsData);
 
         setLoadingProgress('Loading metadata...');
-        const metaRes = await fetch(`/data/metadata.json?v=${BUILD_VERSION}`);
+        const metaRes = await fetch(`${BASE_PATH}/data/metadata.json?v=${BUILD_VERSION}`);
         if (!metaRes.ok) {
           throw new Error(`Failed to fetch metadata: ${metaRes.status}`);
         }
