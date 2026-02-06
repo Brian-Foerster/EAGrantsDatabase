@@ -552,13 +552,37 @@ export default function Home() {
     getScrollElement: () => parentRef.current,
     estimateSize: getRowHeight,
     overscan: 10,
-    // Include expanded state in key to force remount and fresh measurement
-    getItemKey: (index) => {
-      const grant = filteredAndSortedGrants[index];
-      const isExpanded = grant && expandedGrants.has(grant.id);
-      return `${grant?.id || index}-${isExpanded ? 'e' : 'c'}`;
-    },
+    getItemKey: (index) => filteredAndSortedGrants[index]?.id || index,
   });
+
+  // Track row elements for ResizeObserver
+  const rowRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const resizeObserver = useRef<ResizeObserver | null>(null);
+
+  // Setup ResizeObserver to detect row height changes
+  useEffect(() => {
+    resizeObserver.current = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const index = Number(entry.target.getAttribute('data-index'));
+        if (!isNaN(index)) {
+          rowVirtualizer.resizeItem(index, entry.contentRect.height);
+        }
+      }
+    });
+    return () => resizeObserver.current?.disconnect();
+  }, []);
+
+  // Callback ref for row elements
+  const setRowRef = useCallback((el: HTMLDivElement | null, index: number) => {
+    if (el) {
+      rowRefs.current.set(index, el);
+      resizeObserver.current?.observe(el);
+    } else {
+      const oldEl = rowRefs.current.get(index);
+      if (oldEl) resizeObserver.current?.unobserve(oldEl);
+      rowRefs.current.delete(index);
+    }
+  }, []);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -1246,7 +1270,7 @@ export default function Home() {
                   <div
                     key={virtualRow.key}
                     data-index={virtualRow.index}
-                    ref={rowVirtualizer.measureElement}
+                    ref={(el) => setRowRef(el, virtualRow.index)}
                     style={{
                       position: 'absolute',
                       top: 0,
