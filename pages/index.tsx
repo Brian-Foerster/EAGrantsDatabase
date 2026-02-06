@@ -964,7 +964,7 @@ export default function Home() {
         <header style={{
           ...styles.header,
           padding: isMobile ? '18px 16px' : '32px 36px',
-          marginBottom: isMobile ? '16px' : '40px'
+          marginBottom: isMobile ? '24px' : '40px'
         }}>
           <nav style={styles.nav}>
             <Link href="/" style={styles.navLink}>Home</Link>
