@@ -367,9 +367,9 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     // Fallback to grantmaker's grants page
     switch (grant.grantmaker) {
       case 'Coefficient Giving':
-        return 'https://coefficientgiving.org/grants/';
+        return 'https://coefficientgiving.org/funds/';
       case 'GiveWell':
-        return 'https://www.givewell.org/research/grants';
+        return 'https://www.givewell.org/research/all-grants';
       case 'EA Funds':
         return 'https://funds.effectivealtruism.org/grants';
       case 'SFF':
