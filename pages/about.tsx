@@ -131,6 +131,30 @@ export default function About() {
             </p>
 
             <h2 style={styles.sectionTitle}>Limitations</h2>
+
+            <h3 style={styles.subheading}>Publication timing</h3>
+            <p style={styles.paragraph}>
+              Grants appear in public databases when they are published, not when they are
+              committed or disbursed. This creates significant lag: Coefficient Giving may
+              publish grants months after they are made, and some grants may never be
+              published. As a result, recent years will systematically undercount actual
+              grantmaking until databases catch up.
+            </p>
+            <p style={styles.paragraph}>
+              This timing issue affects year-over-year trend analysis. A decline in grants
+              for the current or prior year may reflect publication lag rather than actual
+              funding changes. For reliable trend analysis, use data from years where
+              publication is substantially complete (typically 2+ years prior).
+            </p>
+            <p style={styles.paragraph}>
+              For more on this issue, see the{' '}
+              <a href="https://forum.effectivealtruism.org/posts/NWHb4nsnXRxDDFGLy/historical-ea-funding-data-2025-update" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Historical EA Funding Data (2025 Update)
+              </a>{' '}
+              analysis on the EA Forum.
+            </p>
+
+            <h3 style={styles.subheading}>Other limitations</h3>
             <ul style={styles.list}>
               <li style={styles.listItem}>
                 Coefficient Giving data is sourced from their official archive CSV, which
@@ -151,6 +175,10 @@ export default function About() {
                 The database does not include donation platforms (e.g., Giving What We Can,
                 The Life You Can Save) because their totals largely overlap with the endpoint
                 grantmakers already tracked.
+              </li>
+              <li style={styles.listItem}>
+                Some EA-adjacent grantmakers are not yet tracked, including Longview
+                Philanthropy and regranting programs within CEA and Effective Ventures.
               </li>
             </ul>
 

@@ -204,7 +204,17 @@ Residual grants fill the dollar-amount gaps but cannot provide recipient/project
 
 These fields are empty because the upstream sources don't provide them, not because of scraping failures.
 
-### Open Phil data freshness
+### Publication timing and year-over-year comparisons
+
+Grants appear in public databases when they are **published**, not when they are committed or disbursed. This creates significant lag:
+
+- **Coefficient Giving** may publish grants months after they are made, and some grants (particularly in global catastrophic risk areas) may never be published publicly
+- **GiveWell** anticipated ~$350M in 2025 grantmaking but the database may show substantially less due to publication timing
+- **EA Funds** publishes quarterly after each funding round
+
+This timing issue affects year-over-year trend analysis. A decline in grants for the current or prior year may reflect publication lag rather than actual funding changes. For reliable trend analysis, use data from years where publication is substantially complete (typically 2+ years prior).
+
+For more on this issue, see the [Historical EA Funding Data (2025 Update)](https://forum.effectivealtruism.org/posts/NWHb4nsnXRxDDFGLy/historical-ea-funding-data-2025-update) analysis on the EA Forum.
 
 ### Coefficient Giving data freshness
 
