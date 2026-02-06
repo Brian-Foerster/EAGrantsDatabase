@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 
@@ -6,6 +6,17 @@ const REPO_URL = 'https://github.com/Brian-Foerster/EAGrantsDatabase';
 const FEEDBACK_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSceNe8T97Z36LvBmepyid68MYbyairBvZucnZFlREGROSBOZA/viewform';
 
 export default function About() {
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 800);
+
+  useEffect(() => {
+    const updateWidth = () => setWindowWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
+  }, []);
+
+  const isMobile = windowWidth < 768;
+
   return (
     <>
       <Head>
@@ -13,17 +24,30 @@ export default function About() {
         <meta name="description" content="About the EA Grants Database — data sources, methodology, and limitations" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <main style={styles.main}>
-        <header style={styles.header}>
+      <main style={{
+        ...styles.main,
+        padding: isMobile ? '16px 16px' : '20px 40px'
+      }}>
+        <header style={{
+          ...styles.header,
+          paddingTop: isMobile ? '20px' : '40px',
+          marginBottom: isMobile ? '20px' : '40px'
+        }}>
           <nav style={styles.nav}>
             <Link href="/" style={styles.navLink}>Home</Link>
             <Link href="/about" style={styles.navLink}>About</Link>
           </nav>
-          <h1 style={styles.title}>About</h1>
+          <h1 style={{
+            ...styles.title,
+            fontSize: isMobile ? '32px' : '48px'
+          }}>About</h1>
         </header>
 
         <section style={styles.section}>
-          <div style={styles.content}>
+          <div style={{
+            ...styles.content,
+            padding: isMobile ? '20px' : '40px'
+          }}>
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
