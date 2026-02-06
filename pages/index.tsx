@@ -71,17 +71,24 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const [chartView, setChartView] = useState<'year' | 'month'>('year');
   const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
   const [adjustInflation, setAdjustInflation] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(1200);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
-  // Detect mobile viewport
+  // Detect viewport width for responsive layout
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const updateWidth = () => setWindowWidth(window.innerWidth);
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    return () => window.removeEventListener('resize', updateWidth);
   }, []);
+
+  // Responsive breakpoints
+  const isPhonePortrait = windowWidth < 480;
+  const isPhoneLandscape = windowWidth >= 480 && windowWidth < 768;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  const isMobile = windowWidth < 768;
+  const isCompact = windowWidth < 1024;
 
   // Initialize MiniSearch
   useEffect(() => {
@@ -483,8 +490,12 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
       yearFunder, yearCategory, monthFunder, monthCategory,
     } = chartData;
 
-    const gridYear = { left: '7%', right: '20%', top: '55px', bottom: '15%' };
-    const gridMonth = { left: '7%', right: '20%', top: '55px', bottom: '20%' };
+    const gridYear = isMobile
+      ? { left: '12%', right: '5%', top: '45px', bottom: '15%' }
+      : { left: '7%', right: '20%', top: '55px', bottom: '15%' };
+    const gridMonth = isMobile
+      ? { left: '12%', right: '5%', top: '45px', bottom: '22%' }
+      : { left: '7%', right: '20%', top: '55px', bottom: '20%' };
 
     // Calculate y-axis max that works for both nominal and inflation-adjusted
     // This ensures bars never shrink when inflation is toggled on
@@ -543,6 +554,11 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
       },
     };
 
+    const titleStyle = isMobile ? { fontSize: 14 } : {};
+    const legendConfig = isMobile
+      ? { type: 'scroll' as const, orient: 'horizontal' as const, bottom: 0, left: 'center' }
+      : { type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20 };
+
     switch (chartView) {
       case 'year': {
         const yearLabels = byYear.map(d => String(d.year));
@@ -550,32 +566,32 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         if (timeBreakdown === 'byFunder') {
           return {
             animation: false,
-            title: { text: 'Grants by Year (by Funder)', left: 'center', top: 8 },
+            title: { text: isMobile ? 'By Year (Funder)' : 'Grants by Year (by Funder)', left: 'center', top: 8, textStyle: titleStyle },
             tooltip: breakdownTooltip,
-            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
-            xAxis: { type: 'category', data: yearLabels },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax },
+            legend: legendConfig,
+            xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
             series: buildStackedSeries(yearLabels, yearFunder, funderGroups),
             grid: gridYear,
-            graphic: totalGraphic,
+            graphic: isMobile ? [] : totalGraphic,
           };
         }
         if (timeBreakdown === 'byCategory') {
           return {
             animation: false,
-            title: { text: 'Grants by Year (by Category)', left: 'center', top: 8 },
+            title: { text: isMobile ? 'By Year (Category)' : 'Grants by Year (by Category)', left: 'center', top: 8, textStyle: titleStyle },
             tooltip: breakdownTooltip,
-            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
-            xAxis: { type: 'category', data: yearLabels },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax },
+            legend: legendConfig,
+            xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
             series: buildStackedSeries(yearLabels, yearCategory, categoryGroups),
             grid: gridYear,
-            graphic: totalGraphic,
+            graphic: isMobile ? [] : totalGraphic,
           };
         }
         return {
           animation: false,
-          title: { text: 'Grants by Year', left: 'center', top: 8 },
+          title: { text: 'Grants by Year', left: 'center', top: 8, textStyle: titleStyle },
           tooltip: {
             trigger: 'axis',
             axisPointer: { type: 'shadow' },
@@ -585,56 +601,55 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
               return `${d.name}<br/>Total: $${d.value}M<br/>Count: ${item.count}`;
             }
           },
-          xAxis: { type: 'category', data: yearLabels },
-          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax },
+          xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
+          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
           series: [{
             name: 'Amount', type: 'bar',
             data: byYear.map(d => parseFloat((d.total * inflationMultiplier(String(d.year)) / 1000000).toFixed(2))),
             itemStyle: { color: '#10b981' },
           }],
           grid: gridYear,
-          graphic: totalGraphic,
+          graphic: isMobile ? [] : totalGraphic,
         };
       }
 
       case 'month': {
         const monthLabels = byYearMonth.map(d => d.yearMonth);
+        const monthAxisLabel = {
+          rotate: 45,
+          interval: Math.max(0, Math.floor(monthLabels.length / (isMobile ? 6 : 12))),
+          fontSize: isMobile ? 9 : 12,
+        };
 
         if (timeBreakdown === 'byFunder') {
           return {
             animation: false,
-            title: { text: 'Grants by Month (by Funder)', left: 'center', top: 8 },
+            title: { text: isMobile ? 'By Month (Funder)' : 'Grants by Month (by Funder)', left: 'center', top: 8, textStyle: titleStyle },
             tooltip: breakdownTooltip,
-            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
-            xAxis: {
-              type: 'category', data: monthLabels,
-              axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
-            },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax },
+            legend: legendConfig,
+            xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
             series: buildStackedSeries(monthLabels, monthFunder, funderGroups),
             grid: gridMonth,
-            graphic: totalGraphic,
+            graphic: isMobile ? [] : totalGraphic,
           };
         }
         if (timeBreakdown === 'byCategory') {
           return {
             animation: false,
-            title: { text: 'Grants by Month (by Category)', left: 'center', top: 8 },
+            title: { text: isMobile ? 'By Month (Category)' : 'Grants by Month (by Category)', left: 'center', top: 8, textStyle: titleStyle },
             tooltip: breakdownTooltip,
-            legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
-            xAxis: {
-              type: 'category', data: monthLabels,
-              axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
-            },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax },
+            legend: legendConfig,
+            xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
             series: buildStackedSeries(monthLabels, monthCategory, categoryGroups),
             grid: gridMonth,
-            graphic: totalGraphic,
+            graphic: isMobile ? [] : totalGraphic,
           };
         }
         return {
           animation: false,
-          title: { text: 'Grants by Month', left: 'center', top: 8 },
+          title: { text: 'Grants by Month', left: 'center', top: 8, textStyle: titleStyle },
           tooltip: {
             trigger: 'axis',
             formatter: (params: any) => {
@@ -643,18 +658,15 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
               return `${d.name}<br/>Total: $${(item.total * inflationMultiplier(item.yearMonth) / 1000000).toFixed(2)}M<br/>Count: ${item.count}`;
             }
           },
-          xAxis: {
-            type: 'category', data: monthLabels,
-            axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
-          },
-          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax },
+          xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
+          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
           series: [{
             name: 'Amount', type: 'bar',
             data: byYearMonth.map(d => (d.total * inflationMultiplier(d.yearMonth) / 1000000).toFixed(2)),
             itemStyle: { color: '#3b82f6' },
           }],
           grid: gridMonth,
-          graphic: totalGraphic,
+          graphic: isMobile ? [] : totalGraphic,
         };
       }
 
@@ -670,14 +682,21 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         <meta name="description" content="Aggregated database of Effective Altruism grants" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <main style={{ ...styles.main, padding: isMobile ? '20px 16px' : '20px 80px' }}>
-        <header style={{ ...styles.header, paddingTop: isMobile ? '20px' : '40px', marginBottom: isMobile ? '20px' : '40px' }}>
+      <main style={{
+        ...styles.main,
+        padding: isPhonePortrait ? '12px 12px' : isMobile ? '16px 16px' : isTablet ? '20px 40px' : '20px 80px'
+      }}>
+        <header style={{
+          ...styles.header,
+          paddingTop: isMobile ? '16px' : '40px',
+          marginBottom: isMobile ? '16px' : '40px'
+        }}>
           <nav style={styles.nav}>
             <Link href="/" style={styles.navLink}>Home</Link>
             <Link href="/about" style={styles.navLink}>About</Link>
           </nav>
-          <h1 style={{ ...styles.title, fontSize: isMobile ? '28px' : '48px' }}>EA Grants Database</h1>
-          <p style={{ ...styles.subtitle, fontSize: isMobile ? '14px' : '18px' }}>
+          <h1 style={{ ...styles.title, fontSize: isPhonePortrait ? '24px' : isMobile ? '28px' : '48px' }}>EA Grants Database</h1>
+          <p style={{ ...styles.subtitle, fontSize: isMobile ? '13px' : '18px' }}>
             {isMobile
               ? `${metadata.totalGrants.toLocaleString()} grants · $${(metadata.totalAmount / 1e9).toFixed(1)}B`
               : `Aggregating ${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)}B from ${metadata.grantmakers.length} major EA grantmakers`
@@ -687,8 +706,11 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
 
         {/* Search and Filter */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Search and Filter</h2>
-          <div style={styles.filtersContainer}>
+          <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px' }}>Search and Filter</h2>
+          <div style={{
+            ...styles.filtersContainer,
+            padding: isMobile ? '12px' : '20px'
+          }}>
             <div style={styles.searchContainer}>
               <input
                 type="text"
@@ -901,33 +923,39 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
 
         {/* Charts */}
         <section style={styles.section}>
-          <h2 style={styles.sectionTitle}>Visualizations</h2>
-          <div style={styles.chartControlsRow}>
+          <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px' }}>Visualizations</h2>
+          <div style={{
+            ...styles.chartControlsRow,
+            ...(isPhonePortrait ? { gap: '4px', fontSize: '12px' } : isMobile ? { gap: '6px' } : {})
+          }}>
               <button
                 onClick={() => setChartView('year')}
                 style={{
                   ...styles.chartTab,
                   ...(chartView === 'year' ? styles.chartTabActive : {}),
+                  ...(isMobile ? { padding: '6px 10px', fontSize: '12px' } : {}),
                 }}
               >
-                By Year
+                {isPhonePortrait ? 'Year' : 'By Year'}
               </button>
               <button
                 onClick={() => setChartView('month')}
                 style={{
                   ...styles.chartTab,
                   ...(chartView === 'month' ? styles.chartTabActive : {}),
+                  ...(isMobile ? { padding: '6px 10px', fontSize: '12px' } : {}),
                 }}
               >
-                By Month
+                {isPhonePortrait ? 'Month' : 'By Month'}
               </button>
-              <span style={styles.controlsDivider} />
-              <span style={styles.breakdownLabel}>Break down by:</span>
+              {!isPhonePortrait && <span style={styles.controlsDivider} />}
+              {!isPhonePortrait && <span style={styles.breakdownLabel}>Break down by:</span>}
               <button
                 onClick={() => setTimeBreakdown('total')}
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'total' ? styles.breakdownTabActive : {}),
+                  ...(isMobile ? { padding: '5px 8px', fontSize: '11px' } : {}),
                 }}
               >
                 Total
@@ -937,39 +965,47 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'byFunder' ? styles.breakdownTabActive : {}),
+                  ...(isMobile ? { padding: '5px 8px', fontSize: '11px' } : {}),
                 }}
               >
-                By Funder
+                {isPhonePortrait ? 'Funder' : 'By Funder'}
               </button>
               <button
                 onClick={() => setTimeBreakdown('byCategory')}
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'byCategory' ? styles.breakdownTabActive : {}),
+                  ...(isMobile ? { padding: '5px 8px', fontSize: '11px' } : {}),
                 }}
               >
-                By Category
+                {isPhonePortrait ? 'Category' : 'By Category'}
               </button>
-              <span style={styles.controlsDivider} />
-              <label style={styles.inflationToggle}>
+              {!isMobile && <span style={styles.controlsDivider} />}
+              <label style={{
+                ...styles.inflationToggle,
+                ...(isMobile ? { fontSize: '11px', flexBasis: '100%', marginTop: '4px' } : {})
+              }}>
                 <input
                   type="checkbox"
                   checked={adjustInflation}
                   onChange={() => setAdjustInflation(!adjustInflation)}
                   style={{ cursor: 'pointer' }}
                 />
-                Adjust for inflation (constant 2024 dollars)
+                {isMobile ? 'Inflation-adjusted (2024$)' : 'Adjust for inflation (constant 2024 dollars)'}
               </label>
             </div>
-          <div style={styles.chartDisclaimer}>
+          <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px' }}>
             2025 data is partial and reflects only grants published to date.
           </div>
-          <div style={styles.chartContainer}>
+          <div style={{
+            ...styles.chartContainer,
+            padding: isPhonePortrait ? '4px 0' : isMobile ? '4px 0' : '6px 0',
+          }}>
             <ReactECharts
               option={getChartOption()}
               notMerge={true}
               lazyUpdate={true}
-              style={{ height: '400px', width: '100%' }}
+              style={{ height: isPhonePortrait ? '260px' : isMobile ? '300px' : '400px', width: '100%' }}
               opts={{ renderer: 'canvas' }}
             />
           </div>
@@ -977,30 +1013,42 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
 
         {/* Grants List with Virtualization */}
         <section style={styles.section}>
-          <div style={styles.grantsHeader}>
-            <h2 style={styles.sectionTitle}>Grants</h2>
+          <div style={{
+            ...styles.grantsHeader,
+            ...(isMobile ? { flexDirection: 'column', alignItems: 'flex-start', gap: '10px' } : {})
+          }}>
+            <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px', marginBottom: 0 }}>Grants</h2>
             <div style={styles.sortControls}>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'date' | 'amount' | 'grantmaker' | 'recipient' | 'category')}
-                style={styles.select}
+                style={{
+                  ...styles.select,
+                  ...(isMobile ? { minWidth: 'auto', padding: '8px', fontSize: '13px' } : {})
+                }}
               >
-                <option value="date">Sort by Date</option>
-                <option value="amount">Sort by Amount</option>
-                <option value="grantmaker">Sort by Grantmaker</option>
-                <option value="recipient">Sort by Grantee</option>
-                <option value="category">Sort by Category</option>
+                <option value="date">{isMobile ? 'Date' : 'Sort by Date'}</option>
+                <option value="amount">{isMobile ? 'Amount' : 'Sort by Amount'}</option>
+                <option value="grantmaker">{isMobile ? 'Grantmaker' : 'Sort by Grantmaker'}</option>
+                <option value="recipient">{isMobile ? 'Grantee' : 'Sort by Grantee'}</option>
+                <option value="category">{isMobile ? 'Category' : 'Sort by Category'}</option>
               </select>
               <button
                 onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                style={styles.sortButton}
+                style={{
+                  ...styles.sortButton,
+                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {})
+                }}
               >
-                {sortOrder === 'asc' ? '↑ Ascending' : '↓ Descending'}
+                {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
               </button>
             </div>
           </div>
           
-          <div style={styles.virtualListContainer}>
+          <div style={{
+            ...styles.virtualListContainer,
+            padding: isMobile ? '0 10px' : '0 16px'
+          }}>
             {!isMobile && (
               <div style={styles.listHeaderRow}>
                 <div style={styles.listHeaderCell}>Grantee</div>
@@ -1013,7 +1061,10 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             )}
           <div
             ref={parentRef}
-            style={styles.virtualListScroll}
+            style={{
+              ...styles.virtualListScroll,
+              height: isMobile ? '600px' : '800px'
+            }}
           >
             <div
               style={{
@@ -1054,12 +1105,26 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                             borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
                             color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
                           }}>{displayGrantmaker(grant.grantmaker)}</span>
+                          {grant.fund && (
+                            <span style={{
+                              ...styles.tagSmallSub,
+                              borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
+                              color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+                            }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
+                          )}
                           {grant.category && (
                             <span style={{
                               ...styles.tagSmall,
                               borderColor: categoryColorMap[grant.category] || '#999',
                               color: categoryColorMap[grant.category] || '#999',
                             }}>{displayCategory(grant.category)}</span>
+                          )}
+                          {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== displayCategory(grant.category) && (
+                            <span style={{
+                              ...styles.tagSmallSub,
+                              borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
+                              color: categoryColorMap[grant.category || ''] || '#999',
+                            }}>{grant.focus_area}</span>
                           )}
                           <span style={styles.grantMobileDate}>{format(parseISO(grant.date), 'MM/yyyy')}</span>
                         </div>
@@ -1120,7 +1185,11 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         </section>
 
         {/* Footer */}
-        <footer style={styles.footer}>
+        <footer style={{
+          ...styles.footer,
+          marginTop: isMobile ? '30px' : '60px',
+          paddingTop: isMobile ? '20px' : '40px'
+        }}>
           <p style={styles.footerText}>
             Last updated: {format(parseISO(metadata.lastUpdated), 'MMM d, yyyy')}
           </p>
@@ -1500,6 +1569,15 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '2px 6px',
     fontSize: '11px',
     fontWeight: '600',
+    border: '1px solid',
+    borderRadius: '3px',
+    whiteSpace: 'nowrap',
+  },
+  tagSmallSub: {
+    display: 'inline-block',
+    padding: '2px 6px',
+    fontSize: '10px',
+    fontWeight: '500',
     border: '1px solid',
     borderRadius: '3px',
     whiteSpace: 'nowrap',
