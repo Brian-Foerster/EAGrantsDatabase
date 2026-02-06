@@ -79,6 +79,9 @@ export default function Home() {
   const [adjustInflation, setAdjustInflation] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 400);
   const [expandedGrants, setExpandedGrants] = useState<Set<string>>(new Set());
+  const [hoverTooltip, setHoverTooltip] = useState<{ text: string; visible: boolean }>({ text: '', visible: false });
+  const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const tooltipRef = useRef<HTMLDivElement>(null);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -577,6 +580,40 @@ export default function Home() {
   const rowRefs = useRef<Map<number, HTMLDivElement>>(new Map());
   const resizeObserver = useRef<ResizeObserver | null>(null);
 
+  // Clamp hover tooltip position to viewport
+  useEffect(() => {
+    if (!hoverTooltip.visible || !tooltipRef.current) return;
+    const rect = tooltipRef.current.getBoundingClientRect();
+    let x = tooltipPos.x;
+    let y = tooltipPos.y;
+    const padding = 8;
+
+    if (x + rect.width > window.innerWidth - padding) {
+      x = window.innerWidth - padding - rect.width;
+    }
+    if (y + rect.height > window.innerHeight - padding) {
+      y = window.innerHeight - padding - rect.height;
+    }
+    if (x < padding) x = padding;
+    if (y < padding) y = padding;
+
+    if (x !== tooltipPos.x || y !== tooltipPos.y) {
+      setTooltipPos({ x, y });
+    }
+  }, [hoverTooltip.visible, hoverTooltip.text, tooltipPos.x, tooltipPos.y]);
+
+  const showHoverTooltip = (text: string, e: React.MouseEvent<HTMLElement>) => {
+    setHoverTooltip({ text, visible: true });
+    setTooltipPos({ x: e.clientX + 12, y: e.clientY + 12 });
+  };
+  const moveHoverTooltip = (e: React.MouseEvent<HTMLElement>) => {
+    if (!hoverTooltip.visible) return;
+    setTooltipPos({ x: e.clientX + 12, y: e.clientY + 12 });
+  };
+  const hideHoverTooltip = () => {
+    setHoverTooltip({ text: '', visible: false });
+  };
+
   // Setup ResizeObserver to detect row height changes
   useEffect(() => {
     resizeObserver.current = new ResizeObserver((entries) => {
@@ -689,6 +726,7 @@ export default function Home() {
     const breakdownTooltip = {
       trigger: 'axis' as const,
       axisPointer: { type: 'shadow' as const },
+      confine: true,
       formatter: (params: any) => {
         const items = Array.isArray(params) ? params : [params];
         let total = 0;
@@ -755,6 +793,7 @@ export default function Home() {
           tooltip: {
             trigger: 'axis',
             axisPointer: { type: 'shadow' },
+            confine: true,
             formatter: (params: any) => {
               const d = params[0];
               const item = byYear[d.dataIndex];
@@ -809,6 +848,7 @@ export default function Home() {
           title: isMobile ? { show: false } : { text: 'Grants by Month', left: 'center', top: 8 },
           tooltip: {
             trigger: 'axis',
+            confine: true,
             formatter: (params: any) => {
               const d = params[0];
               const item = byYearMonth[d.dataIndex];
@@ -983,7 +1023,9 @@ export default function Home() {
                                   ...styles.filterOption,
                                   ...(isNonCore ? { opacity: 0.7, fontStyle: 'italic' } : {})
                                 }}
-                                title={tooltip}
+                                onMouseEnter={tooltip ? (e) => showHoverTooltip(tooltip, e) : undefined}
+                                onMouseMove={tooltip ? moveHoverTooltip : undefined}
+                                onMouseLeave={tooltip ? hideHoverTooltip : undefined}
                               >
                                 <input
                                   type="checkbox"
@@ -1433,6 +1475,19 @@ export default function Home() {
           </div>
         </section>
 
+        {hoverTooltip.visible && (
+          <div
+            ref={tooltipRef}
+            style={{
+              ...styles.hoverTooltip,
+              left: tooltipPos.x,
+              top: tooltipPos.y,
+            }}
+          >
+            {hoverTooltip.text}
+          </div>
+        )}
+
         {/* Footer */}
         <footer style={{
           ...styles.footer,
@@ -1564,6 +1619,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: '700',
     color: '#4b5563',
     whiteSpace: 'nowrap',
+  },
+  hoverTooltip: {
+    position: 'fixed',
+    zIndex: 1000,
+    maxWidth: '260px',
+    padding: '6px 8px',
+    backgroundColor: '#111827',
+    color: '#f9fafb',
+    fontSize: '12px',
+    lineHeight: '1.3',
+    borderRadius: '4px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+    pointerEvents: 'none',
   },
   chartControlsRow: {
     display: 'flex',
