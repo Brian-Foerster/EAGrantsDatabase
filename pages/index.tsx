@@ -1797,7 +1797,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     gap: '5px',
-    padding: '12px 0',
+    padding: '8px 0 16px 0',
     borderBottom: '1px solid #e5e7eb',
     cursor: 'pointer',
   },
