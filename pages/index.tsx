@@ -1139,22 +1139,15 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                         {grant.title && grant.title !== grant.recipient && (
                           <p style={styles.grantDesc}>{grant.title}</p>
                         )}
-                        <div style={styles.grantMobileTagRow}>
+                        <div style={styles.grantMobileMeta}>
                           <span style={{
-                            ...styles.tagSmall,
+                            ...styles.tagTiny,
                             borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
                             color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
                           }}>{grant.grantmaker}</span>
-                          {grant.fund && (
-                            <span style={{
-                              ...styles.tagSmallSub,
-                              borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
-                              color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                            }}>{shortFund(grant.fund)}</span>
-                          )}
                           {grant.category && (
                             <span style={{
-                              ...styles.tagSmall,
+                              ...styles.tagTiny,
                               borderColor: categoryColorMap[grant.category] || '#999',
                               color: categoryColorMap[grant.category] || '#999',
                             }}>{shortCategory(grant.category)}</span>
@@ -1598,6 +1591,21 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexWrap: 'wrap',
     gap: '4px',
     alignItems: 'center',
+  },
+  grantMobileMeta: {
+    display: 'flex',
+    gap: '6px',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+  },
+  tagTiny: {
+    display: 'inline-block',
+    padding: '1px 5px',
+    fontSize: '10px',
+    fontWeight: '600',
+    border: '1px solid',
+    borderRadius: '3px',
+    whiteSpace: 'nowrap',
   },
   grantMobileDate: {
     fontSize: '12px',
