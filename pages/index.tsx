@@ -491,10 +491,10 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     } = chartData;
 
     const gridYear = isMobile
-      ? { left: '12%', right: '5%', top: '45px', bottom: '15%' }
+      ? { left: '50px', right: '10px', top: '35px', bottom: '12%' }
       : { left: '7%', right: '20%', top: '55px', bottom: '15%' };
     const gridMonth = isMobile
-      ? { left: '12%', right: '5%', top: '45px', bottom: '22%' }
+      ? { left: '50px', right: '10px', top: '35px', bottom: '20%' }
       : { left: '7%', right: '20%', top: '55px', bottom: '20%' };
 
     // Calculate y-axis max that works for both nominal and inflation-adjusted
@@ -554,10 +554,23 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
       },
     };
 
-    const titleStyle = isMobile ? { fontSize: 14 } : {};
+    const titleStyle = isMobile ? { fontSize: 12 } : {};
+    const titleConfig = (text: string, mobileText?: string) => isMobile
+      ? { text: mobileText || text, left: 'center', top: 4, textStyle: titleStyle }
+      : { text, left: 'center', top: 8, textStyle: titleStyle };
     const legendConfig = isMobile
       ? { type: 'scroll' as const, orient: 'horizontal' as const, bottom: 0, left: 'center' }
       : { type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20 };
+    const yAxisConfig = (max: number) => ({
+      type: 'value' as const,
+      name: isMobile ? '' : (adjustInflation ? '2024 USD ($M)' : 'Amount ($M)'),
+      max,
+      nameTextStyle: { fontSize: isMobile ? 10 : 12 },
+      axisLabel: {
+        fontSize: isMobile ? 10 : 12,
+        formatter: (val: number) => val >= 1000 ? `${(val / 1000).toFixed(1)}B` : `${Math.round(val)}M`,
+      },
+    });
 
     switch (chartView) {
       case 'year': {
@@ -570,7 +583,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
+            yAxis: yAxisConfig(yearMax),
             series: buildStackedSeries(yearLabels, yearFunder, funderGroups),
             grid: gridYear,
             graphic: isMobile ? [] : totalGraphic,
@@ -583,7 +596,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
+            yAxis: yAxisConfig(yearMax),
             series: buildStackedSeries(yearLabels, yearCategory, categoryGroups),
             grid: gridYear,
             graphic: isMobile ? [] : totalGraphic,
@@ -602,7 +615,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             }
           },
           xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
-          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
+          yAxis: yAxisConfig(yearMax),
           series: [{
             name: 'Amount', type: 'bar',
             data: byYear.map(d => parseFloat((d.total * inflationMultiplier(String(d.year)) / 1000000).toFixed(2))),
@@ -628,7 +641,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
+            yAxis: yAxisConfig(monthMax),
             series: buildStackedSeries(monthLabels, monthFunder, funderGroups),
             grid: gridMonth,
             graphic: isMobile ? [] : totalGraphic,
@@ -641,7 +654,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
+            yAxis: yAxisConfig(monthMax),
             series: buildStackedSeries(monthLabels, monthCategory, categoryGroups),
             grid: gridMonth,
             graphic: isMobile ? [] : totalGraphic,
@@ -659,7 +672,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             }
           },
           xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
-          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax, nameTextStyle: { fontSize: isMobile ? 10 : 12 } },
+          yAxis: yAxisConfig(monthMax),
           series: [{
             name: 'Amount', type: 'bar',
             data: byYearMonth.map(d => (d.total * inflationMultiplier(d.yearMonth) / 1000000).toFixed(2)),
@@ -1099,19 +1112,21 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                         {grant.title && grant.title !== grant.recipient && (
                           <p style={styles.grantDesc}>{grant.title}</p>
                         )}
-                        <div style={styles.grantMobileTags}>
+                        <div style={styles.grantMobileTagRow}>
                           <span style={{
                             ...styles.tagSmall,
                             borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
                             color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                          }}>{displayGrantmaker(grant.grantmaker)}</span>
+                          }}>{grant.grantmaker}</span>
                           {grant.fund && (
                             <span style={{
                               ...styles.tagSmallSub,
                               borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
                               color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                            }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
+                            }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infra Fund' : grant.fund}</span>
                           )}
+                        </div>
+                        <div style={styles.grantMobileTagRow}>
                           {grant.category && (
                             <span style={{
                               ...styles.tagSmall,
@@ -1558,6 +1573,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexWrap: 'wrap',
     gap: '6px',
+    alignItems: 'center',
+  },
+  grantMobileTagRow: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '4px',
     alignItems: 'center',
   },
   grantMobileDate: {
