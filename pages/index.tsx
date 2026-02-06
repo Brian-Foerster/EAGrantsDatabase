@@ -36,6 +36,7 @@ interface MinGrant {
   focus_area?: string;
   fund?: string;
   url?: string;
+  description?: string;
   is_residual?: boolean;
 }
 
@@ -539,7 +540,14 @@ export default function Home() {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        return 220; // Expanded mobile row - needs space for all details
+        // More space when description is present - descriptions can be long
+        const desc = grant.description || (grant.title !== grant.recipient ? grant.title : '');
+        const descLength = desc?.length || 0;
+        // Base height + extra for long descriptions
+        if (descLength > 200) return 380;
+        if (descLength > 100) return 340;
+        if (descLength > 0) return 300;
+        return 240; // No description
       }
       return 95; // Collapsed mobile row
     }
@@ -1093,17 +1101,17 @@ export default function Home() {
 
         {/* Charts */}
         <section style={styles.section}>
-          <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px' }}>Visualizations</h2>
+          <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px' }}>Charts</h2>
           <div style={{
             ...styles.chartControlsRow,
-            ...(isPhonePortrait ? { gap: '4px', fontSize: '12px' } : isMobile ? { gap: '6px' } : {})
+            ...(isPhonePortrait ? { gap: '6px', fontSize: '13px' } : isMobile ? { gap: '8px' } : {})
           }}>
               <button
                 onClick={() => setChartView('year')}
                 style={{
                   ...styles.chartTab,
                   ...(chartView === 'year' ? styles.chartTabActive : {}),
-                  ...(isMobile ? { padding: '6px 10px', fontSize: '12px' } : {}),
+                  ...(isMobile ? { padding: '10px 14px', fontSize: '14px' } : {}),
                 }}
               >
                 {isPhonePortrait ? 'Year' : 'By Year'}
@@ -1113,7 +1121,7 @@ export default function Home() {
                 style={{
                   ...styles.chartTab,
                   ...(chartView === 'month' ? styles.chartTabActive : {}),
-                  ...(isMobile ? { padding: '6px 10px', fontSize: '12px' } : {}),
+                  ...(isMobile ? { padding: '10px 14px', fontSize: '14px' } : {}),
                 }}
               >
                 {isPhonePortrait ? 'Month' : 'By Month'}
@@ -1125,7 +1133,7 @@ export default function Home() {
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'total' ? styles.breakdownTabActive : {}),
-                  ...(isMobile ? { padding: '5px 8px', fontSize: '11px' } : {}),
+                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {}),
                 }}
               >
                 Total
@@ -1135,7 +1143,7 @@ export default function Home() {
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'byFunder' ? styles.breakdownTabActive : {}),
-                  ...(isMobile ? { padding: '5px 8px', fontSize: '11px' } : {}),
+                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {}),
                 }}
               >
                 {isPhonePortrait ? 'Funder' : 'By Funder'}
@@ -1145,7 +1153,7 @@ export default function Home() {
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'byCategory' ? styles.breakdownTabActive : {}),
-                  ...(isMobile ? { padding: '5px 8px', fontSize: '11px' } : {}),
+                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {}),
                 }}
               >
                 {isPhonePortrait ? 'Category' : 'By Category'}
@@ -1153,7 +1161,7 @@ export default function Home() {
               {!isMobile && <span style={styles.controlsDivider} />}
               <label style={{
                 ...styles.inflationToggle,
-                ...(isMobile ? { fontSize: '11px', flexBasis: '100%', marginTop: '4px' } : {})
+                ...(isMobile ? { fontSize: '13px', flexBasis: '100%', marginTop: '6px' } : {})
               }}>
                 <input
                   type="checkbox"
@@ -1305,7 +1313,7 @@ export default function Home() {
                             </div>
                             {grant.focus_area && grant.focus_area !== displayCategory(grant.category) && (
                               <div style={styles.expandedRow}>
-                                <span style={styles.expandedLabel}>Focus:</span>
+                                <span style={styles.expandedLabel}>Sub-category:</span>
                                 <span>{grant.focus_area}</span>
                               </div>
                             )}
@@ -1313,6 +1321,12 @@ export default function Home() {
                               <span style={styles.expandedLabel}>Date:</span>
                               <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
                             </div>
+                            {(grant.description || (grant.title && grant.title !== grant.recipient)) && (
+                              <div style={styles.expandedDescRow}>
+                                <span style={styles.expandedLabel}>Description:</span>
+                                <span style={styles.expandedDescText}>{grant.description || grant.title}</span>
+                              </div>
+                            )}
                             {getGrantUrl(grant) && (
                               <div style={styles.expandedRow}>
                                 <a
@@ -1848,7 +1862,19 @@ const styles: { [key: string]: React.CSSProperties } = {
   expandedLabel: {
     fontWeight: '600',
     color: '#6b7280',
-    minWidth: '60px',
+    minWidth: '80px',
+    flexShrink: 0,
+  },
+  expandedDescRow: {
+    display: 'flex',
+    gap: '8px',
+    fontSize: '12px',
+    color: '#4b5563',
+    flexWrap: 'wrap',
+  },
+  expandedDescText: {
+    flex: 1,
+    lineHeight: '1.4',
   },
   expandedLink: {
     color: '#3b82f6',

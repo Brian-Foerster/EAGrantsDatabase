@@ -232,6 +232,7 @@ function createMinimizedGrants(grants: Grant[]) {
     focus_area: grant.focus_area,
     fund: grant.fund,
     url: grant.url,
+    description: grant.description || '',
     ...(grant.is_residual ? { is_residual: true } : {}),
   }));
 }
