@@ -127,10 +127,10 @@ export default function Home() {
         setLoadingProgress('Building search index...');
         // Build search index client-side (saves 2.5MB download)
         const ms = new MiniSearch({
-          fields: ['title', 'recipient', 'category', 'grantmaker'],
+          fields: ['title', 'recipient', 'description', 'category', 'grantmaker'],
           storeFields: ['id'],
           searchOptions: {
-            boost: { title: 2, recipient: 1.5 },
+            boost: { title: 2, recipient: 1.5, description: 1 },
             fuzzy: 0.2,
             prefix: true,
           }
@@ -155,7 +155,7 @@ export default function Home() {
       return;
     }
     
-    const results = miniSearch.search(searchTerm);
+    const results = miniSearch.search(searchTerm, { combineWith: 'AND' });
     setSearchResults(results.map(r => r.id).slice(0, 1000));
   }, [miniSearch, searchTerm]);
 
@@ -173,45 +173,58 @@ export default function Home() {
       }
     }
 
-    // Apply grantmaker, fund, category, and sub-category filters with OR logic
-    // If ANY filter matches, the grant is included
-    // Non-core EA funds are excluded by default unless explicitly selected
+    // Apply filters: AND between groups, OR within groups
+    // Group 1 (Source): Grantmaker + Fund — OR within
+    // Group 2 (Topic): Category + Sub-category — OR within
+    // Between groups: AND
+    // Non-core EA funds excluded by default unless explicitly selected
     const hasGmFilter = selectedGrantmakers.length > 0;
     const hasFundFilter = selectedFunds.length > 0;
     const hasCatFilter = selectedCategories.length > 0;
     const hasSubFilter = selectedSubcategories.length > 0;
-    const hasAnyFilter = hasGmFilter || hasFundFilter || hasCatFilter || hasSubFilter;
+    const hasSourceFilter = hasGmFilter || hasFundFilter;
+    const hasTopicFilter = hasCatFilter || hasSubFilter;
 
-    if (hasAnyFilter) {
-      filtered = filtered.filter(grant => {
-        // Check if grant matches any selected filter (OR logic)
+    filtered = filtered.filter(grant => {
+      // --- Source group (Grantmaker / Fund) ---
+      let passesSource: boolean;
+      if (hasSourceFilter) {
         const matchesGm = hasGmFilter && selectedGrantmakers.includes(grant.grantmaker);
-        const matchesFund = hasFundFilter && grant.fund && selectedFunds.includes(grant.fund);
-        const matchesCat = hasCatFilter && grant.category && selectedCategories.includes(grant.category);
-        const matchesSub = hasSubFilter && grant.focus_area && selectedSubcategories.includes(grant.focus_area);
+        const matchesFund = hasFundFilter && !!grant.fund && selectedFunds.includes(grant.fund);
 
-        if (matchesFund || matchesCat || matchesSub) {
-          // Explicit fund/category/sub-category selection always includes
-          return true;
-        }
-        if (matchesGm) {
-          // Grantmaker selected - include if no more specific filters, excluding non-core EA
-          // Unless a fund from this grantmaker is also selected (then only show that fund)
-          const grantmakerHasSelectedFunds = selectedFunds.some(f => {
+        if (matchesFund) {
+          passesSource = true;
+        } else if (matchesGm) {
+          // If user also selected specific funds for this grantmaker, only show those
+          const grantmakerHasSelectedFunds = hasFundFilter && selectedFunds.some(f => {
             const fundGrant = grants.find(g => g.fund === f);
             return fundGrant && fundGrant.grantmaker === grant.grantmaker;
           });
           if (grantmakerHasSelectedFunds) {
-            return grant.fund && selectedFunds.includes(grant.fund);
+            passesSource = !!grant.fund && selectedFunds.includes(grant.fund);
+          } else {
+            passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS);
           }
-          return !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS);
+        } else {
+          passesSource = false;
         }
-        return false;
-      });
-    } else {
-      // No filters - exclude non-core EA funds by default
-      filtered = filtered.filter(grant => !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS));
-    }
+      } else {
+        // No source filter — exclude non-core EA funds by default
+        passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS);
+      }
+
+      // --- Topic group (Category / Sub-category) ---
+      let passesTopic: boolean;
+      if (hasTopicFilter) {
+        const matchesCat = hasCatFilter && !!grant.category && selectedCategories.includes(grant.category);
+        const matchesSub = hasSubFilter && !!grant.focus_area && selectedSubcategories.includes(grant.focus_area);
+        passesTopic = matchesCat || matchesSub;
+      } else {
+        passesTopic = true;
+      }
+
+      return passesSource && passesTopic;
+    });
 
     // Apply year filter
     if (selectedYears.length > 0) {
