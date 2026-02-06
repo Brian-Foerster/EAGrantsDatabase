@@ -101,10 +101,11 @@ export default function About() {
 
             <h3 style={styles.subheading}>Categories</h3>
             <p style={styles.paragraph}>
-              Grants are classified into five categories based on the source organization's own
+              Grants are classified into seven categories based on the source organization's own
               labeling: Long-Term &amp; Existential Risk, Global Health &amp; Development,
-              Animal Welfare, Community &amp; Infrastructure, and Other. Mapping tables
-              translate each source's terminology to this taxonomy.
+              Animal Welfare, EA Community &amp; Infrastructure, Scientific Research,
+              Policy Reform, and Other. Mapping tables translate each source's terminology
+              to this taxonomy.
             </p>
 
             <h3 style={styles.subheading}>Deduplication</h3>
@@ -132,12 +133,12 @@ export default function About() {
 
             <h3 style={styles.subheading}>Non-core EA focus areas</h3>
             <p style={styles.paragraph}>
-              Approximately 537 grants ($291M) from Coefficient Giving focus areas that are
-              not generally considered part of the EA movement are excluded from the default
-              view. These include US policy reform areas such as Criminal Justice Reform,
-              Housing Policy Reform, Immigration Policy, Macroeconomic Stabilization Policy,
-              Land Use Reform, and Abundance &amp; Growth. These grants can be viewed by
-              selecting them explicitly in the Fund filter.
+              Approximately 560 grants ($313M) in the Policy Reform category are excluded
+              from the default view. These include US policy areas such as Criminal Justice
+              Reform, Housing Policy Reform, Immigration Policy, Macroeconomic Stabilization
+              Policy, Innovation Policy, and Abundance &amp; Growth — areas that are not
+              generally considered part of the EA movement. These grants can be viewed by
+              selecting them explicitly in the Fund filter or the Policy Reform category.
             </p>
 
             <h2 style={styles.sectionTitle}>Limitations</h2>

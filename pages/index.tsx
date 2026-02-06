@@ -12,12 +12,13 @@ import * as path from 'path';
 // Funds/focus areas that are excluded by default (not generally considered core EA)
 // These grants are only shown when explicitly selected in the Fund filter
 const NON_CORE_EA_FUNDS: Record<string, string> = {
-  'Abundance & Growth': 'Focus area not generally considered part of the EA movement',
-  'Housing Policy Reform': 'US policy focus area outside traditional EA cause areas',
-  'Immigration Policy': 'US policy focus area outside traditional EA cause areas',
-  'Criminal Justice Reform': 'US policy focus area outside traditional EA cause areas',
-  'Land Use Reform': 'US policy focus area outside traditional EA cause areas',
-  'Macroeconomic Stabilization Policy': 'US policy focus area outside traditional EA cause areas',
+  'Abundance & Growth': 'Policy area not generally considered part of the EA movement',
+  'Housing Policy Reform': 'US policy area outside traditional EA cause areas',
+  'Immigration Policy': 'US policy area outside traditional EA cause areas',
+  'Criminal Justice Reform': 'US policy area outside traditional EA cause areas',
+  'Land Use Reform': 'US policy area outside traditional EA cause areas',
+  'Macroeconomic Stabilization Policy': 'US policy area outside traditional EA cause areas',
+  'Innovation Policy': 'US policy area outside traditional EA cause areas',
 };
 
 interface MinGrant {
@@ -295,7 +296,9 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     'LTXR': 'Long-Term & Existential Risk',
     'GH': 'Global Health & Development',
     'AW': 'Animal Welfare',
-    'Meta': 'Community & Infrastructure',
+    'Meta': 'EA Community & Infrastructure',
+    'Science': 'Scientific Research',
+    'Policy': 'Policy Reform',
     'Other': 'Other',
   };
 
@@ -307,6 +310,27 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
 
   const displayCategory = (code?: string): string => code ? (CATEGORY_DISPLAY[code] || code) : '';
   const displayGrantmaker = (name: string): string => GRANTMAKER_DISPLAY[name] || name;
+
+  // Normalize sub-categories to consolidate similar ones
+  const SUBCATEGORY_NORMALIZE: Record<string, string> = {
+    // GH consolidation
+    'Global Health & Wellbeing': 'Global Health & Development',
+    'Human Health and Wellbeing': 'Global Health & Development',
+    'Science for Global Health': 'Health Research',
+    'Global Health R&D': 'Health Research',
+    'Global Public Health Policy': 'Health Policy',
+    'Global Aid Policy': 'Development Policy',
+    // LTXR consolidation
+    'Science Supporting Biosecurity and Pandemic Preparedness': 'Biosecurity & Pandemic Preparedness',
+    'Science Supporting Biosecurity': 'Biosecurity & Pandemic Preparedness',
+    'Potential Risks from Advanced Artificial Intelligence': 'AI Safety',
+    'Navigating Transformative AI': 'AI Safety',
+    // Science consolidation
+    'Transformative Basic Science': 'Basic Science',
+    'Scientific Innovation: Tools and Techniques': 'Scientific Tools',
+    'Other Scientific Research Areas': 'Scientific Research',
+  };
+  const normalizeSubcategory = (sub?: string): string => sub ? (SUBCATEGORY_NORMALIZE[sub] || sub) : '';
 
   const categoryColorMap = useMemo(() => {
     const cats = Array.from(new Set(grants.map(g => g.category).filter(Boolean))) as string[];
@@ -725,7 +749,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                       );
                     })}
                     <p style={styles.nonCoreNote}>
-                      * Excluded by default — focus areas not generally considered part of the EA movement. Hover for details.
+                      * Excluded by default — Policy Reform areas not generally considered part of the EA movement. Hover for details.
                     </p>
                   </div>
                 )}
@@ -759,7 +783,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                   onClick={() => toggleFilter('subcategory')}
                   style={styles.filterHeader}
                 >
-                  <span style={styles.filterHeaderLabel}>Focus Area</span>
+                  <span style={styles.filterHeaderLabel}>Sub-Category</span>
                   <span style={styles.filterHeaderIcon}>{expandedFilters.subcategory ? '\u2212' : '+'}</span>
                 </button>
                 {expandedFilters.subcategory && (
