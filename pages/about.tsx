@@ -28,7 +28,7 @@ export default function About() {
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
               the Effective Altruism community. It currently includes approximately 5,050 grants
-              totaling approximately $6.2 billion, spanning 2012 to 2025.
+              totaling approximately $6.2 billion, spanning 2012 to 2026.
             </p>
             <p style={styles.paragraph}>
               The database is updated monthly via an automated scraping pipeline. The source
@@ -49,7 +49,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>GiveWell</h3>
             <p style={styles.paragraph}>
-              Approximately 439 grants (2014 through 2025), exported from GiveWell's public{' '}
+              Approximately 440 grants (2014 through 2026), exported from GiveWell's public{' '}
               <a href="https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Airtable database
               </a>.
@@ -169,7 +169,7 @@ export default function About() {
                 sources because the upstream data does not include them.
               </li>
               <li style={styles.listItem}>
-                2025 data is partial and reflects only grants published to date.
+                2025 and 2026 data is partial and reflects only grants published to date.
               </li>
               <li style={styles.listItem}>
                 The database does not include donation platforms (e.g., Giving What We Can,
