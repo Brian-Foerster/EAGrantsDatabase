@@ -574,7 +574,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
           </nav>
           <h1 style={styles.title}>EA Grants Database</h1>
           <p style={styles.subtitle}>
-            Aggregating {metadata.totalGrants.toLocaleString()} grants from {metadata.grantmakers.length} major EA grantmakers
+            Aggregating {metadata.totalGrants.toLocaleString()} grants totaling ${(metadata.totalAmount / 1e9).toFixed(1)}B from {metadata.grantmakers.length} major EA grantmakers
           </p>
         </header>
 

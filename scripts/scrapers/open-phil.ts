@@ -123,6 +123,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
       description,
       category,
       focus_area: focusArea,
+      fund: focusArea || undefined,
       source_id: `cg-row-${i}`,
       exclude_from_total: isGiveWellRecommended,
     };
