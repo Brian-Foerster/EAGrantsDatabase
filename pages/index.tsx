@@ -71,7 +71,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const [chartView, setChartView] = useState<'year' | 'month'>('year');
   const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
   const [adjustInflation, setAdjustInflation] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(1200);
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 400);
 
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -322,6 +322,32 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const displayCategory = (code?: string): string => code ? (CATEGORY_DISPLAY[code] || code) : '';
   const displayGrantmaker = (name: string): string => GRANTMAKER_DISPLAY[name] || name;
 
+  // Short names for mobile display
+  const CATEGORY_SHORT: Record<string, string> = {
+    'LTXR': 'LTXR',
+    'GH': 'Global Health',
+    'AW': 'Animal Welfare',
+    'Meta': 'EA Infra',
+    'Science': 'Science',
+    'Policy': 'Policy',
+    'Other': 'Other',
+  };
+  const shortCategory = (code?: string): string => code ? (CATEGORY_SHORT[code] || CATEGORY_DISPLAY[code] || code) : '';
+
+  // Shorten long fund names for mobile
+  const shortFund = (fund: string): string => {
+    if (fund === 'EA Infrastructure Fund') return 'Infra Fund';
+    if (fund === 'Global Health & Development') return 'GH&D';
+    if (fund === 'Global Health & Development Fund') return 'GH&D Fund';
+    if (fund === 'Long-Term Future Fund') return 'LT Future';
+    if (fund === 'Animal Welfare Fund') return 'AW Fund';
+    if (fund === 'All Grants Fund') return 'All Grants';
+    if (fund === 'Board Designated') return 'Board';
+    if (fund.includes('Coefficient Giving')) return 'Coefficient';
+    if (fund.length > 20) return fund.slice(0, 18) + '...';
+    return fund;
+  };
+
   // Normalize sub-categories to consolidate similar ones
   const SUBCATEGORY_NORMALIZE: Record<string, string> = {
     // GH consolidation
@@ -491,10 +517,10 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     } = chartData;
 
     const gridYear = isMobile
-      ? { left: '50px', right: '10px', top: '35px', bottom: '12%' }
+      ? { left: '45px', right: '8px', top: '30px', bottom: '10%' }
       : { left: '7%', right: '20%', top: '55px', bottom: '15%' };
     const gridMonth = isMobile
-      ? { left: '50px', right: '10px', top: '35px', bottom: '20%' }
+      ? { left: '45px', right: '8px', top: '30px', bottom: '18%' }
       : { left: '7%', right: '20%', top: '55px', bottom: '20%' };
 
     // Calculate y-axis max that works for both nominal and inflation-adjusted
@@ -555,20 +581,21 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     };
 
     const titleStyle = isMobile ? { fontSize: 12 } : {};
-    const titleConfig = (text: string, mobileText?: string) => isMobile
-      ? { text: mobileText || text, left: 'center', top: 4, textStyle: titleStyle }
-      : { text, left: 'center', top: 8, textStyle: titleStyle };
+    // Hide legend on mobile - tooltip provides enough info
     const legendConfig = isMobile
-      ? { type: 'scroll' as const, orient: 'horizontal' as const, bottom: 0, left: 'center' }
+      ? { show: false }
       : { type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20 };
     const yAxisConfig = (max: number) => ({
       type: 'value' as const,
       name: isMobile ? '' : (adjustInflation ? '2024 USD ($M)' : 'Amount ($M)'),
-      max,
-      nameTextStyle: { fontSize: isMobile ? 10 : 12 },
+      max: Math.ceil(max / 100) * 100, // Round to nearest 100
+      nameTextStyle: { fontSize: 12 },
       axisLabel: {
-        fontSize: isMobile ? 10 : 12,
-        formatter: (val: number) => val >= 1000 ? `${(val / 1000).toFixed(1)}B` : `${Math.round(val)}M`,
+        fontSize: isMobile ? 9 : 12,
+        formatter: function(val: number) {
+          if (val >= 1000) return (val / 1000).toFixed(1) + 'B';
+          return Math.round(val) + 'M';
+        },
       },
     });
 
@@ -579,7 +606,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         if (timeBreakdown === 'byFunder') {
           return {
             animation: false,
-            title: { text: isMobile ? 'By Year (Funder)' : 'Grants by Year (by Funder)', left: 'center', top: 8, textStyle: titleStyle },
+            title: isMobile ? { show: false } : { text: 'Grants by Year (by Funder)', left: 'center', top: 8 },
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
@@ -592,7 +619,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         if (timeBreakdown === 'byCategory') {
           return {
             animation: false,
-            title: { text: isMobile ? 'By Year (Category)' : 'Grants by Year (by Category)', left: 'center', top: 8, textStyle: titleStyle },
+            title: isMobile ? { show: false } : { text: 'Grants by Year (by Category)', left: 'center', top: 8 },
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
@@ -604,7 +631,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         }
         return {
           animation: false,
-          title: { text: 'Grants by Year', left: 'center', top: 8, textStyle: titleStyle },
+          title: isMobile ? { show: false } : { text: 'Grants by Year', left: 'center', top: 8 },
           tooltip: {
             trigger: 'axis',
             axisPointer: { type: 'shadow' },
@@ -637,7 +664,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         if (timeBreakdown === 'byFunder') {
           return {
             animation: false,
-            title: { text: isMobile ? 'By Month (Funder)' : 'Grants by Month (by Funder)', left: 'center', top: 8, textStyle: titleStyle },
+            title: isMobile ? { show: false } : { text: 'Grants by Month (by Funder)', left: 'center', top: 8 },
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
@@ -650,7 +677,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         if (timeBreakdown === 'byCategory') {
           return {
             animation: false,
-            title: { text: isMobile ? 'By Month (Category)' : 'Grants by Month (by Category)', left: 'center', top: 8, textStyle: titleStyle },
+            title: isMobile ? { show: false } : { text: 'Grants by Month (by Category)', left: 'center', top: 8 },
             tooltip: breakdownTooltip,
             legend: legendConfig,
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
@@ -662,7 +689,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         }
         return {
           animation: false,
-          title: { text: 'Grants by Month', left: 'center', top: 8, textStyle: titleStyle },
+          title: isMobile ? { show: false } : { text: 'Grants by Month', left: 'center', top: 8 },
           tooltip: {
             trigger: 'axis',
             formatter: (params: any) => {
@@ -1123,23 +1150,14 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                               ...styles.tagSmallSub,
                               borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
                               color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                            }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infra Fund' : grant.fund}</span>
+                            }}>{shortFund(grant.fund)}</span>
                           )}
-                        </div>
-                        <div style={styles.grantMobileTagRow}>
                           {grant.category && (
                             <span style={{
                               ...styles.tagSmall,
                               borderColor: categoryColorMap[grant.category] || '#999',
                               color: categoryColorMap[grant.category] || '#999',
-                            }}>{displayCategory(grant.category)}</span>
-                          )}
-                          {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== displayCategory(grant.category) && (
-                            <span style={{
-                              ...styles.tagSmallSub,
-                              borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
-                              color: categoryColorMap[grant.category || ''] || '#999',
-                            }}>{grant.focus_area}</span>
+                            }}>{shortCategory(grant.category)}</span>
                           )}
                           <span style={styles.grantMobileDate}>{format(parseISO(grant.date), 'MM/yyyy')}</span>
                         </div>
