@@ -9,6 +9,17 @@ import { GetStaticProps } from 'next';
 import * as fs from 'fs';
 import * as path from 'path';
 
+// Funds/focus areas that are excluded by default (not generally considered core EA)
+// These grants are only shown when explicitly selected in the Fund filter
+const NON_CORE_EA_FUNDS: Record<string, string> = {
+  'Abundance & Growth': 'Focus area not generally considered part of the EA movement',
+  'Housing Policy Reform': 'US policy focus area outside traditional EA cause areas',
+  'Immigration Policy': 'US policy focus area outside traditional EA cause areas',
+  'Criminal Justice Reform': 'US policy focus area outside traditional EA cause areas',
+  'Land Use Reform': 'US policy focus area outside traditional EA cause areas',
+  'Macroeconomic Stabilization Policy': 'US policy focus area outside traditional EA cause areas',
+};
+
 interface MinGrant {
   id: string;
   title: string;
@@ -109,6 +120,9 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     // Apply fund (sub-grantmaker) filter
     if (selectedFunds.length > 0) {
       filtered = filtered.filter(grant => grant.fund != null && selectedFunds.includes(grant.fund));
+    } else {
+      // Exclude non-core EA funds by default (when no funds explicitly selected)
+      filtered = filtered.filter(grant => !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS));
     }
 
     // Apply category filter
@@ -635,20 +649,35 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                       <div key={group.grantmaker} style={styles.fundGroup}>
                         <div style={styles.fundGroupHeader}>{group.displayName}</div>
                         <div style={styles.fundGroupOptions}>
-                          {group.funds.map(fund => (
-                            <label key={fund} style={styles.filterOption}>
-                              <input
-                                type="checkbox"
-                                checked={selectedFunds.includes(fund)}
-                                onChange={() => toggleFund(fund)}
-                                style={styles.checkbox}
-                              />
-                              {fund}
-                            </label>
-                          ))}
+                          {group.funds.map(fund => {
+                            const isNonCore = fund in NON_CORE_EA_FUNDS;
+                            const tooltip = isNonCore ? NON_CORE_EA_FUNDS[fund] : undefined;
+                            return (
+                              <label
+                                key={fund}
+                                style={{
+                                  ...styles.filterOption,
+                                  ...(isNonCore ? { opacity: 0.7, fontStyle: 'italic' } : {})
+                                }}
+                                title={tooltip}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={selectedFunds.includes(fund)}
+                                  onChange={() => toggleFund(fund)}
+                                  style={styles.checkbox}
+                                />
+                                {fund}
+                                {isNonCore && <span style={styles.nonCoreIndicator}>*</span>}
+                              </label>
+                            );
+                          })}
                         </div>
                       </div>
                     ))}
+                    <p style={styles.nonCoreNote}>
+                      * Excluded by default — focus areas not generally considered part of the EA movement. Hover for details.
+                    </p>
                   </div>
                 )}
               </div>
@@ -1169,6 +1198,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     height: '18px',
     cursor: 'pointer',
     accentColor: '#3b82f6',
+  },
+  nonCoreIndicator: {
+    marginLeft: '4px',
+    color: '#999',
+    fontSize: '12px',
+  },
+  nonCoreNote: {
+    fontSize: '12px',
+    color: '#888',
+    fontStyle: 'italic',
+    marginTop: '12px',
+    paddingTop: '8px',
+    borderTop: '1px solid #e5e5e5',
   },
   amountFilterRow: {
     display: 'flex',
