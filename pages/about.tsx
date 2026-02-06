@@ -4,6 +4,7 @@ import Link from 'next/link';
 
 const REPO_URL = 'https://github.com/Brian-Foerster/EAGrantsDatabase';
 const FEEDBACK_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSceNe8T97Z36LvBmepyid68MYbyairBvZucnZFlREGROSBOZA/viewform';
+const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 
 export default function About() {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 800);
@@ -23,6 +24,13 @@ export default function About() {
         <title>About - EA Grants Database</title>
         <meta name="description" content="About the EA Grants Database — data sources, methodology, and limitations" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        {process.env.NODE_ENV === 'production' && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `(function(){try{var v='${BUILD_VERSION}';var u=new URL(window.location.href);if(u.searchParams.get('v')!==v){u.searchParams.set('v',v);window.location.replace(u.toString());}}catch(e){}})();`,
+            }}
+          />
+        )}
       </Head>
       <main style={{
         ...styles.main,
