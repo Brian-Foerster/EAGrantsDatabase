@@ -546,6 +546,11 @@ export default function Home() {
     };
   }, [filteredAndSortedGrants]);
 
+  const filteredTotal = useMemo(
+    () => filteredAndSortedGrants.reduce((sum, grant) => sum + grant.amount, 0),
+    [filteredAndSortedGrants]
+  );
+
   // Virtualization
   // Estimate row height - expanded mobile rows need more space
   // Initial estimate - actual heights measured by virtualizer via measureElement
@@ -681,7 +686,6 @@ export default function Home() {
     const yearMax = calcYearMax();
     const monthMax = calcMonthMax();
 
-    const filteredTotal = filteredAndSortedGrants.reduce((s, g) => s + g.amount, 0);
     const totalGraphic = [{
       type: 'text' as const,
       right: 14,
@@ -1205,6 +1209,12 @@ export default function Home() {
             ...styles.chartContainer,
             padding: isPhonePortrait ? '4px 0' : isMobile ? '4px 0' : '6px 0',
           }}>
+            {isMobile && (
+              <div style={styles.chartTotalMobile}>
+                Total: {'$'}
+                {(filteredTotal / 1000000).toFixed(2)}M
+              </div>
+            )}
             <ReactECharts
               option={getChartOption()}
               notMerge={true}
@@ -1549,6 +1559,19 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '6px 0',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    position: 'relative',
+  },
+  chartTotalMobile: {
+    position: 'absolute',
+    right: '10px',
+    bottom: '8px',
+    fontSize: '12px',
+    fontWeight: '700',
+    color: '#666',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    padding: '2px 6px',
+    borderRadius: '4px',
+    letterSpacing: '0.01em',
   },
   chartControlsRow: {
     display: 'flex',
