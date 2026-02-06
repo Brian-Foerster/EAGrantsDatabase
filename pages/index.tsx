@@ -540,9 +540,9 @@ export default function Home() {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        return 250; // Initial estimate for expanded - will be measured
+        return 220; // Initial estimate for expanded - will be measured
       }
-      return 105; // Collapsed mobile row
+      return 100; // Collapsed mobile row
     }
     return 100; // Desktop row
   }, [isMobile, filteredAndSortedGrants, expandedGrants]);
@@ -557,10 +557,10 @@ export default function Home() {
 
   // Force re-measure when grants expand/collapse
   useEffect(() => {
-    // Small delay to ensure state has updated
+    // Longer delay to ensure DOM has fully updated
     const timer = setTimeout(() => {
       rowVirtualizer.measure();
-    }, 10);
+    }, 50);
     return () => clearTimeout(timer);
   }, [expandedGrants.size]);
 
@@ -1795,8 +1795,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   grantRowMobile: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '5px',
-    padding: '14px 0 12px 0',
+    gap: '6px',
+    padding: '12px 0',
     borderBottom: '1px solid #e5e7eb',
     cursor: 'pointer',
   },
@@ -1845,12 +1845,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginLeft: 'auto',
   },
   grantMobileExpanded: {
-    marginTop: '8px',
-    paddingTop: '8px',
+    marginTop: '6px',
+    paddingTop: '6px',
     borderTop: '1px solid #e5e7eb',
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
+    gap: '3px',
   },
   expandedRow: {
     display: 'flex',
