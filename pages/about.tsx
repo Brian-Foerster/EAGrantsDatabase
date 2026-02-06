@@ -130,6 +130,16 @@ export default function About() {
               US dollars using the Bureau of Labor Statistics CPI-U annual averages.
             </p>
 
+            <h3 style={styles.subheading}>Non-core EA focus areas</h3>
+            <p style={styles.paragraph}>
+              Approximately 537 grants ($291M) from Coefficient Giving focus areas that are
+              not generally considered part of the EA movement are excluded from the default
+              view. These include US policy reform areas such as Criminal Justice Reform,
+              Housing Policy Reform, Immigration Policy, Macroeconomic Stabilization Policy,
+              Land Use Reform, and Abundance &amp; Growth. These grants can be viewed by
+              selecting them explicitly in the Fund filter.
+            </p>
+
             <h2 style={styles.sectionTitle}>Limitations</h2>
 
             <h3 style={styles.subheading}>Publication timing</h3>
