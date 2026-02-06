@@ -1015,7 +1015,9 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                             ...styles.subTag,
                             borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
                             color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                          }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
+                          }}>
+                            <span style={styles.tagLabel}>Fund:</span> {grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}
+                          </span>
                         )}
                       </div>
                       <div />
@@ -1027,12 +1029,14 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                             color: categoryColorMap[grant.category] || '#999',
                           }}>{displayCategory(grant.category)}</span>
                         )}
-                        {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== grant.fund && (
+                        {grant.focus_area && grant.focus_area !== grant.category && (
                           <span style={{
                             ...styles.subTag,
                             borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
                             color: categoryColorMap[grant.category || ''] || '#999',
-                          }}>{grant.focus_area}</span>
+                          }}>
+                            <span style={styles.tagLabel}>Sub:</span> {grant.focus_area}
+                          </span>
                         )}
                       </div>
                       <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
@@ -1449,10 +1453,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'inline-block',
     padding: '3px 8px',
     fontSize: '12px',
-    fontWeight: '600',
+    fontWeight: '500',
     border: '1px solid',
     borderRadius: '4px',
-    whiteSpace: 'nowrap',
+    whiteSpace: 'normal',
+    maxWidth: '180px',
+    lineHeight: '1.3',
+  },
+  tagLabel: {
+    fontWeight: '600',
+    opacity: 0.7,
   },
   grantAmountCol: {
     fontSize: '16px',
