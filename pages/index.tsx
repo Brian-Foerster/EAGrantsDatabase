@@ -535,21 +535,12 @@ export default function Home() {
 
   // Virtualization
   // Estimate row height - expanded mobile rows need more space
-  // Calculate row height based on content
+  // Initial estimate - actual heights measured by virtualizer via measureElement
   const getRowHeight = useCallback((index: number) => {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        // Tighter heights - calculate based on actual content
-        const desc = grant.description || (grant.title !== grant.recipient ? grant.title : '');
-        const descLength = desc?.length || 0;
-        const hasSubCategory = grant.focus_area && grant.focus_area !== grant.category;
-        const baseHeight = 200; // Header + grantmaker + fund + category + date + link
-        const subCatHeight = hasSubCategory ? 18 : 0;
-        // Estimate description height: ~50 chars per line, ~16px per line
-        const descLines = descLength > 0 ? Math.ceil(descLength / 45) : 0;
-        const descHeight = descLines * 16;
-        return baseHeight + subCatHeight + descHeight;
+        return 250; // Initial estimate for expanded - will be measured
       }
       return 105; // Collapsed mobile row
     }
@@ -1258,6 +1249,8 @@ export default function Home() {
                 return (
                   <div
                     key={virtualRow.key}
+                    data-index={virtualRow.index}
+                    ref={rowVirtualizer.measureElement}
                     style={{
                       position: 'absolute',
                       top: 0,
