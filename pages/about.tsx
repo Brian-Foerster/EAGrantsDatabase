@@ -27,8 +27,8 @@ export default function About() {
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
-              the Effective Altruism community. It currently includes approximately 4,700 grants
-              totaling approximately $5.7 billion, spanning 2012 to 2025.
+              the Effective Altruism community. It currently includes approximately 5,050 grants
+              totaling approximately $6.2 billion, spanning 2012 to 2025.
             </p>
             <p style={styles.paragraph}>
               The database is updated monthly via an automated scraping pipeline. The source
@@ -40,13 +40,11 @@ export default function About() {
 
             <h3 style={styles.subheading}>Coefficient Giving (formerly Open Philanthropy)</h3>
             <p style={styles.paragraph}>
-              Approximately 2,361 grants (2012 through October 2024), sourced from a{' '}
-              <a href="https://github.com/rufuspollock/open-philanthropy-grants" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                GitHub archive
-              </a>{' '}
-              of the Open Philanthropy grants database. Open Philanthropy rebranded to
-              Coefficient Giving in 2025; this archive predates the transition. The original
-              grants page now redirects and no longer hosts a public database.
+              Approximately 2,713 grants (2012 through 2025), sourced from the official{' '}
+              <a href="https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Coefficient Giving Grants Archive
+              </a>.
+              Open Philanthropy rebranded to Coefficient Giving in 2025.
             </p>
 
             <h3 style={styles.subheading}>GiveWell</h3>
@@ -135,8 +133,8 @@ export default function About() {
             <h2 style={styles.sectionTitle}>Limitations</h2>
             <ul style={styles.list}>
               <li style={styles.listItem}>
-                Coefficient Giving data ends October 2024. No new data source has been
-                identified for Coefficient Giving grants after that date.
+                Coefficient Giving data is sourced from their official archive CSV, which
+                is updated periodically as grants are published.
               </li>
               <li style={styles.listItem}>
                 Founders Pledge and Animal Charity Evaluators entries are entirely residual —

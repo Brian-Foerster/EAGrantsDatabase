@@ -38,28 +38,26 @@ The EA Grants Database aggregates individual grant data from the major Effective
 
 | Field | Value |
 |-------|-------|
-| **Endpoint** | `https://raw.githubusercontent.com/rufuspollock/open-philanthropy-grants/main/OpenPhilGrants.csv` |
-| **Format** | CSV (archived on GitHub) |
+| **Endpoint** | `https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv` |
+| **Format** | CSV (official archive) |
 | **Scraper** | `scripts/scrapers/open-phil.ts` |
-| **Grants** | ~2,361 |
-| **Coverage** | 2012–October 2024 |
-| **Update frequency** | Archive is static (last updated Dec 2024) |
+| **Grants** | ~2,713 |
+| **Coverage** | 2012–2025 |
+| **Update frequency** | Updated periodically by Coefficient Giving |
 
-**How it works:** Open Philanthropy's website (`openphilanthropy.org`) now redirects to `coefficientgiving.org`, which no longer has a public grants database. We use Rufus Pollock's GitHub archive of the grants CSV, which was scraped before the redirect.
+**How it works:** We scrape the official Coefficient Giving Grants Archive CSV, which is published at `coefficientgiving.org`. This replaced the previous GitHub archive which only had data through October 2024.
 
-CSV columns: `Grant, Organization Name, Focus Area, Amount, Date`. The `Focus Area` field is mapped to the sector taxonomy via `scripts/mappings/op-focus-areas.json`. Date is in "Month Year" format (e.g., "October 2024").
+CSV columns: `Grant, Organization Name, Focus Area, Amount, Date, Details`. The `Focus Area` field is mapped to the sector taxonomy via `scripts/mappings/op-focus-areas.json`. Date is in "Month Year" format (e.g., "October 2024").
 
-**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~147 grants.
+**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~152 grants.
 
-**Limitation:** This archive will not receive new data. Future Open Phil / Coefficient Giving grants will need a new data source.
-
-**2024 annual total ($650M):** The EA historical grantmaking spreadsheet used $495M for Open Phil 2024, but this appears to undercount. Multiple sources point to a higher figure:
+**2024 annual total ($650M):** Multiple sources support this figure:
 
 - Good Ventures' 2024 report states they "funded $593 million in grants recommended by Open Philanthropy, including $113 million to GiveWell's top charities" ([Good Ventures](https://www.goodventures.org/our-portfolio/grantmaking-approach/))
 - Inside Philanthropy reports Open Phil "directed over $100 million to causes from donors besides Good Ventures in 2024" ([Inside Philanthropy, Nov 2025](https://www.insidephilanthropy.com/home/open-philanthropy-is-now-coefficient-giving-heres-what-has-and-hasnt-changed))
 - The MCF 2025 memo lists Open Phil at "~$650M" ([EA Forum](https://forum.effectivealtruism.org/posts/dm2uawLLeLbY8WNKM/updates-on-the-effective-giving-ecosystem-mcf-2025-memo))
 
-We use $650M as a conservative estimate. The true figure may be closer to $693M ($593M Good Ventures + $100M+ other donors). Prior years (2014–2023) use the EA historical grantmaking spreadsheet figures which have not been revised.
+We use $650M as a conservative estimate. Prior years (2014–2023) use the EA historical grantmaking spreadsheet figures.
 
 ---
 
@@ -210,7 +208,7 @@ These fields are empty because the upstream sources don't provide them, not beca
 
 ### Coefficient Giving data freshness
 
-The Coefficient Giving archive at `github.com/rufuspollock/open-philanthropy-grants` was last updated December 2024 with data through October 2024. Open Philanthropy rebranded to Coefficient Giving in 2025 and their grants page now redirects without a public database. New Coefficient Giving grants after October 2024 will not appear until a new data source is identified.
+The Coefficient Giving archive at `coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv` is updated periodically by Coefficient Giving as grants are published. Per their [grant publishing process](https://coefficientgiving.org/grant-publishing-process/), grants are typically published within a few months of being made.
 
 ### Founders Pledge category assignment
 

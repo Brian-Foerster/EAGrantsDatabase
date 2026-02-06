@@ -1,7 +1,9 @@
 /**
- * Open Philanthropy Scraper
- * Primary: GitHub archive CSV (rufuspollock/open-philanthropy-grants)
- * Data through ~Oct 2024, columns: Grant, Organization Name, Focus Area, Amount, Date
+ * Coefficient Giving Scraper (formerly Open Philanthropy)
+ * Primary: Official Coefficient Giving Grants Archive CSV
+ * https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv
+ *
+ * Columns: Grant, Organization Name, Focus Area, Amount, Date, Details
  */
 
 import { parse } from 'csv-parse/sync';
@@ -9,14 +11,15 @@ import { Grant, ScrapeResult } from '../../types/grants';
 import { fetchWithRetry, normalizeDate, saveRawData, parseDollarAmount } from '../scraper-utils';
 import focusAreaMapping from '../mappings/op-focus-areas.json';
 
-const CSV_URL = 'https://raw.githubusercontent.com/rufuspollock/open-philanthropy-grants/main/OpenPhilGrants.csv';
+const CSV_URL = 'https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv';
 
-interface OPRawGrant {
+interface CGRawGrant {
   Grant: string;
   'Organization Name': string;
   'Focus Area': string;
   Amount: string;
   Date: string;
+  Details?: string;
 }
 
 function mapFocusArea(raw: string): string {
@@ -35,10 +38,10 @@ function mapFocusArea(raw: string): string {
 
   // Keyword-based fallback
   const lower = raw.toLowerCase();
-  if (lower.includes('ai') || lower.includes('artificial intelligence') || lower.includes('biosecurity') || lower.includes('pandemic') || lower.includes('catastrophic') || lower.includes('nuclear') || lower.includes('x-risk')) return 'LTXR';
-  if (lower.includes('health') || lower.includes('malaria') || lower.includes('givewell') || lower.includes('development') || lower.includes('economic growth')) return 'GH';
-  if (lower.includes('animal') || lower.includes('welfare') || lower.includes('cage') || lower.includes('farm')) return 'AW';
-  if (lower.includes('effective altruism') || lower.includes('ea ') || lower.includes('career') || lower.includes('giving')) return 'Meta';
+  if (lower.includes('ai') || lower.includes('artificial intelligence') || lower.includes('biosecurity') || lower.includes('pandemic') || lower.includes('catastrophic') || lower.includes('nuclear') || lower.includes('x-risk') || lower.includes('transformative')) return 'LTXR';
+  if (lower.includes('health') || lower.includes('malaria') || lower.includes('givewell') || lower.includes('development') || lower.includes('economic growth') || lower.includes('air quality') || lower.includes('lead')) return 'GH';
+  if (lower.includes('animal') || lower.includes('welfare') || lower.includes('cage') || lower.includes('farm') || lower.includes('chicken') || lower.includes('fish')) return 'AW';
+  if (lower.includes('effective altruism') || lower.includes('ea ') || lower.includes('career') || lower.includes('giving') || lower.includes('forecasting')) return 'Meta';
 
   return 'Other';
 }
@@ -63,15 +66,15 @@ function parseDateString(raw: string): string {
 
 export async function scrapeOpenPhil(): Promise<ScrapeResult> {
   const errors: string[] = [];
-  console.log('[Open Phil] Fetching grants CSV from GitHub archive...');
+  console.log('[Coefficient] Fetching grants CSV from coefficientgiving.org...');
 
   const response = await fetchWithRetry(CSV_URL);
   const csvText = await response.text();
-  console.log(`[Open Phil] Received ${(csvText.length / 1024).toFixed(0)}KB of CSV data`);
+  console.log(`[Coefficient] Received ${(csvText.length / 1024).toFixed(0)}KB of CSV data`);
 
-  saveRawData('open-phil', csvText);
+  saveRawData('coefficient-giving', csvText);
 
-  const records: OPRawGrant[] = parse(csvText, {
+  const records: CGRawGrant[] = parse(csvText, {
     columns: true,
     skip_empty_lines: true,
     trim: true,
@@ -79,7 +82,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
     relax_quotes: true,
   });
 
-  console.log(`[Open Phil] Parsed ${records.length} records`);
+  console.log(`[Coefficient] Parsed ${records.length} records`);
 
   const grants: Grant[] = [];
   for (let i = 0; i < records.length; i++) {
@@ -110,7 +113,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
     const description = descParts.length > 1 ? descParts.join('. ') : '';
 
     const grant: Grant = {
-      id: `op-${String(i).padStart(5, '0')}`,
+      id: `cg-${String(i).padStart(5, '0')}`,
       title: r.Grant || `Grant to ${r['Organization Name']}`,
       recipient: r['Organization Name'] || 'Unknown',
       amount,
@@ -120,21 +123,29 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
       description,
       category,
       focus_area: focusArea,
-      source_id: `op-row-${i}`,
+      source_id: `cg-row-${i}`,
       exclude_from_total: isGiveWellRecommended,
     };
 
     grants.push(grant);
   }
 
-  console.log(`[Open Phil] Processed ${grants.length} grants (${errors.length} errors)`);
+  console.log(`[Coefficient] Processed ${grants.length} grants (${errors.length} errors)`);
   const gwExcluded = grants.filter(g => g.exclude_from_total).length;
   if (gwExcluded > 0) {
-    console.log(`[Open Phil] ${gwExcluded} GiveWell-recommended grants flagged for dedup`);
+    console.log(`[Coefficient] ${gwExcluded} GiveWell-recommended grants flagged for dedup`);
   }
 
+  // Log year breakdown
+  const byYear: Record<string, number> = {};
+  grants.forEach(g => {
+    const y = g.date.slice(0, 4);
+    byYear[y] = (byYear[y] || 0) + 1;
+  });
+  console.log(`[Coefficient] Year breakdown: ${Object.entries(byYear).sort().map(([y, c]) => `${y}:${c}`).join(', ')}`);
+
   return {
-    source: 'open-phil',
+    source: 'coefficient-giving',
     grants,
     errors,
     scrapedAt: new Date().toISOString(),
