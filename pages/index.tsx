@@ -71,8 +71,17 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const [chartView, setChartView] = useState<'year' | 'month'>('year');
   const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
   const [adjustInflation, setAdjustInflation] = useState(false);
-  
+  const [isMobile, setIsMobile] = useState(false);
+
   const parentRef = useRef<HTMLDivElement>(null);
+
+  // Detect mobile viewport
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Initialize MiniSearch
   useEffect(() => {
@@ -633,15 +642,18 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
         <meta name="description" content="Aggregated database of Effective Altruism grants" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
-      <main style={styles.main}>
-        <header style={styles.header}>
+      <main style={{ ...styles.main, padding: isMobile ? '20px 16px' : '20px 80px' }}>
+        <header style={{ ...styles.header, paddingTop: isMobile ? '20px' : '40px', marginBottom: isMobile ? '20px' : '40px' }}>
           <nav style={styles.nav}>
             <Link href="/" style={styles.navLink}>Home</Link>
             <Link href="/about" style={styles.navLink}>About</Link>
           </nav>
-          <h1 style={styles.title}>EA Grants Database</h1>
-          <p style={styles.subtitle}>
-            Aggregating {metadata.totalGrants.toLocaleString()} grants totaling ${(metadata.totalAmount / 1e9).toFixed(1)}B from {metadata.grantmakers.length} major EA grantmakers
+          <h1 style={{ ...styles.title, fontSize: isMobile ? '28px' : '48px' }}>EA Grants Database</h1>
+          <p style={{ ...styles.subtitle, fontSize: isMobile ? '14px' : '18px' }}>
+            {isMobile
+              ? `${metadata.totalGrants.toLocaleString()} grants · $${(metadata.totalAmount / 1e9).toFixed(1)}B`
+              : `Aggregating ${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)}B from ${metadata.grantmakers.length} major EA grantmakers`
+            }
           </p>
         </header>
 
@@ -961,14 +973,16 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
           </div>
           
           <div style={styles.virtualListContainer}>
-            <div style={styles.listHeaderRow}>
-              <div style={styles.listHeaderCell}>Grantee</div>
-              <div style={styles.listHeaderCell}>Grantmaker</div>
-              <div />
-              <div style={styles.listHeaderCell}>Category</div>
-              <div style={{ ...styles.listHeaderCell, textAlign: 'right' }}>Amount</div>
-              <div style={{ ...styles.listHeaderCell, textAlign: 'right' }}>Date</div>
-            </div>
+            {!isMobile && (
+              <div style={styles.listHeaderRow}>
+                <div style={styles.listHeaderCell}>Grantee</div>
+                <div style={styles.listHeaderCell}>Grantmaker</div>
+                <div />
+                <div style={styles.listHeaderCell}>Category</div>
+                <div style={{ ...styles.listHeaderCell, textAlign: 'right' }}>Amount</div>
+                <div style={{ ...styles.listHeaderCell, textAlign: 'right' }}>Date</div>
+              </div>
+            )}
           <div
             ref={parentRef}
             style={styles.virtualListScroll}
@@ -993,51 +1007,82 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                   >
-                    <div style={styles.grantRow}>
-                      <div style={styles.grantLeft}>
-                        <h3 style={styles.grantTitle}>
-                          {grant.url
-                            ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
-                            : grant.recipient}
-                        </h3>
+                    {isMobile ? (
+                      <div style={styles.grantRowMobile}>
+                        <div style={styles.grantMobileTop}>
+                          <h3 style={styles.grantTitle}>
+                            {grant.url
+                              ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
+                              : grant.recipient}
+                          </h3>
+                          <div style={styles.grantMobileAmount}>{formatCurrency(grant.amount)}</div>
+                        </div>
                         {grant.title && grant.title !== grant.recipient && (
                           <p style={styles.grantDesc}>{grant.title}</p>
                         )}
-                      </div>
-                      <div style={styles.grantFunderCol}>
-                        <span style={{
-                          ...styles.tagColored,
-                          borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                          color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                        }}>{displayGrantmaker(grant.grantmaker)}</span>
-                        {grant.fund && (
+                        <div style={styles.grantMobileTags}>
                           <span style={{
-                            ...styles.subTag,
-                            borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
+                            ...styles.tagSmall,
+                            borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
                             color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                          }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
-                        )}
+                          }}>{displayGrantmaker(grant.grantmaker)}</span>
+                          {grant.category && (
+                            <span style={{
+                              ...styles.tagSmall,
+                              borderColor: categoryColorMap[grant.category] || '#999',
+                              color: categoryColorMap[grant.category] || '#999',
+                            }}>{displayCategory(grant.category)}</span>
+                          )}
+                          <span style={styles.grantMobileDate}>{format(parseISO(grant.date), 'MM/yyyy')}</span>
+                        </div>
                       </div>
-                      <div />
-                      <div style={styles.grantCategoryCol}>
-                        {grant.category && (
+                    ) : (
+                      <div style={styles.grantRow}>
+                        <div style={styles.grantLeft}>
+                          <h3 style={styles.grantTitle}>
+                            {grant.url
+                              ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
+                              : grant.recipient}
+                          </h3>
+                          {grant.title && grant.title !== grant.recipient && (
+                            <p style={styles.grantDesc}>{grant.title}</p>
+                          )}
+                        </div>
+                        <div style={styles.grantFunderCol}>
                           <span style={{
                             ...styles.tagColored,
-                            borderColor: categoryColorMap[grant.category] || '#999',
-                            color: categoryColorMap[grant.category] || '#999',
-                          }}>{displayCategory(grant.category)}</span>
-                        )}
-                        {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== displayCategory(grant.category) && (
-                          <span style={{
-                            ...styles.subTag,
-                            borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
-                            color: categoryColorMap[grant.category || ''] || '#999',
-                          }}>{grant.focus_area}</span>
-                        )}
+                            borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+                            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+                          }}>{displayGrantmaker(grant.grantmaker)}</span>
+                          {grant.fund && (
+                            <span style={{
+                              ...styles.subTag,
+                              borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
+                              color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+                            }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
+                          )}
+                        </div>
+                        <div />
+                        <div style={styles.grantCategoryCol}>
+                          {grant.category && (
+                            <span style={{
+                              ...styles.tagColored,
+                              borderColor: categoryColorMap[grant.category] || '#999',
+                              color: categoryColorMap[grant.category] || '#999',
+                            }}>{displayCategory(grant.category)}</span>
+                          )}
+                          {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== displayCategory(grant.category) && (
+                            <span style={{
+                              ...styles.subTag,
+                              borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
+                              color: categoryColorMap[grant.category || ''] || '#999',
+                            }}>{grant.focus_area}</span>
+                          )}
+                        </div>
+                        <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
+                        <div style={styles.grantDateCol}>{format(parseISO(grant.date), 'MM/dd/yyyy')}</div>
                       </div>
-                      <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
-                      <div style={styles.grantDateCol}>{format(parseISO(grant.date), 'MM/dd/yyyy')}</div>
-                    </div>
+                    )}
                   </div>
                 );
               })}
@@ -1392,6 +1437,44 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '10px',
     padding: '16px 0',
     borderBottom: '1px solid #e5e7eb',
+  },
+  grantRowMobile: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '6px',
+    padding: '12px 0',
+    borderBottom: '1px solid #e5e7eb',
+  },
+  grantMobileTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: '12px',
+  },
+  grantMobileAmount: {
+    fontSize: '16px',
+    fontWeight: '700',
+    color: '#1a202c',
+    whiteSpace: 'nowrap',
+  },
+  grantMobileTags: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '6px',
+    alignItems: 'center',
+  },
+  grantMobileDate: {
+    fontSize: '12px',
+    color: '#888',
+  },
+  tagSmall: {
+    display: 'inline-block',
+    padding: '2px 6px',
+    fontSize: '11px',
+    fontWeight: '600',
+    border: '1px solid',
+    borderRadius: '3px',
+    whiteSpace: 'nowrap',
   },
   grantLeft: {
     minWidth: 0,
