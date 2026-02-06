@@ -112,16 +112,38 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
       }
     }
 
-    // Apply grantmaker filter
-    if (selectedGrantmakers.length > 0) {
-      filtered = filtered.filter(grant => selectedGrantmakers.includes(grant.grantmaker));
-    }
-
-    // Apply fund (sub-grantmaker) filter
-    if (selectedFunds.length > 0) {
-      filtered = filtered.filter(grant => grant.fund != null && selectedFunds.includes(grant.fund));
+    // Apply grantmaker and fund filters together
+    // Logic: fund selections are more specific and take precedence
+    // - If funds are selected, those funds are always shown
+    // - If grantmakers are selected (without specific fund selections for that grantmaker),
+    //   show all core EA funds from those grantmakers
+    // - Non-core EA funds are only shown when explicitly selected
+    if (selectedFunds.length > 0 || selectedGrantmakers.length > 0) {
+      filtered = filtered.filter(grant => {
+        // If this specific fund is selected, include it
+        if (grant.fund && selectedFunds.includes(grant.fund)) {
+          return true;
+        }
+        // If grantmaker is selected, include grants from that grantmaker
+        // (but exclude non-core EA funds unless explicitly selected)
+        if (selectedGrantmakers.includes(grant.grantmaker)) {
+          // Check if any funds from this grantmaker are explicitly selected
+          // If so, only show those specific funds (more specific wins)
+          const grantmakerHasSelectedFunds = selectedFunds.some(f => {
+            const fundGrant = grants.find(g => g.fund === f);
+            return fundGrant && fundGrant.grantmaker === grant.grantmaker;
+          });
+          if (grantmakerHasSelectedFunds) {
+            // Only show explicitly selected funds from this grantmaker
+            return grant.fund && selectedFunds.includes(grant.fund);
+          }
+          // No specific funds selected for this grantmaker - show all core EA funds
+          return !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS);
+        }
+        return false;
+      });
     } else {
-      // Exclude non-core EA funds by default (when no funds explicitly selected)
+      // No grantmaker or fund filters - exclude non-core EA funds by default
       filtered = filtered.filter(grant => !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS));
     }
 
@@ -221,6 +243,18 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     setSelectedFunds(prev =>
       prev.includes(fund) ? prev.filter(f => f !== fund) : [...prev, fund]
     );
+  };
+
+  const selectAllFundsForGrantmaker = (grantmaker: string, funds: string[]) => {
+    // Check if all funds are already selected
+    const allSelected = funds.every(f => selectedFunds.includes(f));
+    if (allSelected) {
+      // Deselect all funds from this grantmaker
+      setSelectedFunds(prev => prev.filter(f => !funds.includes(f)));
+    } else {
+      // Select all funds from this grantmaker (including non-core EA)
+      setSelectedFunds(prev => [...new Set([...prev, ...funds])]);
+    }
   };
 
   const toggleCategory = (cat: string) => {
@@ -645,9 +679,23 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                 </button>
                 {expandedFilters.fund && (
                   <div style={styles.filterOptionsGrouped}>
-                    {fundsByGrantmaker.map(group => (
+                    {fundsByGrantmaker.map(group => {
+                      const allSelected = group.funds.every(f => selectedFunds.includes(f));
+                      const someSelected = group.funds.some(f => selectedFunds.includes(f));
+                      return (
                       <div key={group.grantmaker} style={styles.fundGroup}>
-                        <div style={styles.fundGroupHeader}>{group.displayName}</div>
+                        <div style={styles.fundGroupHeaderRow}>
+                          <div style={styles.fundGroupHeader}>{group.displayName}</div>
+                          <button
+                            onClick={() => selectAllFundsForGrantmaker(group.grantmaker, group.funds)}
+                            style={{
+                              ...styles.selectAllButton,
+                              ...(allSelected ? styles.selectAllButtonActive : {})
+                            }}
+                          >
+                            {allSelected ? 'Deselect All' : someSelected ? 'Select All' : 'Select All'}
+                          </button>
+                        </div>
                         <div style={styles.fundGroupOptions}>
                           {group.funds.map(fund => {
                             const isNonCore = fund in NON_CORE_EA_FUNDS;
@@ -674,7 +722,8 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                           })}
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                     <p style={styles.nonCoreNote}>
                       * Excluded by default — focus areas not generally considered part of the EA movement. Hover for details.
                     </p>
@@ -1174,11 +1223,30 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderLeft: '3px solid #e5e7eb',
     paddingLeft: '12px',
   },
+  fundGroupHeaderRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '8px',
+  },
   fundGroupHeader: {
     fontSize: '14px',
     fontWeight: '600',
     color: '#374151',
-    marginBottom: '8px',
+  },
+  selectAllButton: {
+    fontSize: '11px',
+    padding: '2px 8px',
+    border: '1px solid #d1d5db',
+    borderRadius: '4px',
+    backgroundColor: '#f9fafb',
+    color: '#6b7280',
+    cursor: 'pointer',
+  },
+  selectAllButtonActive: {
+    backgroundColor: '#3b82f6',
+    borderColor: '#3b82f6',
+    color: 'white',
   },
   fundGroupOptions: {
     display: 'flex',
