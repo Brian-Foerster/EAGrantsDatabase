@@ -9,8 +9,8 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 // Build timestamp for cache busting (set at build time)
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 
-// Base path for GitHub Pages deployment
-const BASE_PATH = process.env.NODE_ENV === 'production' ? '/EAGrantsDatabase' : '';
+// Base path for GitHub Pages deployment (set in .env.local for dev)
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 // Funds/focus areas that are excluded by default (not generally considered core EA)
 // These grants are only shown when explicitly selected in the Fund filter
@@ -963,7 +963,7 @@ export default function Home() {
       }}>
         <header style={{
           ...styles.header,
-          paddingTop: isMobile ? '16px' : '40px',
+          padding: isMobile ? '18px 16px' : '32px 36px',
           marginBottom: isMobile ? '16px' : '40px'
         }}>
           <nav style={styles.nav}>
@@ -1632,34 +1632,44 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '20px 80px',
   },
   header: {
-    textAlign: 'center',
+    textAlign: 'left',
     marginBottom: '40px',
-    paddingTop: '40px',
+    borderRadius: '16px',
+    border: '1px solid #e5e7eb',
+    background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #fef3c7 100%)',
+    boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
   },
   nav: {
     display: 'flex',
-    justifyContent: 'center',
-    gap: '30px',
-    marginBottom: '30px',
+    justifyContent: 'flex-start',
+    gap: '18px',
+    marginBottom: '18px',
   },
   navLink: {
-    fontSize: '16px',
-    fontWeight: '500',
-    color: '#3b82f6',
+    fontSize: '13px',
+    fontWeight: '700',
+    color: '#1f2937',
     textDecoration: 'none',
-    padding: '8px 16px',
-    borderRadius: '4px',
+    padding: '6px 10px',
+    borderRadius: '999px',
+    border: '1px solid #d1d5db',
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    letterSpacing: '0.08em',
+    textTransform: 'uppercase',
     transition: 'background-color 0.2s',
   },
   title: {
     fontSize: '48px',
     fontWeight: 'bold',
-    marginBottom: '10px',
-    color: '#1a202c',
+    marginBottom: '12px',
+    color: '#0f172a',
+    letterSpacing: '-0.02em',
   },
   subtitle: {
     fontSize: '18px',
-    color: '#666',
+    color: '#475569',
+    lineHeight: '1.5',
+    maxWidth: '720px',
   },
   resultCount: {
     fontSize: '13px',
