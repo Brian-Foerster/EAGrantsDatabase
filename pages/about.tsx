@@ -109,15 +109,21 @@ export default function About() {
 
             <h3 style={styles.subheading}>Founders Pledge</h3>
             <p style={styles.paragraph}>
-              Annual grant totals from IRS 990 filings (2016 through 2024), sourced via
-              ProPublica Nonprofit Explorer. These figures represent grants paid, not "money
+              Annual grant totals from IRS 990 filings (2016 through 2024), sourced via{' '}
+              <a href="https://projects.propublica.org/nonprofits/organizations/371795297" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                ProPublica Nonprofit Explorer
+              </a>. These figures represent grants paid, not "money
               moved" (which is a larger figure). Grants span multiple cause areas but cannot
               be broken out by category.
             </p>
 
             <h3 style={styles.subheading}>Animal Charity Evaluators</h3>
             <p style={styles.paragraph}>
-              Annual totals from EA community grantmaking estimates (2014 through 2024).
+              Annual totals (2014 through 2024) from the EA historical grantmaking spreadsheet.{' '}
+              <a href="https://animalcharityevaluators.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                ACE
+              </a>{' '}
+              publishes giving metrics but no machine-readable grant database.
               All entries are categorized as Animal Welfare.
             </p>
 
@@ -152,7 +158,11 @@ export default function About() {
             <h3 style={styles.subheading}>Inflation adjustment</h3>
             <p style={styles.paragraph}>
               An optional toggle on the chart converts historical amounts to constant 2024
-              US dollars using the Bureau of Labor Statistics CPI-U annual averages.
+              US dollars using{' '}
+              <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Bureau of Labor Statistics
+              </a>{' '}
+              CPI-U annual averages.
             </p>
 
             <h3 style={styles.subheading}>Non-core EA focus areas</h3>
@@ -207,13 +217,15 @@ export default function About() {
                 2025 and 2026 data is partial and reflects only grants published to date.
               </li>
               <li style={styles.listItem}>
-                The database does not include donation platforms (e.g., Giving What We Can,
-                The Life You Can Save) because their totals largely overlap with the endpoint
-                grantmakers already tracked.
+                The database does not include donation platforms (e.g.,{' '}
+                <a href="https://www.givingwhatwecan.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Giving What We Can</a>,{' '}
+                <a href="https://www.thelifeyoucansave.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>The Life You Can Save</a>)
+                because their totals largely overlap with the grantmakers already tracked.
               </li>
               <li style={styles.listItem}>
-                Some EA-adjacent grantmakers are not yet tracked, including Longview
-                Philanthropy and regranting programs within CEA and Effective Ventures.
+                Some EA-adjacent grantmakers are not yet tracked, including{' '}
+                <a href="https://www.longview.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Longview Philanthropy</a>{' '}
+                and regranting programs within CEA and Effective Ventures.
               </li>
             </ul>
 
