@@ -540,14 +540,16 @@ export default function Home() {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        // Heights for expanded content including grantmaker row
+        // Tighter heights - calculate based on actual content
         const desc = grant.description || (grant.title !== grant.recipient ? grant.title : '');
         const descLength = desc?.length || 0;
-        // Base expanded height + extra for long descriptions (+20 for grantmaker row)
-        if (descLength > 200) return 360;
-        if (descLength > 100) return 330;
-        if (descLength > 0) return 300;
-        return 260; // No description
+        const hasSubCategory = grant.focus_area && grant.focus_area !== grant.category;
+        const baseHeight = 200; // Header + grantmaker + fund + category + date + link
+        const subCatHeight = hasSubCategory ? 18 : 0;
+        // Estimate description height: ~50 chars per line, ~16px per line
+        const descLines = descLength > 0 ? Math.ceil(descLength / 45) : 0;
+        const descHeight = descLines * 16;
+        return baseHeight + subCatHeight + descHeight;
       }
       return 105; // Collapsed mobile row
     }
