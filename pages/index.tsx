@@ -361,6 +361,24 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     return fund;
   };
 
+  // Get URL for grant - use grant URL if available, otherwise link to grantmaker page
+  const getGrantUrl = (grant: MinGrant): string | undefined => {
+    if (grant.url) return grant.url;
+    // Fallback to grantmaker's grants page
+    switch (grant.grantmaker) {
+      case 'Coefficient Giving':
+        return 'https://coefficientgiving.org/grants/';
+      case 'GiveWell':
+        return 'https://www.givewell.org/research/grants';
+      case 'EA Funds':
+        return 'https://funds.effectivealtruism.org/grants';
+      case 'SFF':
+        return 'https://survivalandflourishing.fund/recommendations';
+      default:
+        return undefined;
+    }
+  };
+
   // Normalize sub-categories to consolidate similar ones
   const SUBCATEGORY_NORMALIZE: Record<string, string> = {
     // GH consolidation
@@ -473,12 +491,29 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   }, [filteredAndSortedGrants]);
 
   // Virtualization
+  // Estimate row height - expanded mobile rows need more space
+  const getRowHeight = (index: number) => {
+    if (isMobile) {
+      const grant = filteredAndSortedGrants[index];
+      if (grant && expandedGrants.has(grant.id)) {
+        return 180; // Expanded mobile row
+      }
+      return 85; // Collapsed mobile row
+    }
+    return 110; // Desktop row (taller for wrapped text)
+  };
+
   const rowVirtualizer = useVirtualizer({
     count: filteredAndSortedGrants.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 90,
+    estimateSize: getRowHeight,
     overscan: 5,
   });
+
+  // Re-measure when grants expand/collapse
+  useEffect(() => {
+    rowVirtualizer.measure();
+  }, [expandedGrants, rowVirtualizer]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -1146,9 +1181,12 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                       >
                         <div style={styles.grantMobileTop}>
                           <h3 style={styles.grantTitle}>
-                            {grant.url
-                              ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink} onClick={e => e.stopPropagation()}>{grant.recipient}</a>
-                              : grant.recipient}
+                            {(() => {
+                              const url = getGrantUrl(grant);
+                              return url
+                                ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink} onClick={e => e.stopPropagation()}>{grant.recipient}</a>
+                                : grant.recipient;
+                            })()}
                           </h3>
                           <div style={styles.grantMobileAmount}>{formatCurrency(grant.amount)}</div>
                         </div>
@@ -1193,6 +1231,19 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                               <span style={styles.expandedLabel}>Date:</span>
                               <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
                             </div>
+                            {getGrantUrl(grant) && (
+                              <div style={styles.expandedRow}>
+                                <a
+                                  href={getGrantUrl(grant)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  style={styles.expandedLink}
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  View on {grant.grantmaker} →
+                                </a>
+                              </div>
+                            )}
                           </div>
                         )}
                       </div>
@@ -1200,12 +1251,15 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                       <div style={styles.grantRow}>
                         <div style={styles.grantLeft}>
                           <h3 style={styles.grantTitle}>
-                            {grant.url
-                              ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
-                              : grant.recipient}
+                            {(() => {
+                              const url = getGrantUrl(grant);
+                              return url
+                                ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
+                                : grant.recipient;
+                            })()}
                           </h3>
                           {grant.title && grant.title !== grant.recipient && (
-                            <p style={styles.grantDesc}>{grant.title}</p>
+                            <p style={styles.grantDescFull}>{grant.title}</p>
                           )}
                         </div>
                         <div style={styles.grantFunderCol}>
@@ -1673,6 +1727,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#6b7280',
     minWidth: '60px',
   },
+  expandedLink: {
+    color: '#3b82f6',
+    textDecoration: 'none',
+    fontSize: '12px',
+    fontWeight: '500',
+  },
   grantMobileDate: {
     fontSize: '12px',
     color: '#888',
@@ -1717,6 +1777,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+  },
+  grantDescFull: {
+    margin: '3px 0 0 0',
+    fontSize: '14px',
+    color: '#4b5563',
+    lineHeight: '1.4',
   },
   grantTagCol: {
     display: 'flex',
