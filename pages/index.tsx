@@ -486,6 +486,34 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     const gridYear = { left: '7%', right: '20%', top: '55px', bottom: '15%' };
     const gridMonth = { left: '7%', right: '20%', top: '55px', bottom: '20%' };
 
+    // Calculate y-axis max that works for both nominal and inflation-adjusted
+    // This ensures bars never shrink when inflation is toggled on
+    const calcYearMax = () => {
+      let nominalMax = 0;
+      let inflatedMax = 0;
+      byYear.forEach(d => {
+        const nominal = d.total / 1000000;
+        const inflated = d.total * (CPI_MULTIPLIERS[String(d.year)] ?? 1.0) / 1000000;
+        nominalMax = Math.max(nominalMax, nominal);
+        inflatedMax = Math.max(inflatedMax, inflated);
+      });
+      return Math.max(nominalMax, inflatedMax) * 1.05; // 5% padding
+    };
+    const calcMonthMax = () => {
+      let nominalMax = 0;
+      let inflatedMax = 0;
+      byYearMonth.forEach(d => {
+        const year = d.yearMonth.slice(0, 4);
+        const nominal = d.total / 1000000;
+        const inflated = d.total * (CPI_MULTIPLIERS[year] ?? 1.0) / 1000000;
+        nominalMax = Math.max(nominalMax, nominal);
+        inflatedMax = Math.max(inflatedMax, inflated);
+      });
+      return Math.max(nominalMax, inflatedMax) * 1.05;
+    };
+    const yearMax = calcYearMax();
+    const monthMax = calcMonthMax();
+
     const filteredTotal = filteredAndSortedGrants.reduce((s, g) => s + g.amount, 0);
     const totalGraphic = [{
       type: 'text' as const,
@@ -526,7 +554,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             tooltip: breakdownTooltip,
             legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
             xAxis: { type: 'category', data: yearLabels },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax },
             series: buildStackedSeries(yearLabels, yearFunder, funderGroups),
             grid: gridYear,
             graphic: totalGraphic,
@@ -539,7 +567,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             tooltip: breakdownTooltip,
             legend: { type: 'scroll', orient: 'vertical', right: 10, top: 20, bottom: 20 },
             xAxis: { type: 'category', data: yearLabels },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax },
             series: buildStackedSeries(yearLabels, yearCategory, categoryGroups),
             grid: gridYear,
             graphic: totalGraphic,
@@ -558,7 +586,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             }
           },
           xAxis: { type: 'category', data: yearLabels },
-          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: yearMax },
           series: [{
             name: 'Amount', type: 'bar',
             data: byYear.map(d => parseFloat((d.total * inflationMultiplier(String(d.year)) / 1000000).toFixed(2))),
@@ -582,7 +610,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
               type: 'category', data: monthLabels,
               axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
             },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax },
             series: buildStackedSeries(monthLabels, monthFunder, funderGroups),
             grid: gridMonth,
             graphic: totalGraphic,
@@ -598,7 +626,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
               type: 'category', data: monthLabels,
               axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
             },
-            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+            yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax },
             series: buildStackedSeries(monthLabels, monthCategory, categoryGroups),
             grid: gridMonth,
             graphic: totalGraphic,
@@ -619,7 +647,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
             type: 'category', data: monthLabels,
             axisLabel: { rotate: 45, interval: Math.max(0, Math.floor(monthLabels.length / 12)) },
           },
-          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)' },
+          yAxis: { type: 'value', name: adjustInflation ? '2024 USD ($M)' : 'Amount ($M)', max: monthMax },
           series: [{
             name: 'Amount', type: 'bar',
             data: byYearMonth.map(d => (d.total * inflationMultiplier(d.yearMonth) / 1000000).toFixed(2)),
