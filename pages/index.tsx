@@ -552,17 +552,13 @@ export default function Home() {
     getScrollElement: () => parentRef.current,
     estimateSize: getRowHeight,
     overscan: 10,
-    getItemKey: (index) => filteredAndSortedGrants[index]?.id || index,
+    // Include expanded state in key to force remount and fresh measurement
+    getItemKey: (index) => {
+      const grant = filteredAndSortedGrants[index];
+      const isExpanded = grant && expandedGrants.has(grant.id);
+      return `${grant?.id || index}-${isExpanded ? 'e' : 'c'}`;
+    },
   });
-
-  // Force re-measure when grants expand/collapse
-  useEffect(() => {
-    // Longer delay to ensure DOM has fully updated
-    const timer = setTimeout(() => {
-      rowVirtualizer.measure();
-    }, 50);
-    return () => clearTimeout(timer);
-  }, [expandedGrants.size]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
