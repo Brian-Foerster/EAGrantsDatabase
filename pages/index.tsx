@@ -113,49 +113,44 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
       }
     }
 
-    // Apply grantmaker and fund filters together
-    // Logic: fund selections are more specific and take precedence
-    // - If funds are selected, those funds are always shown
-    // - If grantmakers are selected (without specific fund selections for that grantmaker),
-    //   show all core EA funds from those grantmakers
-    // - Non-core EA funds are only shown when explicitly selected
-    if (selectedFunds.length > 0 || selectedGrantmakers.length > 0) {
+    // Apply grantmaker, fund, category, and sub-category filters with OR logic
+    // If ANY filter matches, the grant is included
+    // Non-core EA funds are excluded by default unless explicitly selected
+    const hasGmFilter = selectedGrantmakers.length > 0;
+    const hasFundFilter = selectedFunds.length > 0;
+    const hasCatFilter = selectedCategories.length > 0;
+    const hasSubFilter = selectedSubcategories.length > 0;
+    const hasAnyFilter = hasGmFilter || hasFundFilter || hasCatFilter || hasSubFilter;
+
+    if (hasAnyFilter) {
       filtered = filtered.filter(grant => {
-        // If this specific fund is selected, include it
-        if (grant.fund && selectedFunds.includes(grant.fund)) {
+        // Check if grant matches any selected filter (OR logic)
+        const matchesGm = hasGmFilter && selectedGrantmakers.includes(grant.grantmaker);
+        const matchesFund = hasFundFilter && grant.fund && selectedFunds.includes(grant.fund);
+        const matchesCat = hasCatFilter && grant.category && selectedCategories.includes(grant.category);
+        const matchesSub = hasSubFilter && grant.focus_area && selectedSubcategories.includes(grant.focus_area);
+
+        if (matchesFund || matchesCat || matchesSub) {
+          // Explicit fund/category/sub-category selection always includes
           return true;
         }
-        // If grantmaker is selected, include grants from that grantmaker
-        // (but exclude non-core EA funds unless explicitly selected)
-        if (selectedGrantmakers.includes(grant.grantmaker)) {
-          // Check if any funds from this grantmaker are explicitly selected
-          // If so, only show those specific funds (more specific wins)
+        if (matchesGm) {
+          // Grantmaker selected - include if no more specific filters, excluding non-core EA
+          // Unless a fund from this grantmaker is also selected (then only show that fund)
           const grantmakerHasSelectedFunds = selectedFunds.some(f => {
             const fundGrant = grants.find(g => g.fund === f);
             return fundGrant && fundGrant.grantmaker === grant.grantmaker;
           });
           if (grantmakerHasSelectedFunds) {
-            // Only show explicitly selected funds from this grantmaker
             return grant.fund && selectedFunds.includes(grant.fund);
           }
-          // No specific funds selected for this grantmaker - show all core EA funds
           return !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS);
         }
         return false;
       });
     } else {
-      // No grantmaker or fund filters - exclude non-core EA funds by default
+      // No filters - exclude non-core EA funds by default
       filtered = filtered.filter(grant => !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS));
-    }
-
-    // Apply category filter
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(grant => grant.category != null && selectedCategories.includes(grant.category));
-    }
-
-    // Apply subcategory filter
-    if (selectedSubcategories.length > 0) {
-      filtered = filtered.filter(grant => grant.focus_area != null && selectedSubcategories.includes(grant.focus_area));
     }
 
     // Apply year filter
@@ -1032,7 +1027,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                             color: categoryColorMap[grant.category] || '#999',
                           }}>{displayCategory(grant.category)}</span>
                         )}
-                        {grant.focus_area && grant.focus_area !== grant.category && (
+                        {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== grant.fund && (
                           <span style={{
                             ...styles.subTag,
                             borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
