@@ -540,16 +540,16 @@ export default function Home() {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        // Tighter heights - just enough for content
+        // Heights for expanded content including grantmaker row
         const desc = grant.description || (grant.title !== grant.recipient ? grant.title : '');
         const descLength = desc?.length || 0;
-        // Base expanded height + extra for long descriptions
-        if (descLength > 200) return 310;
-        if (descLength > 100) return 280;
-        if (descLength > 0) return 250;
-        return 210; // No description
+        // Base expanded height + extra for long descriptions (+20 for grantmaker row)
+        if (descLength > 200) return 360;
+        if (descLength > 100) return 330;
+        if (descLength > 0) return 300;
+        return 260; // No description
       }
-      return 100; // Collapsed mobile row
+      return 105; // Collapsed mobile row
     }
     return 100; // Desktop row
   }, [isMobile, filteredAndSortedGrants, expandedGrants]);
@@ -1301,6 +1301,10 @@ export default function Home() {
                         </div>
                         {expandedGrants.has(grant.id) && (
                           <div style={styles.grantMobileExpanded}>
+                            <div style={styles.expandedRow}>
+                              <span style={styles.expandedLabel}>Grantmaker:</span>
+                              <span>{grant.grantmaker}</span>
+                            </div>
                             {grant.fund && (
                               <div style={styles.expandedRow}>
                                 <span style={styles.expandedLabel}>Fund:</span>
@@ -1797,7 +1801,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     gap: '5px',
-    padding: '10px 0 12px 0',
+    padding: '14px 0 12px 0',
     borderBottom: '1px solid #e5e7eb',
     cursor: 'pointer',
   },
