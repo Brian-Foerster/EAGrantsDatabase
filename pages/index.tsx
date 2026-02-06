@@ -72,6 +72,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
   const [adjustInflation, setAdjustInflation] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 400);
+  const [expandedGrants, setExpandedGrants] = useState<Set<string>>(new Set());
 
   const parentRef = useRef<HTMLDivElement>(null);
 
@@ -285,6 +286,18 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     setSelectedYears(prev =>
       prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]
     );
+  };
+
+  const toggleGrantExpanded = (grantId: string) => {
+    setExpandedGrants(prev => {
+      const next = new Set(prev);
+      if (next.has(grantId)) {
+        next.delete(grantId);
+      } else {
+        next.add(grantId);
+      }
+      return next;
+    });
   };
 
   // Color constants
@@ -1127,11 +1140,14 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                     }}
                   >
                     {isMobile ? (
-                      <div style={styles.grantRowMobile}>
+                      <div
+                        style={styles.grantRowMobile}
+                        onClick={() => toggleGrantExpanded(grant.id)}
+                      >
                         <div style={styles.grantMobileTop}>
                           <h3 style={styles.grantTitle}>
                             {grant.url
-                              ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
+                              ? <a href={grant.url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink} onClick={e => e.stopPropagation()}>{grant.recipient}</a>
                               : grant.recipient}
                           </h3>
                           <div style={styles.grantMobileAmount}>{formatCurrency(grant.amount)}</div>
@@ -1153,7 +1169,32 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                             }}>{shortCategory(grant.category)}</span>
                           )}
                           <span style={styles.grantMobileDate}>{format(parseISO(grant.date), 'MM/yyyy')}</span>
+                          <span style={styles.expandIndicator}>{expandedGrants.has(grant.id) ? '▲' : '▼'}</span>
                         </div>
+                        {expandedGrants.has(grant.id) && (
+                          <div style={styles.grantMobileExpanded}>
+                            {grant.fund && (
+                              <div style={styles.expandedRow}>
+                                <span style={styles.expandedLabel}>Fund:</span>
+                                <span>{grant.fund}</span>
+                              </div>
+                            )}
+                            <div style={styles.expandedRow}>
+                              <span style={styles.expandedLabel}>Category:</span>
+                              <span>{displayCategory(grant.category)}</span>
+                            </div>
+                            {grant.focus_area && grant.focus_area !== displayCategory(grant.category) && (
+                              <div style={styles.expandedRow}>
+                                <span style={styles.expandedLabel}>Focus:</span>
+                                <span>{grant.focus_area}</span>
+                              </div>
+                            )}
+                            <div style={styles.expandedRow}>
+                              <span style={styles.expandedLabel}>Date:</span>
+                              <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ) : (
                       <div style={styles.grantRow}>
@@ -1537,7 +1578,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   listHeaderRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 200px 10px 250px 110px 100px',
+    gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
     gap: '10px',
     padding: '12px 0',
     borderBottom: '2px solid #e5e7eb',
@@ -1555,7 +1596,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   grantRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 200px 10px 250px 110px 100px',
+    gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
     alignItems: 'start',
     gap: '10px',
     padding: '16px 0',
@@ -1567,6 +1608,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     gap: '6px',
     padding: '12px 0',
     borderBottom: '1px solid #e5e7eb',
+    cursor: 'pointer',
   },
   grantMobileTop: {
     display: 'flex',
@@ -1606,6 +1648,30 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: '1px solid',
     borderRadius: '3px',
     whiteSpace: 'nowrap',
+  },
+  expandIndicator: {
+    fontSize: '10px',
+    color: '#999',
+    marginLeft: 'auto',
+  },
+  grantMobileExpanded: {
+    marginTop: '8px',
+    paddingTop: '8px',
+    borderTop: '1px solid #e5e7eb',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '4px',
+  },
+  expandedRow: {
+    display: 'flex',
+    gap: '8px',
+    fontSize: '12px',
+    color: '#4b5563',
+  },
+  expandedLabel: {
+    fontWeight: '600',
+    color: '#6b7280',
+    minWidth: '60px',
   },
   grantMobileDate: {
     fontSize: '12px',
@@ -1684,12 +1750,12 @@ const styles: { [key: string]: React.CSSProperties } = {
   subTag: {
     display: 'inline-block',
     padding: '3px 8px',
-    fontSize: '12px',
+    fontSize: '11px',
     fontWeight: '500',
     border: '1px solid',
     borderRadius: '4px',
     whiteSpace: 'normal',
-    maxWidth: '180px',
+    maxWidth: '210px',
     lineHeight: '1.3',
   },
   grantAmountCol: {
