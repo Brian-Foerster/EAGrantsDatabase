@@ -50,197 +50,150 @@ export default function About() {
           }}>
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
-              This site aggregates publicly available grant data from grantmakers associated with
-              the Effective Altruism community. It currently includes approximately 5,050 grants
-              totaling approximately $6.2 billion, spanning 2012 to 2026.
+              A database of grants from EA-aligned grantmakers. It pulls together public data
+              from several sources into one searchable interface. Currently covers about 5,050
+              grants totaling $6.2 billion, from 2012 to present.
             </p>
             <p style={styles.paragraph}>
-              The database is updated monthly via an automated scraping pipeline. The source
-              code and full methodology documentation are available on{' '}
+              Updated monthly. Source code is on{' '}
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={styles.link}>GitHub</a>.
             </p>
 
-            <h2 style={styles.sectionTitle}>Data sources with individual grants</h2>
+            <h2 style={styles.sectionTitle}>Data sources</h2>
 
             <h3 style={styles.subheading}>Coefficient Giving (formerly Open Philanthropy)</h3>
             <p style={styles.paragraph}>
-              Approximately 2,713 grants (2012 through 2025), sourced from the official{' '}
+              ~2,700 grants (2012–2025) from their{' '}
               <a href="https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                Coefficient Giving Grants Archive
-              </a>.
-              Open Philanthropy rebranded to Coefficient Giving in 2025.
+                official CSV archive
+              </a>. Open Philanthropy rebranded to Coefficient Giving in 2025.
             </p>
 
             <h3 style={styles.subheading}>GiveWell</h3>
             <p style={styles.paragraph}>
-              Approximately 440 grants (2014 through 2026), exported from GiveWell's public{' '}
+              ~440 grants (2014–2026) from their public{' '}
               <a href="https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                Airtable database
-              </a>.
-              All grants are categorized as Global Health &amp; Development.
+                Airtable
+              </a>. All categorized as Global Health &amp; Development.
             </p>
 
-            <h3 style={styles.subheading}>Effective Altruism Funds</h3>
+            <h3 style={styles.subheading}>EA Funds</h3>
             <p style={styles.paragraph}>
-              Approximately 1,595 grants (2017 through 2025) from the public API at{' '}
+              ~1,600 grants (2017–2025) from their{' '}
               <a href="https://funds.effectivealtruism.org/api/grants" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                funds.effectivealtruism.org
-              </a>.
-              Covers four funds: Long-Term Future Fund, Animal Welfare Fund, Global Health and
-              Development Fund, and Infrastructure Fund.
+                public API
+              </a>. Includes Long-Term Future, Animal Welfare, Global Health &amp; Development, and Infrastructure funds.
             </p>
 
             <h3 style={styles.subheading}>Survival and Flourishing Fund</h3>
             <p style={styles.paragraph}>
-              Approximately 471 grants (2019 through 2025), parsed from the HTML table on
-              the{' '}
+              ~470 grants (2019–2025) from their{' '}
               <a href="https://survivalandflourishing.fund/recommendations" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 recommendations page
-              </a>.
-              All grants are categorized as Long-Term &amp; Existential Risk.
-            </p>
-
-            <h2 style={styles.sectionTitle}>Data sources with annual totals only</h2>
-            <p style={styles.paragraph}>
-              The following grantmakers do not publish individual grant data with dollar
-              amounts. Annual totals are used to generate residual entries that represent
-              each year's total disbursements as a single record.
+              </a>. All categorized as Long-Term &amp; Existential Risk.
             </p>
 
             <h3 style={styles.subheading}>Founders Pledge</h3>
             <p style={styles.paragraph}>
-              Annual grant totals from IRS 990 filings (2016 through 2024), sourced via
-              ProPublica Nonprofit Explorer. These figures represent grants paid, not "money
-              moved" (which is a larger figure). Grants span multiple cause areas but cannot
-              be broken out by category.
+              Annual totals only (2016–2024) from IRS 990 filings via ProPublica. These are grants paid,
+              not "money moved." Individual grants aren't published, so each year appears as a single entry.
             </p>
 
             <h3 style={styles.subheading}>Animal Charity Evaluators</h3>
             <p style={styles.paragraph}>
-              Annual totals from EA community grantmaking estimates (2014 through 2024).
-              All entries are categorized as Animal Welfare.
+              Annual totals only (2014–2024). Individual grants aren't published. All categorized as Animal Welfare.
             </p>
 
-            <h2 style={styles.sectionTitle}>Processing</h2>
+            <h2 style={styles.sectionTitle}>How data is processed</h2>
 
             <h3 style={styles.subheading}>Categories</h3>
             <p style={styles.paragraph}>
-              Grants are classified into seven categories based on the source organization's own
-              labeling: Long-Term &amp; Existential Risk, Global Health &amp; Development,
-              Animal Welfare, EA Community &amp; Infrastructure, Scientific Research,
-              Policy Reform, and Other. Mapping tables translate each source's terminology
-              to this taxonomy.
+              Grants are grouped into categories based on how each grantmaker labels them:
+              Long-Term &amp; Existential Risk, Global Health &amp; Development, Animal Welfare,
+              EA Community &amp; Infrastructure, Scientific Research, Policy Reform, and Other.
             </p>
 
             <h3 style={styles.subheading}>Deduplication</h3>
             <p style={styles.paragraph}>
-              Two deduplication layers are applied. First, approximately 147 Coefficient Giving
-              grants labeled as funding to GiveWell-recommended charities are excluded to
-              avoid double-counting with GiveWell's own records. Second, cross-source fuzzy
-              matching identifies grants to the same recipient in the same year with amounts
-              within 10%, merging approximately 43 additional duplicates.
+              Some grants appear in multiple sources. Coefficient Giving grants to GiveWell-recommended
+              charities (~147) are excluded to avoid double-counting. Fuzzy matching catches
+              ~43 more duplicates (same recipient, same year, amounts within 10%).
             </p>
 
-            <h3 style={styles.subheading}>Residual grants</h3>
+            <h3 style={styles.subheading}>Residual entries</h3>
             <p style={styles.paragraph}>
-              For grantmakers with published annual totals, a residual grant is generated when
-              the gap between the published total and the sum of scraped individual grants
-              exceeds both $100,000 and 5% of the published total. This provides approximate
-              dollar coverage without itemization.
+              When a grantmaker publishes annual totals but not individual grants, the difference
+              between their stated total and what we have on record shows up as a "residual" entry.
             </p>
 
             <h3 style={styles.subheading}>Inflation adjustment</h3>
             <p style={styles.paragraph}>
-              An optional toggle on the chart converts historical amounts to constant 2024
-              US dollars using the Bureau of Labor Statistics CPI-U annual averages.
+              The chart has a toggle to show amounts in constant 2024 dollars (using CPI-U).
             </p>
 
-            <h3 style={styles.subheading}>Non-core EA focus areas</h3>
+            <h3 style={styles.subheading}>Policy grants</h3>
             <p style={styles.paragraph}>
-              Approximately 560 grants ($313M) in the Policy Reform category are excluded
-              from the default view. These include US policy areas such as Criminal Justice
-              Reform, Housing Policy Reform, Immigration Policy, Macroeconomic Stabilization
-              Policy, Innovation Policy, and Abundance &amp; Growth — areas that are not
-              generally considered part of the EA movement. These grants can be viewed by
-              selecting them explicitly in the Fund filter or the Policy Reform category.
+              About 560 grants ($313M) in US policy areas (criminal justice, housing, immigration, etc.)
+              are hidden by default since they're not typically considered core EA. You can view them
+              by selecting Policy Reform in the filters.
             </p>
 
             <h2 style={styles.sectionTitle}>Limitations</h2>
 
-            <h3 style={styles.subheading}>Publication timing</h3>
+            <h3 style={styles.subheading}>Publication lag</h3>
             <p style={styles.paragraph}>
-              Grants appear in public databases when they are published, not when they are
-              committed or disbursed. This creates significant lag: Coefficient Giving may
-              publish grants months after they are made, and some grants may never be
-              published. As a result, recent years will systematically undercount actual
-              grantmaking until databases catch up.
+              Grants show up here when grantmakers publish them, not when the money is actually sent.
+              This can take months. Recent years (2024–2026) will undercount actual grantmaking until
+              the data catches up. For trend analysis, use data from 2+ years ago.
             </p>
             <p style={styles.paragraph}>
-              This timing issue affects year-over-year trend analysis. A decline in grants
-              for the current or prior year may reflect publication lag rather than actual
-              funding changes. For reliable trend analysis, use data from years where
-              publication is substantially complete (typically 2+ years prior).
-            </p>
-            <p style={styles.paragraph}>
-              For more on this issue, see the{' '}
+              More on this:{' '}
               <a href="https://forum.effectivealtruism.org/posts/NWHb4nsnXRxDDFGLy/historical-ea-funding-data-2025-update" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Historical EA Funding Data (2025 Update)
-              </a>{' '}
-              analysis on the EA Forum.
+              </a> on the EA Forum.
             </p>
 
-            <h3 style={styles.subheading}>Other limitations</h3>
+            <h3 style={styles.subheading}>Other notes</h3>
             <ul style={styles.list}>
               <li style={styles.listItem}>
-                Coefficient Giving data is sourced from their official archive CSV, which
-                is updated periodically as grants are published.
+                Founders Pledge and ACE only have annual totals, not individual grants.
               </li>
               <li style={styles.listItem}>
-                Founders Pledge and Animal Charity Evaluators entries are entirely residual —
-                they represent annual totals, not individual grants.
+                Details like country and topics are often missing because the source data doesn't include them.
               </li>
               <li style={styles.listItem}>
-                Metadata fields such as country, topics, and description are sparse for many
-                sources because the upstream data does not include them.
+                2025 and 2026 data is incomplete.
               </li>
               <li style={styles.listItem}>
-                2025 and 2026 data is partial and reflects only grants published to date.
+                Donation platforms (Giving What We Can, The Life You Can Save) aren't included since
+                they overlap with grantmakers already tracked.
               </li>
               <li style={styles.listItem}>
-                The database does not include donation platforms (e.g., Giving What We Can,
-                The Life You Can Save) because their totals largely overlap with the endpoint
-                grantmakers already tracked.
-              </li>
-              <li style={styles.listItem}>
-                Some EA-adjacent grantmakers are not yet tracked, including Longview
-                Philanthropy and regranting programs within CEA and Effective Ventures.
+                Some grantmakers aren't tracked yet: Longview Philanthropy, CEA regranting, Effective Ventures.
               </li>
             </ul>
 
             <h2 style={styles.sectionTitle}>Source code</h2>
             <p style={styles.paragraph}>
-              The full source code, scraping pipeline, and detailed methodology documentation
-              are available at{' '}
+              Everything is on{' '}
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={styles.link}>
-                github.com/Brian-Foerster/EAGrantsDatabase
-              </a>.
-              See{' '}
+                GitHub
+              </a>. See{' '}
               <a href={`${REPO_URL}/blob/main/DATA_SOURCES.md`} target="_blank" rel="noopener noreferrer" style={styles.link}>
                 DATA_SOURCES.md
               </a>{' '}
-              for the complete data sourcing notes. Contributions via pull request are welcome.
+              for details on how data is collected. Pull requests welcome.
             </p>
 
             <h2 style={styles.sectionTitle}>Feedback</h2>
             <p style={styles.paragraph}>
-              To report errors, suggest additional data sources, or provide other feedback,
-              use the{' '}
+              Found an error or have a suggestion? Use the{' '}
               <a href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer" style={styles.link}>
                 feedback form
               </a>{' '}
               or{' '}
               <a href={`${REPO_URL}/issues`} target="_blank" rel="noopener noreferrer" style={styles.link}>
-                open an issue on GitHub
+                open a GitHub issue
               </a>.
             </p>
           </div>

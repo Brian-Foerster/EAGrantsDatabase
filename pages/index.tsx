@@ -889,8 +889,8 @@ export default function Home() {
           <h1 style={{ ...styles.title, fontSize: isPhonePortrait ? '24px' : isMobile ? '28px' : '48px' }}>EA Grants Database</h1>
           <p style={{ ...styles.subtitle, fontSize: isMobile ? '13px' : '18px' }}>
             {isMobile
-              ? `${metadata.totalGrants.toLocaleString()} grants · $${(metadata.totalAmount / 1e9).toFixed(1)}B`
-              : `Aggregating ${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)}B from ${metadata.grantmakers.length} major EA grantmakers`
+              ? `${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)}B from ${metadata.grantmakers.length} grantmakers`
+              : `${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)} billion from ${metadata.grantmakers.length} EA-aligned grantmakers (2012–present)`
             }
           </p>
         </header>
