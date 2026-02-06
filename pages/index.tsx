@@ -54,6 +54,8 @@ export default function Home() {
   const [metadata, setMetadata] = useState<Metadata | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState('Loading...');
+  const [loadError, setLoadError] = useState(false);
+  const fetchAttempted = useRef(false);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrantmakers, setSelectedGrantmakers] = useState<string[]>([]);
@@ -91,17 +93,30 @@ export default function Home() {
   const isMobile = windowWidth < 768;
   const isCompact = windowWidth < 1024;
 
-  // Fetch data client-side
+  // Fetch data client-side only
   useEffect(() => {
+    // Prevent double fetch in React strict mode or re-renders
+    if (fetchAttempted.current) return;
+    fetchAttempted.current = true;
+
     const fetchData = async () => {
       try {
         setLoadingProgress('Loading grants data...');
         const grantsRes = await fetch(`/data/grants.min.json?v=${BUILD_VERSION}`);
+        if (!grantsRes.ok) {
+          throw new Error(`Failed to fetch grants: ${grantsRes.status}`);
+        }
         const grantsData = await grantsRes.json();
+        if (!Array.isArray(grantsData)) {
+          throw new Error('Invalid grants data format');
+        }
         setGrants(grantsData);
 
         setLoadingProgress('Loading metadata...');
         const metaRes = await fetch(`/data/metadata.json?v=${BUILD_VERSION}`);
+        if (!metaRes.ok) {
+          throw new Error(`Failed to fetch metadata: ${metaRes.status}`);
+        }
         const metaData = await metaRes.json();
         setMetadata(metaData);
 
@@ -122,7 +137,8 @@ export default function Home() {
         setIsLoading(false);
       } catch (err) {
         console.error('Failed to load data:', err);
-        setLoadingProgress('Error loading data. Please refresh.');
+        setLoadError(true);
+        setLoadingProgress(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
       }
     };
     fetchData();
@@ -804,8 +820,16 @@ export default function Home() {
         <main style={styles.loadingContainer}>
           <div style={styles.loadingContent}>
             <h1 style={styles.loadingTitle}>EA Grants Database</h1>
-            <div style={styles.loadingSpinner} />
+            {!loadError && <div style={styles.loadingSpinner} />}
             <p style={styles.loadingText}>{loadingProgress}</p>
+            {loadError && (
+              <button
+                onClick={() => window.location.reload()}
+                style={styles.retryButton}
+              >
+                Retry
+              </button>
+            )}
           </div>
         </main>
       </>
@@ -1404,6 +1428,17 @@ const styles: { [key: string]: React.CSSProperties } = {
   loadingText: {
     fontSize: '16px',
     color: '#6b7280',
+  },
+  retryButton: {
+    marginTop: '20px',
+    padding: '12px 24px',
+    fontSize: '16px',
+    fontWeight: '600',
+    color: 'white',
+    backgroundColor: '#3b82f6',
+    border: 'none',
+    borderRadius: '6px',
+    cursor: 'pointer',
   },
   main: {
     maxWidth: '1400px',
