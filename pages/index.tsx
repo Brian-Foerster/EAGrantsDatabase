@@ -540,16 +540,16 @@ export default function Home() {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        // More space when description is present - descriptions can be long
+        // Tighter heights - just enough for content
         const desc = grant.description || (grant.title !== grant.recipient ? grant.title : '');
         const descLength = desc?.length || 0;
-        // Base height + extra for long descriptions
-        if (descLength > 200) return 380;
-        if (descLength > 100) return 340;
-        if (descLength > 0) return 300;
-        return 240; // No description
+        // Base expanded height + extra for long descriptions
+        if (descLength > 200) return 310;
+        if (descLength > 100) return 280;
+        if (descLength > 0) return 250;
+        return 210; // No description
       }
-      return 95; // Collapsed mobile row
+      return 100; // Collapsed mobile row
     }
     return 100; // Desktop row
   }, [isMobile, filteredAndSortedGrants, expandedGrants]);
@@ -1797,7 +1797,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     flexDirection: 'column',
     gap: '5px',
-    padding: '8px 0 16px 0',
+    padding: '10px 0 12px 0',
     borderBottom: '1px solid #e5e7eb',
     cursor: 'pointer',
   },
