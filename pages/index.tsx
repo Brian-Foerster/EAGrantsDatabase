@@ -1,13 +1,13 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
 import MiniSearch from 'minisearch';
 import ReactECharts from 'echarts-for-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { GetStaticProps } from 'next';
-import * as fs from 'fs';
-import * as path from 'path';
+
+// Build timestamp for cache busting (set at build time)
+const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 
 // Funds/focus areas that are excluded by default (not generally considered core EA)
 // These grants are only shown when explicitly selected in the Fund filter
@@ -48,13 +48,13 @@ interface Metadata {
   lastUpdated: string;
 }
 
-interface HomeProps {
-  grants: MinGrant[];
-  metadata: Metadata;
-  searchIndexData: any;
-}
+export default function Home() {
+  // Data loading state
+  const [grants, setGrants] = useState<MinGrant[]>([]);
+  const [metadata, setMetadata] = useState<Metadata | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState('Loading...');
 
-export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrantmakers, setSelectedGrantmakers] = useState<string[]>([]);
   const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
@@ -91,19 +91,42 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
   const isMobile = windowWidth < 768;
   const isCompact = windowWidth < 1024;
 
-  // Initialize MiniSearch
+  // Fetch data client-side
   useEffect(() => {
-    const ms = MiniSearch.loadJS(searchIndexData, {
-      fields: ['title', 'recipient', 'description', 'category', 'grantmaker'],
-      storeFields: ['id'],
-      searchOptions: {
-        boost: { title: 2, recipient: 1.5, description: 1 },
-        fuzzy: 0.2,
-        prefix: true,
+    const fetchData = async () => {
+      try {
+        setLoadingProgress('Loading grants data...');
+        const grantsRes = await fetch(`/data/grants.min.json?v=${BUILD_VERSION}`);
+        const grantsData = await grantsRes.json();
+        setGrants(grantsData);
+
+        setLoadingProgress('Loading metadata...');
+        const metaRes = await fetch(`/data/metadata.json?v=${BUILD_VERSION}`);
+        const metaData = await metaRes.json();
+        setMetadata(metaData);
+
+        setLoadingProgress('Building search index...');
+        // Build search index client-side (saves 2.5MB download)
+        const ms = new MiniSearch({
+          fields: ['title', 'recipient', 'category', 'grantmaker'],
+          storeFields: ['id'],
+          searchOptions: {
+            boost: { title: 2, recipient: 1.5 },
+            fuzzy: 0.2,
+            prefix: true,
+          }
+        });
+        ms.addAll(grantsData);
+        setMiniSearch(ms);
+
+        setIsLoading(false);
+      } catch (err) {
+        console.error('Failed to load data:', err);
+        setLoadingProgress('Error loading data. Please refresh.');
       }
-    });
-    setMiniSearch(ms);
-  }, [searchIndexData]);
+    };
+    fetchData();
+  }, []);
 
   // Perform search
   useEffect(() => {
@@ -763,6 +786,32 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
     }
   };
 
+  // Loading screen
+  if (isLoading || !metadata) {
+    return (
+      <>
+        <Head>
+          <title>EA Grants Database</title>
+          <meta name="description" content="Aggregated database of Effective Altruism grants" />
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </Head>
+        <main style={styles.loadingContainer}>
+          <div style={styles.loadingContent}>
+            <h1 style={styles.loadingTitle}>EA Grants Database</h1>
+            <div style={styles.loadingSpinner} />
+            <p style={styles.loadingText}>{loadingProgress}</p>
+          </div>
+        </main>
+      </>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -1326,6 +1375,36 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
 }
 
 const styles: { [key: string]: React.CSSProperties } = {
+  loadingContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    backgroundColor: '#f9fafb',
+  },
+  loadingContent: {
+    textAlign: 'center',
+    padding: '40px',
+  },
+  loadingTitle: {
+    fontSize: '32px',
+    fontWeight: 'bold',
+    color: '#1a202c',
+    marginBottom: '30px',
+  },
+  loadingSpinner: {
+    width: '50px',
+    height: '50px',
+    border: '4px solid #e5e7eb',
+    borderTop: '4px solid #3b82f6',
+    borderRadius: '50%',
+    margin: '0 auto 20px',
+    animation: 'spin 1s linear infinite',
+  },
+  loadingText: {
+    fontSize: '16px',
+    color: '#6b7280',
+  },
   main: {
     maxWidth: '1400px',
     margin: '0 auto',
@@ -1863,18 +1942,3 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-export const getStaticProps: GetStaticProps<HomeProps> = async () => {
-  const dataDir = path.join(process.cwd(), 'public', 'data');
-  
-  const grants = JSON.parse(fs.readFileSync(path.join(dataDir, 'grants.min.json'), 'utf-8'));
-  const metadata = JSON.parse(fs.readFileSync(path.join(dataDir, 'metadata.json'), 'utf-8'));
-  const searchIndexData = JSON.parse(fs.readFileSync(path.join(dataDir, 'search-index.json'), 'utf-8'));
-
-  return {
-    props: {
-      grants,
-      metadata,
-      searchIndexData,
-    },
-  };
-};
