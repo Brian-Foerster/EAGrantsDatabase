@@ -1027,7 +1027,7 @@ export default function Home({ grants, metadata, searchIndexData }: HomeProps) {
                             color: categoryColorMap[grant.category] || '#999',
                           }}>{displayCategory(grant.category)}</span>
                         )}
-                        {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== grant.fund && (
+                        {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== displayCategory(grant.category) && (
                           <span style={{
                             ...styles.subTag,
                             borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
