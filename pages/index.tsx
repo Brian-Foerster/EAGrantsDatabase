@@ -534,28 +534,34 @@ export default function Home() {
 
   // Virtualization
   // Estimate row height - expanded mobile rows need more space
-  const getRowHeight = (index: number) => {
+  // Calculate row height based on content
+  const getRowHeight = useCallback((index: number) => {
     if (isMobile) {
       const grant = filteredAndSortedGrants[index];
       if (grant && expandedGrants.has(grant.id)) {
-        return 160; // Expanded mobile row
+        return 220; // Expanded mobile row - needs space for all details
       }
-      return 70; // Collapsed mobile row
+      return 95; // Collapsed mobile row
     }
-    return 85; // Desktop row
-  };
+    return 100; // Desktop row
+  }, [isMobile, filteredAndSortedGrants, expandedGrants]);
 
   const rowVirtualizer = useVirtualizer({
     count: filteredAndSortedGrants.length,
     getScrollElement: () => parentRef.current,
     estimateSize: getRowHeight,
-    overscan: 5,
+    overscan: 10,
+    getItemKey: (index) => filteredAndSortedGrants[index]?.id || index,
   });
 
-  // Re-measure when grants expand/collapse
+  // Force re-measure when grants expand/collapse
   useEffect(() => {
-    rowVirtualizer.measure();
-  }, [expandedGrants, rowVirtualizer]);
+    // Small delay to ensure state has updated
+    const timer = setTimeout(() => {
+      rowVirtualizer.measure();
+    }, 10);
+    return () => clearTimeout(timer);
+  }, [expandedGrants.size]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -1770,14 +1776,14 @@ const styles: { [key: string]: React.CSSProperties } = {
     gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
     alignItems: 'start',
     gap: '8px',
-    padding: '10px 0',
+    padding: '12px 0',
     borderBottom: '1px solid #e5e7eb',
   },
   grantRowMobile: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '4px',
-    padding: '8px 0',
+    gap: '5px',
+    padding: '12px 0',
     borderBottom: '1px solid #e5e7eb',
     cursor: 'pointer',
   },
