@@ -24,6 +24,8 @@ const NON_CORE_EA_FUNDS: Record<string, string> = {
   'Innovation Policy': 'US policy area outside traditional EA cause areas',
 };
 
+const isNonCoreFund = (fund?: string) => !!fund && fund in NON_CORE_EA_FUNDS;
+
 interface MinGrant {
   id: string;
   title: string;
@@ -295,6 +297,44 @@ export default function Home() {
     const subs = new Set(grants.map(g => g.focus_area).filter(Boolean) as string[]);
     return Array.from(subs).sort();
   }, [grants]);
+
+  const nonCoreOnlyCategories = useMemo(() => {
+    const info: Record<string, { hasCore: boolean; hasNonCore: boolean }> = {};
+    grants.forEach(g => {
+      if (!g.category) return;
+      if (!info[g.category]) info[g.category] = { hasCore: false, hasNonCore: false };
+      if (isNonCoreFund(g.fund)) {
+        info[g.category].hasNonCore = true;
+      } else {
+        info[g.category].hasCore = true;
+      }
+    });
+    return new Set(
+      Object.entries(info)
+        .filter(([, v]) => v.hasNonCore && !v.hasCore)
+        .map(([k]) => k)
+    );
+  }, [grants]);
+
+  const nonCoreOnlySubcategories = useMemo(() => {
+    const info: Record<string, { hasCore: boolean; hasNonCore: boolean }> = {};
+    grants.forEach(g => {
+      if (!g.focus_area) return;
+      if (!info[g.focus_area]) info[g.focus_area] = { hasCore: false, hasNonCore: false };
+      if (isNonCoreFund(g.fund)) {
+        info[g.focus_area].hasNonCore = true;
+      } else {
+        info[g.focus_area].hasCore = true;
+      }
+    });
+    return new Set(
+      Object.entries(info)
+        .filter(([, v]) => v.hasNonCore && !v.hasCore)
+        .map(([k]) => k)
+    );
+  }, [grants]);
+
+  const nonCoreCategoryTooltip = 'Excluded by default — only appears in non-core funds.';
 
   const availableYears = useMemo(() => {
     const years = new Set(grants.map(g => new Date(g.date).getFullYear()));
@@ -1058,17 +1098,35 @@ export default function Home() {
                 </button>
                 {expandedFilters.category && (
                   <div style={styles.filterOptions}>
-                    {metadata.categories.map(cat => (
-                      <label key={cat} style={styles.filterOption}>
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.includes(cat)}
-                          onChange={() => toggleCategory(cat)}
-                          style={styles.checkbox}
-                        />
-                        {displayCategory(cat)}
-                      </label>
-                    ))}
+                    {metadata.categories.map(cat => {
+                      const isNonCoreOnly = nonCoreOnlyCategories.has(cat);
+                      return (
+                        <label
+                          key={cat}
+                          style={{
+                            ...styles.filterOption,
+                            ...(isNonCoreOnly ? { opacity: 0.7, fontStyle: 'italic' } : {})
+                          }}
+                          onMouseEnter={isNonCoreOnly ? (e) => showHoverTooltip(nonCoreCategoryTooltip, e) : undefined}
+                          onMouseMove={isNonCoreOnly ? moveHoverTooltip : undefined}
+                          onMouseLeave={isNonCoreOnly ? hideHoverTooltip : undefined}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedCategories.includes(cat)}
+                            onChange={() => toggleCategory(cat)}
+                            style={styles.checkbox}
+                          />
+                          {displayCategory(cat)}
+                          {isNonCoreOnly && <span style={styles.nonCoreIndicator}>*</span>}
+                        </label>
+                      );
+                    })}
+                    {nonCoreOnlyCategories.size > 0 && (
+                      <p style={styles.nonCoreNote}>
+                        * Excluded by default — only appears in non-core funds.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
@@ -1082,17 +1140,35 @@ export default function Home() {
                 </button>
                 {expandedFilters.subcategory && (
                   <div style={styles.filterOptions}>
-                    {availableSubcategories.map(sub => (
-                      <label key={sub} style={styles.filterOption}>
-                        <input
-                          type="checkbox"
-                          checked={selectedSubcategories.includes(sub)}
-                          onChange={() => toggleSubcategory(sub)}
-                          style={styles.checkbox}
-                        />
-                        {sub}
-                      </label>
-                    ))}
+                    {availableSubcategories.map(sub => {
+                      const isNonCoreOnly = nonCoreOnlySubcategories.has(sub);
+                      return (
+                        <label
+                          key={sub}
+                          style={{
+                            ...styles.filterOption,
+                            ...(isNonCoreOnly ? { opacity: 0.7, fontStyle: 'italic' } : {})
+                          }}
+                          onMouseEnter={isNonCoreOnly ? (e) => showHoverTooltip(nonCoreCategoryTooltip, e) : undefined}
+                          onMouseMove={isNonCoreOnly ? moveHoverTooltip : undefined}
+                          onMouseLeave={isNonCoreOnly ? hideHoverTooltip : undefined}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedSubcategories.includes(sub)}
+                            onChange={() => toggleSubcategory(sub)}
+                            style={styles.checkbox}
+                          />
+                          {sub}
+                          {isNonCoreOnly && <span style={styles.nonCoreIndicator}>*</span>}
+                        </label>
+                      );
+                    })}
+                    {nonCoreOnlySubcategories.size > 0 && (
+                      <p style={styles.nonCoreNote}>
+                        * Excluded by default — only appears in non-core funds.
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
