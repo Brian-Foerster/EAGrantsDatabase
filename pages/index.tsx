@@ -8,6 +8,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 // Build timestamp for cache busting (set at build time)
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
+const CACHE_BUST_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME;
 
 // Base path for GitHub Pages deployment (set in .env.local for dev)
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || (process.env.NODE_ENV === 'production' ? '/EAGrantsDatabase' : '');
@@ -951,10 +952,10 @@ export default function Home() {
         <title>EA Grants Database</title>
         <meta name="description" content="Aggregated database of Effective Altruism grants" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        {process.env.NODE_ENV === 'production' && (
+        {process.env.NODE_ENV === 'production' && CACHE_BUST_VERSION && (
           <script
             dangerouslySetInnerHTML={{
-              __html: `(function(){try{var v='${BUILD_VERSION}';var u=new URL(window.location.href);if(u.searchParams.get('v')!==v){u.searchParams.set('v',v);window.location.replace(u.toString());}}catch(e){}})();`,
+              __html: `(function(){try{var v='${CACHE_BUST_VERSION}';var u=new URL(window.location.href);if(u.searchParams.get('v')!==v){u.searchParams.set('v',v);window.location.replace(u.toString());}}catch(e){}})();`,
             }}
           />
         )}
