@@ -8,7 +8,6 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 
 // Build timestamp for cache busting (set at build time)
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
-const CACHE_BUST_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME;
 
 // Base path for deployment (set via NEXT_PUBLIC_BASE_PATH when needed)
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -1052,13 +1051,6 @@ export default function Home() {
         <meta name="description" content="Aggregated database of Effective Altruism grants" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://brian-foerster.github.io/EAGrantsDatabase/" />
-        {process.env.NODE_ENV === 'production' && CACHE_BUST_VERSION && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `(function(){try{var v='${CACHE_BUST_VERSION}';var u=new URL(window.location.href);if(u.searchParams.get('v')!==v){u.searchParams.set('v',v);window.location.replace(u.toString());}}catch(e){}})();`,
-            }}
-          />
-        )}
         <script
           data-goatcounter="https://brian-foerster.goatcounter.com/count"
           async
@@ -1076,13 +1068,13 @@ export default function Home() {
         }}>
           <nav style={styles.nav}>
             <Link
-              href={CACHE_BUST_VERSION ? `/?v=${CACHE_BUST_VERSION}` : '/'}
+              href="/"
               style={styles.navLink}
             >
               Home
             </Link>
             <Link
-              href={CACHE_BUST_VERSION ? `/about?v=${CACHE_BUST_VERSION}` : '/about'}
+              href="/about"
               style={styles.navLink}
             >
               About

@@ -5,7 +5,6 @@ import Link from 'next/link';
 const REPO_URL = 'https://github.com/Brian-Foerster/EAGrantsDatabase';
 const FEEDBACK_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSceNe8T97Z36LvBmepyid68MYbyairBvZucnZFlREGROSBOZA/viewform';
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
-const CACHE_BUST_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME;
 
 export default function About() {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 800);
@@ -28,13 +27,6 @@ export default function About() {
         <meta name="description" content="About the EA Grants Database — data sources, methodology, and limitations" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://brian-foerster.github.io/EAGrantsDatabase/about" />
-        {process.env.NODE_ENV === 'production' && CACHE_BUST_VERSION && (
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `(function(){try{var v='${CACHE_BUST_VERSION}';var u=new URL(window.location.href);if(u.searchParams.get('v')!==v){u.searchParams.set('v',v);window.location.replace(u.toString());}}catch(e){}})();`,
-            }}
-          />
-        )}
       </Head>
       <main style={{
         ...styles.main,
@@ -47,13 +39,13 @@ export default function About() {
         }}>
           <nav style={styles.nav}>
             <Link
-              href={CACHE_BUST_VERSION ? `/?v=${CACHE_BUST_VERSION}` : '/'}
+              href="/"
               style={styles.navLink}
             >
               Home
             </Link>
             <Link
-              href={CACHE_BUST_VERSION ? `/about?v=${CACHE_BUST_VERSION}` : '/about'}
+              href="/about"
               style={styles.navLink}
             >
               About
