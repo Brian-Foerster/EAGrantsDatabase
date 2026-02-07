@@ -137,7 +137,7 @@ export default function Home() {
           storeFields: ['id'],
           searchOptions: {
             boost: { title: 2, recipient: 1.5, description: 1 },
-            fuzzy: 0.2,
+            fuzzy: 0,
             prefix: true,
           }
         });
@@ -884,10 +884,13 @@ export default function Home() {
       return step * magnitude;
     };
 
-    const yAxisConfig = (max: number) => ({
+    const yAxisConfig = (max: number) => {
+      const buffer = isMobile ? 1.06 : 1.04;
+      const paddedMax = max * buffer;
+      return {
       type: 'value' as const,
       name: isMobile ? '' : (adjustInflation ? '2024 USD ($M)' : 'Amount ($M)'),
-      max: niceMax(max), // Use a finer "nice" max so smaller values still show variation
+      max: niceMax(paddedMax), // Smaller padding so scale tracks bars more closely
       nameTextStyle: { fontSize: 12 },
       axisLabel: {
         fontSize: isMobile ? 9 : 12,
@@ -896,7 +899,8 @@ export default function Home() {
           return Math.round(val) + 'M';
         },
       },
-    });
+      };
+    };
 
     switch (chartView) {
       case 'year': {
@@ -1466,31 +1470,33 @@ export default function Home() {
             ...styles.grantsHeader,
             ...(isMobile ? { flexDirection: 'column', alignItems: 'flex-start', gap: '10px' } : {})
           }}>
-            <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px', marginBottom: 0 }}>Grants</h2>
-            <div style={styles.sortControls}>
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as 'date' | 'amount' | 'grantmaker' | 'recipient' | 'category')}
-                style={{
-                  ...styles.select,
-                  ...(isMobile ? { minWidth: 'auto', padding: '8px', fontSize: '13px' } : {})
-                }}
-              >
-                <option value="date">{isMobile ? 'Date' : 'Sort by Date'}</option>
-                <option value="amount">{isMobile ? 'Amount' : 'Sort by Amount'}</option>
-                <option value="grantmaker">{isMobile ? 'Grantmaker' : 'Sort by Grantmaker'}</option>
-                <option value="recipient">{isMobile ? 'Grantee' : 'Sort by Grantee'}</option>
-                <option value="category">{isMobile ? 'Category' : 'Sort by Category'}</option>
-              </select>
-              <button
-                onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-                style={{
-                  ...styles.sortButton,
-                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {})
-                }}
-              >
-                {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
-              </button>
+            <div style={styles.grantsHeaderLeft}>
+              <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px', marginBottom: 0 }}>Grants</h2>
+              <div style={styles.sortControls}>
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as 'date' | 'amount' | 'grantmaker' | 'recipient' | 'category')}
+                  style={{
+                    ...styles.select,
+                    ...(isMobile ? { minWidth: 'auto', padding: '8px', fontSize: '13px' } : {})
+                  }}
+                >
+                  <option value="date">{isMobile ? 'Date' : 'Sort by Date'}</option>
+                  <option value="amount">{isMobile ? 'Amount' : 'Sort by Amount'}</option>
+                  <option value="grantmaker">{isMobile ? 'Grantmaker' : 'Sort by Grantmaker'}</option>
+                  <option value="recipient">{isMobile ? 'Grantee' : 'Sort by Grantee'}</option>
+                  <option value="category">{isMobile ? 'Category' : 'Sort by Category'}</option>
+                </select>
+                <button
+                  onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                  style={{
+                    ...styles.sortButton,
+                    ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {})
+                  }}
+                >
+                  {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
+                </button>
+              </div>
             </div>
             <button
               onClick={downloadFilteredCsv}
@@ -1499,7 +1505,7 @@ export default function Home() {
                 ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {})
               }}
             >
-              Download CSV
+              Download Results CSV
             </button>
           </div>
           
@@ -2120,6 +2126,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: '20px',
     flexWrap: 'wrap',
     gap: '15px',
+  },
+  grantsHeaderLeft: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+    flexWrap: 'wrap',
   },
   sortControls: {
     display: 'flex',
