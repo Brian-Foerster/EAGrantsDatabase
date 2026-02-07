@@ -100,6 +100,12 @@ export default function Home() {
   const isMobile = windowWidth < 768;
   const isCompact = windowWidth < 1024;
   const canOverlayChartTotal = !isMobile && windowWidth >= 1200;
+  const expandedLabelWidth = isMobile
+    ? Math.min(110, Math.max(70, Math.round(windowWidth * 0.28)))
+    : 110;
+  const expandedLabelStyle = isMobile
+    ? { minWidth: expandedLabelWidth, flexBasis: expandedLabelWidth, flexShrink: 0 }
+    : {};
 
   // Fetch data client-side only
   useEffect(() => {
@@ -1497,26 +1503,26 @@ export default function Home() {
                         {expandedGrants.has(grant.id) && (
                           <div style={styles.grantMobileExpanded}>
                             <div style={styles.expandedRow}>
-                              <span style={styles.expandedLabel}>Grantmaker:</span>
+                              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Grantmaker:</span>
                               <span>{grant.grantmaker}</span>
                             </div>
                             {grant.fund && (
                               <div style={styles.expandedRow}>
-                                <span style={styles.expandedLabel}>Fund:</span>
+                                <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Fund:</span>
                                 <span>{grant.fund}</span>
                               </div>
                             )}
                             <div style={styles.expandedRow}>
-                              <span style={styles.expandedLabel}>Category:</span>
+                              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Category:</span>
                               <span>{displayCategory(grant.category)}</span>
                             </div>
                             <div style={styles.expandedRow}>
-                              <span style={styles.expandedLabel}>Date:</span>
+                              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Date:</span>
                               <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
                             </div>
                             {(grant.description || (grant.title && grant.title !== grant.recipient)) && (
                               <div style={styles.expandedDescRow}>
-                                <span style={styles.expandedLabel}>Description:</span>
+                                <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Description:</span>
                                 <span style={styles.expandedDescText}>{grant.description || grant.title}</span>
                               </div>
                             )}
