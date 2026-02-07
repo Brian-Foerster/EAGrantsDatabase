@@ -10,8 +10,8 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 const CACHE_BUST_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME;
 
-// Base path for GitHub Pages deployment (set in .env.local for dev)
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || (process.env.NODE_ENV === 'production' ? '/EAGrantsDatabase' : '');
+// Base path for deployment (set via NEXT_PUBLIC_BASE_PATH when needed)
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
 // Funds/focus areas that are excluded by default (not generally considered core EA)
 // These grants are only shown when explicitly selected in the Fund filter
