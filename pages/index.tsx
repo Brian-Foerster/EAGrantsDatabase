@@ -102,6 +102,7 @@ export default function Home() {
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
   const isMobile = windowWidth < 768;
   const isCompact = windowWidth < 1024;
+  const canOverlayChartTotal = !isMobile && windowWidth >= 1200;
 
   // Fetch data client-side only
   useEffect(() => {
@@ -1342,6 +1343,12 @@ export default function Home() {
             ...styles.chartContainer,
             padding: isPhonePortrait ? '4px 0' : isMobile ? '4px 0' : '6px 0',
           }}>
+            {canOverlayChartTotal && (
+              <div style={styles.chartTotalOverlay}>
+                Total: {'$'}
+                {(filteredTotal / 1000000).toFixed(2)}M
+              </div>
+            )}
             <ReactECharts
               option={getChartOption()}
               notMerge={true}
@@ -1350,15 +1357,17 @@ export default function Home() {
               opts={{ renderer: 'canvas' }}
             />
           </div>
-          <div style={{
-            ...styles.chartMetaRow,
-            ...(isMobile ? { fontSize: '12px' } : {})
-          }}>
-            <div style={styles.chartTotal}>
-              Total: {'$'}
-              {(filteredTotal / 1000000).toFixed(2)}M
+          {!canOverlayChartTotal && (
+            <div style={{
+              ...styles.chartMetaRow,
+              ...(isMobile ? { fontSize: '12px' } : {})
+            }}>
+              <div style={styles.chartTotal}>
+                Total: {'$'}
+                {(filteredTotal / 1000000).toFixed(2)}M
+              </div>
             </div>
-          </div>
+          )}
         </section>
 
         {/* Grants List with Virtualization */}
@@ -1733,6 +1742,20 @@ const styles: { [key: string]: React.CSSProperties } = {
     padding: '6px 0',
     borderRadius: '8px',
     boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    position: 'relative',
+  },
+  chartTotalOverlay: {
+    position: 'absolute',
+    right: '12px',
+    bottom: '8px',
+    fontSize: '13px',
+    fontWeight: '700',
+    color: '#4b5563',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    border: '1px solid #e5e7eb',
+    padding: '4px 8px',
+    borderRadius: '6px',
+    pointerEvents: 'none',
   },
   chartMetaRow: {
     display: 'flex',
