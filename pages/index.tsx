@@ -35,7 +35,6 @@ interface MinGrant {
   date: string;
   grantmaker: string;
   category?: string;
-  focus_area?: string;
   fund?: string;
   url?: string;
   description?: string;
@@ -67,7 +66,6 @@ export default function Home() {
   const [selectedGrantmakers, setSelectedGrantmakers] = useState<string[]>([]);
   const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedSubcategories, setSelectedSubcategories] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
   const [amountMin, setAmountMin] = useState('');
   const [amountMax, setAmountMax] = useState('');
@@ -187,9 +185,8 @@ export default function Home() {
     const hasGmFilter = selectedGrantmakers.length > 0;
     const hasFundFilter = selectedFunds.length > 0;
     const hasCatFilter = selectedCategories.length > 0;
-    const hasSubFilter = selectedSubcategories.length > 0;
     const hasSourceFilter = hasGmFilter || hasFundFilter;
-    const hasTopicFilter = hasCatFilter || hasSubFilter;
+    const hasTopicFilter = hasCatFilter;
 
     filtered = filtered.filter(grant => {
       // --- Source group (Grantmaker / Fund) ---
@@ -223,8 +220,7 @@ export default function Home() {
       let passesTopic: boolean;
       if (hasTopicFilter) {
         const matchesCat = hasCatFilter && !!grant.category && selectedCategories.includes(grant.category);
-        const matchesSub = hasSubFilter && !!grant.focus_area && selectedSubcategories.includes(grant.focus_area);
-        passesTopic = matchesCat || matchesSub;
+        passesTopic = matchesCat;
       } else {
         passesTopic = true;
       }
@@ -260,14 +256,13 @@ export default function Home() {
       } else if (sortBy === 'recipient') {
         cmp = a.recipient.localeCompare(b.recipient);
       } else if (sortBy === 'category') {
-        cmp = (a.category || '').localeCompare(b.category || '')
-          || (a.focus_area || '').localeCompare(b.focus_area || '');
+        cmp = (a.category || '').localeCompare(b.category || '');
       }
       return sortOrder === 'asc' ? cmp : -cmp;
     });
 
     return sorted;
-  }, [grants, searchTerm, searchResults, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubcategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+  }, [grants, searchTerm, searchResults, selectedGrantmakers, selectedFunds, selectedCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
 
   const fundsByGrantmaker = useMemo(() => {
     const gmDisplayNames: Record<string, string> = {
@@ -312,49 +307,6 @@ export default function Home() {
     );
   }, [grants]);
 
-  const nonCoreOnlySubcategories = useMemo(() => {
-    const info: Record<string, { hasCore: boolean; hasNonCore: boolean }> = {};
-    grants.forEach(g => {
-      if (!g.focus_area) return;
-      if (!info[g.focus_area]) info[g.focus_area] = { hasCore: false, hasNonCore: false };
-      if (isNonCoreFund(g.fund)) {
-        info[g.focus_area].hasNonCore = true;
-      } else {
-        info[g.focus_area].hasCore = true;
-      }
-    });
-    return new Set(
-      Object.entries(info)
-        .filter(([, v]) => v.hasNonCore && !v.hasCore)
-        .map(([k]) => k)
-    );
-  }, [grants]);
-
-  const duplicateCoefficientSubcategories = useMemo(() => {
-    const info: Record<string, { grantmakers: Set<string>; funds: Set<string> }> = {};
-    grants.forEach(g => {
-      if (!g.focus_area) return;
-      if (!info[g.focus_area]) {
-        info[g.focus_area] = { grantmakers: new Set(), funds: new Set() };
-      }
-      info[g.focus_area].grantmakers.add(g.grantmaker);
-      if (g.fund) info[g.focus_area].funds.add(g.fund);
-    });
-    return new Set(
-      Object.entries(info)
-        .filter(([, v]) => v.grantmakers.size === 1 && v.grantmakers.has('Coefficient Giving') && v.funds.size === 1)
-        .filter(([sub, v]) => v.funds.has(sub))
-        .map(([sub]) => sub)
-    );
-  }, [grants]);
-
-  const availableSubcategories = useMemo(() => {
-    const subs = new Set(grants.map(g => g.focus_area).filter(Boolean) as string[]);
-    return Array.from(subs)
-      .filter(sub => !duplicateCoefficientSubcategories.has(sub))
-      .sort();
-  }, [grants, duplicateCoefficientSubcategories]);
-
   const nonCoreCategoryTooltip = 'Excluded by default — only appears in non-core funds.';
 
   const availableYears = useMemo(() => {
@@ -396,12 +348,6 @@ export default function Home() {
     );
   };
 
-  const toggleSubcategory = (sub: string) => {
-    setSelectedSubcategories(prev =>
-      prev.includes(sub) ? prev.filter(s => s !== sub) : [...prev, sub]
-    );
-  };
-
   const toggleYear = (year: number) => {
     setSelectedYears(prev =>
       prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]
@@ -440,7 +386,6 @@ export default function Home() {
       g.date,
       g.grantmaker,
       g.category || '',
-      g.focus_area || '',
       g.fund || '',
       g.url || '',
       g.description || '',
@@ -469,7 +414,6 @@ export default function Home() {
     setSelectedGrantmakers([]);
     setSelectedFunds([]);
     setSelectedCategories([]);
-    setSelectedSubcategories([]);
     setSelectedYears([]);
     setAmountMin('');
     setAmountMax('');
@@ -585,7 +529,6 @@ export default function Home() {
     'Scientific Innovation: Tools and Techniques': 'Scientific Tools',
     'Other Scientific Research Areas': 'Scientific Research',
   };
-  const normalizeSubcategory = (sub?: string): string => sub ? (SUBCATEGORY_NORMALIZE[sub] || sub) : '';
 
   const categoryColorMap = useMemo(() => {
     const cats = Array.from(new Set(grants.map(g => g.category).filter(Boolean))) as string[];
@@ -1261,48 +1204,6 @@ export default function Home() {
               </div>
               <div style={styles.filterSection}>
                 <button
-                  onClick={() => toggleFilter('subcategory')}
-                  style={styles.filterHeader}
-                >
-                  <span style={styles.filterHeaderLabel}>Sub-Category</span>
-                  <span style={styles.filterHeaderIcon}>{expandedFilters.subcategory ? '\u2212' : '+'}</span>
-                </button>
-                {expandedFilters.subcategory && (
-                  <div style={styles.filterOptions}>
-                    {availableSubcategories.map(sub => {
-                      const isNonCoreOnly = nonCoreOnlySubcategories.has(sub);
-                      return (
-                        <label
-                          key={sub}
-                          style={{
-                            ...styles.filterOption,
-                            ...(isNonCoreOnly ? { opacity: 0.7, fontStyle: 'italic' } : {})
-                          }}
-                          onMouseEnter={isNonCoreOnly ? (e) => showHoverTooltip(nonCoreCategoryTooltip, e) : undefined}
-                          onMouseMove={isNonCoreOnly ? moveHoverTooltip : undefined}
-                          onMouseLeave={isNonCoreOnly ? hideHoverTooltip : undefined}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedSubcategories.includes(sub)}
-                            onChange={() => toggleSubcategory(sub)}
-                            style={styles.checkbox}
-                          />
-                          {sub}
-                          {isNonCoreOnly && <span style={styles.nonCoreIndicator}>*</span>}
-                        </label>
-                      );
-                    })}
-                    {nonCoreOnlySubcategories.size > 0 && (
-                      <p style={styles.nonCoreNote}>
-                        * Excluded by default — only appears in non-core funds.
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-              <div style={styles.filterSection}>
-                <button
                   onClick={() => toggleFilter('year')}
                   style={styles.filterHeader}
                 >
@@ -1609,12 +1510,6 @@ export default function Home() {
                               <span style={styles.expandedLabel}>Category:</span>
                               <span>{displayCategory(grant.category)}</span>
                             </div>
-                            {grant.focus_area && grant.focus_area !== displayCategory(grant.category) && (
-                              <div style={styles.expandedRow}>
-                                <span style={styles.expandedLabel}>Sub-category:</span>
-                                <span>{grant.focus_area}</span>
-                              </div>
-                            )}
                             <div style={styles.expandedRow}>
                               <span style={styles.expandedLabel}>Date:</span>
                               <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
@@ -1678,13 +1573,6 @@ export default function Home() {
                               borderColor: categoryColorMap[grant.category] || '#999',
                               color: categoryColorMap[grant.category] || '#999',
                             }}>{displayCategory(grant.category)}</span>
-                          )}
-                          {grant.focus_area && grant.focus_area !== grant.category && grant.focus_area !== displayCategory(grant.category) && (
-                            <span style={{
-                              ...styles.subTag,
-                              borderColor: (categoryColorMap[grant.category || ''] || '#999') + 'aa',
-                              color: categoryColorMap[grant.category || ''] || '#999',
-                            }}>{grant.focus_area}</span>
                           )}
                         </div>
                         <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
