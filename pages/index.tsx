@@ -409,6 +409,62 @@ export default function Home() {
     );
   };
 
+  const csvEscape = (value: string | number | boolean | null | undefined) => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+  };
+
+  const downloadFilteredCsv = () => {
+    const headers = [
+      'id',
+      'title',
+      'recipient',
+      'amount',
+      'currency',
+      'date',
+      'grantmaker',
+      'category',
+      'sub_category',
+      'fund',
+      'url',
+      'description',
+      'is_residual',
+    ];
+
+    const rows = filteredAndSortedGrants.map(g => ([
+      g.id,
+      g.title,
+      g.recipient,
+      g.amount,
+      g.currency,
+      g.date,
+      g.grantmaker,
+      g.category || '',
+      g.focus_area || '',
+      g.fund || '',
+      g.url || '',
+      g.description || '',
+      g.is_residual ? 'true' : '',
+    ]));
+
+    const csv = [
+      headers.map(csvEscape).join(','),
+      ...rows.map(row => row.map(csvEscape).join(',')),
+    ].join('\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const stamp = format(new Date(), 'yyyy-MM-dd');
+    link.href = url;
+    link.download = `ea-grants-filtered-${stamp}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const clearAllFilters = () => {
     setSearchTerm('');
     setSelectedGrantmakers([]);
@@ -818,10 +874,21 @@ export default function Home() {
     const legendConfig = isMobile
       ? { show: false }
       : { type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20 };
+    const niceMax = (value: number) => {
+      if (value <= 0) return 0;
+      const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
+      const normalized = value / magnitude;
+      const step =
+        normalized <= 1 ? 1 :
+        normalized <= 2 ? 2 :
+        normalized <= 5 ? 5 : 10;
+      return step * magnitude;
+    };
+
     const yAxisConfig = (max: number) => ({
       type: 'value' as const,
       name: isMobile ? '' : (adjustInflation ? '2024 USD ($M)' : 'Amount ($M)'),
-      max: Math.ceil(max / 100) * 100, // Round to nearest 100
+      max: niceMax(max), // Use a finer "nice" max so smaller values still show variation
       nameTextStyle: { fontSize: 12 },
       axisLabel: {
         fontSize: isMobile ? 9 : 12,
@@ -1433,6 +1500,15 @@ export default function Home() {
                 {sortOrder === 'asc' ? '↑ Asc' : '↓ Desc'}
               </button>
             </div>
+            <button
+              onClick={downloadFilteredCsv}
+              style={{
+                ...styles.downloadButton,
+                ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {})
+              }}
+            >
+              Download CSV
+            </button>
           </div>
           
           <div style={{
@@ -2057,6 +2133,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     display: 'flex',
     gap: '10px',
     alignItems: 'center',
+  },
+  downloadButton: {
+    padding: '10px 16px',
+    fontSize: '14px',
+    border: '1px solid #d1d5db',
+    borderRadius: '6px',
+    backgroundColor: '#f9fafb',
+    color: '#111827',
+    fontWeight: '600',
+    cursor: 'pointer',
   },
   virtualListContainer: {
     backgroundColor: 'white',
