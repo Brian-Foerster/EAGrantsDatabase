@@ -388,6 +388,17 @@ export default function Home() {
     );
   };
 
+  const clearAllFilters = () => {
+    setSearchTerm('');
+    setSelectedGrantmakers([]);
+    setSelectedFunds([]);
+    setSelectedCategories([]);
+    setSelectedSubcategories([]);
+    setSelectedYears([]);
+    setAmountMin('');
+    setAmountMax('');
+  };
+
   const toggleGrantExpanded = (grantId: string) => {
     setExpandedGrants(prev => {
       const next = new Set(prev);
@@ -1008,6 +1019,15 @@ export default function Home() {
                 ? `${grants.length.toLocaleString()} grants`
                 : `${filteredAndSortedGrants.length.toLocaleString()} of ${grants.length.toLocaleString()} grants`}
             </div>
+            <div style={styles.filterActionsRow}>
+              <button
+                type="button"
+                onClick={clearAllFilters}
+                style={styles.clearFiltersButton}
+              >
+                Clear all
+              </button>
+            </div>
             <div style={styles.filterAccordion}>
               <div style={styles.filterSection}>
                 <button
@@ -1319,15 +1339,6 @@ export default function Home() {
             2025 data is partial and reflects only grants published to date.
           </div>
           <div style={{
-            ...styles.chartMetaRow,
-            ...(isMobile ? { fontSize: '12px' } : {})
-          }}>
-            <div style={styles.chartTotal}>
-              Total: {'$'}
-              {(filteredTotal / 1000000).toFixed(2)}M
-            </div>
-          </div>
-          <div style={{
             ...styles.chartContainer,
             padding: isPhonePortrait ? '4px 0' : isMobile ? '4px 0' : '6px 0',
           }}>
@@ -1338,6 +1349,15 @@ export default function Home() {
               style={{ height: isPhonePortrait ? '260px' : isMobile ? '300px' : '400px', width: '100%' }}
               opts={{ renderer: 'canvas' }}
             />
+          </div>
+          <div style={{
+            ...styles.chartMetaRow,
+            ...(isMobile ? { fontSize: '12px' } : {})
+          }}>
+            <div style={styles.chartTotal}>
+              Total: {'$'}
+              {(filteredTotal / 1000000).toFixed(2)}M
+            </div>
           </div>
         </section>
 
@@ -1684,6 +1704,21 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#888',
     marginTop: '6px',
   },
+  filterActionsRow: {
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginTop: '8px',
+  },
+  clearFiltersButton: {
+    fontSize: '12px',
+    fontWeight: '600',
+    color: '#1f2937',
+    backgroundColor: '#f3f4f6',
+    border: '1px solid #d1d5db',
+    borderRadius: '6px',
+    padding: '6px 10px',
+    cursor: 'pointer',
+  },
   section: {
     marginBottom: '40px',
   },
@@ -1705,7 +1740,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     alignItems: 'center',
     gap: '12px',
     color: '#6b7280',
-    marginBottom: '8px',
+    marginTop: '8px',
     flexWrap: 'wrap',
   },
   chartTotal: {
