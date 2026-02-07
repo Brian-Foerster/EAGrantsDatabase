@@ -987,8 +987,18 @@ export default function Home() {
           marginBottom: isMobile ? '24px' : '40px'
         }}>
           <nav style={styles.nav}>
-            <Link href="/" style={styles.navLink}>Home</Link>
-            <Link href="/about" style={styles.navLink}>About</Link>
+            <Link
+              href={CACHE_BUST_VERSION ? `/?v=${CACHE_BUST_VERSION}` : '/'}
+              style={styles.navLink}
+            >
+              Home
+            </Link>
+            <Link
+              href={CACHE_BUST_VERSION ? `/about?v=${CACHE_BUST_VERSION}` : '/about'}
+              style={styles.navLink}
+            >
+              About
+            </Link>
           </nav>
           <h1 style={{ ...styles.title, fontSize: isPhonePortrait ? '24px' : isMobile ? '28px' : '48px' }}>EA Grants Database</h1>
           <p style={{ ...styles.subtitle, fontSize: isMobile ? '13px' : '18px' }}>

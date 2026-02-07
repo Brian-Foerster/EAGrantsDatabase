@@ -43,8 +43,18 @@ export default function About() {
           marginBottom: isMobile ? '20px' : '40px'
         }}>
           <nav style={styles.nav}>
-            <Link href="/" style={styles.navLink}>Home</Link>
-            <Link href="/about" style={styles.navLink}>About</Link>
+            <Link
+              href={CACHE_BUST_VERSION ? `/?v=${CACHE_BUST_VERSION}` : '/'}
+              style={styles.navLink}
+            >
+              Home
+            </Link>
+            <Link
+              href={CACHE_BUST_VERSION ? `/about?v=${CACHE_BUST_VERSION}` : '/about'}
+              style={styles.navLink}
+            >
+              About
+            </Link>
           </nav>
           <h1 style={{
             ...styles.title,
