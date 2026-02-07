@@ -1045,12 +1045,12 @@ export default function Home() {
                 style={styles.searchInput}
               />
             </div>
-            <div style={styles.resultCount}>
-              {filteredAndSortedGrants.length === grants.length
-                ? `${grants.length.toLocaleString()} grants`
-                : `${filteredAndSortedGrants.length.toLocaleString()} of ${grants.length.toLocaleString()} grants`}
-            </div>
-            <div style={styles.filterActionsRow}>
+            <div style={styles.filterMetaRow}>
+              <div style={styles.resultCount}>
+                {filteredAndSortedGrants.length === grants.length
+                  ? `${grants.length.toLocaleString()} grants`
+                  : `${filteredAndSortedGrants.length.toLocaleString()} of ${grants.length.toLocaleString()} grants`}
+              </div>
               <button
                 type="button"
                 onClick={clearAllFilters}
@@ -1743,10 +1743,13 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#888',
     marginTop: '6px',
   },
-  filterActionsRow: {
+  filterMetaRow: {
     display: 'flex',
-    justifyContent: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
     marginTop: '8px',
+    flexWrap: 'wrap',
   },
   clearFiltersButton: {
     fontSize: '12px',
