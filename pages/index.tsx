@@ -879,8 +879,14 @@ export default function Home() {
       const normalized = value / magnitude;
       const step =
         normalized <= 1 ? 1 :
+        normalized <= 1.2 ? 1.2 :
+        normalized <= 1.5 ? 1.5 :
         normalized <= 2 ? 2 :
-        normalized <= 5 ? 5 : 10;
+        normalized <= 3 ? 3 :
+        normalized <= 4 ? 4 :
+        normalized <= 5 ? 5 :
+        normalized <= 6 ? 6 :
+        normalized <= 8 ? 8 : 10;
       return step * magnitude;
     };
 
