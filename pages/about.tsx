@@ -17,6 +17,8 @@ export default function About() {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
+  const isPhonePortrait = windowWidth < 480;
+  const isTablet = windowWidth >= 768 && windowWidth < 1024;
   const isMobile = windowWidth < 768;
 
   return (
@@ -35,7 +37,7 @@ export default function About() {
       </Head>
       <main style={{
         ...styles.main,
-        padding: isMobile ? '16px 16px' : '20px 40px'
+        padding: isPhonePortrait ? '12px 12px' : isMobile ? '16px 16px' : isTablet ? '20px 40px' : '20px 80px'
       }}>
         <header style={{
           ...styles.header,
@@ -304,9 +306,9 @@ export default function About() {
 
 const styles: { [key: string]: React.CSSProperties } = {
   main: {
-    maxWidth: '900px',
+    maxWidth: '1400px',
     margin: '0 auto',
-    padding: '20px 40px',
+    padding: '20px 80px',
   },
   header: {
     textAlign: 'left',
