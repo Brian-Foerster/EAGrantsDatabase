@@ -252,6 +252,13 @@ export default function About() {
                 <a href="https://www.longview.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Longview Philanthropy</a>{' '}
                 and regranting programs within CEA and Effective Ventures.
               </li>
+              <li style={styles.listItem}>
+                The FTX Future Fund committed approximately $160M in grants during 2022
+                before the collapse of FTX. These grants are excluded because it is unclear
+                which commitments were actually disbursed and which were clawed back during
+                bankruptcy proceedings. There is no authoritative source distinguishing
+                paid grants from unfulfilled commitments.
+              </li>
             </ul>
 
             <h2 style={styles.sectionTitle}>Source code</h2>
