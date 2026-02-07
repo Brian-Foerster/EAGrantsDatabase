@@ -4,7 +4,7 @@
 
 The EA Grants Database aggregates individual grant data from the major Effective Altruism grantmakers. Where individual grant data is unavailable, residual grants are computed from published annual totals to ensure complete coverage of the EA funding universe.
 
-**Current totals:** 4,705 grants, $5.7B, spanning 2012–2025.
+**Current totals:** 5,051 grants, $6.2B, spanning 2012–2026.
 
 **Pipeline:** `npm run scrape` → `npm run build:data` → site rebuild
 
@@ -88,8 +88,8 @@ The `Round` field (e.g., "SFF-2024") is converted to a date. Amounts with matchi
 | **Airtable URL** | `https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm` |
 | **Format** | CSV |
 | **Scraper** | `scripts/scrapers/givewell.ts` |
-| **Grants** | ~439 |
-| **Coverage** | 2014–2025 |
+| **Grants** | ~440 |
+| **Coverage** | 2014–2026 |
 | **Update frequency** | Ongoing (Airtable is kept current by GiveWell) |
 
 **How it works:** GiveWell publishes its grants database as an Airtable shared view. There is no public API or CSV endpoint — the CSV must be downloaded manually:
@@ -109,7 +109,7 @@ CSV columns: `Grant, Recipient, Amount, Date, Link to grant description, Topics,
 
 | Field | Value |
 |-------|-------|
-| **Source** | IRS 990 filings via ProPublica Nonprofit Explorer |
+| **Source** | IRS 990 filings via [ProPublica Nonprofit Explorer](https://projects.propublica.org/nonprofits/organizations/371795297) |
 | **Grants** | Residual entries only (no individual grant data available) |
 | **Coverage** | 2016–2024 |
 | **Category** | Other (mixed: climate, GH, biosecurity, AI safety) |
@@ -149,7 +149,7 @@ CSV columns: `Grant, Recipient, Amount, Date, Link to grant description, Topics,
 
 Two layers:
 
-1. **Source-level flags:** Grants marked `exclude_from_total = true` are removed. Currently used for Open Phil's "GiveWell-recommended charities" focus area grants (~147 grants), which would otherwise double-count with GiveWell's own data.
+1. **Source-level flags:** Grants marked `exclude_from_total = true` are removed. Currently used for Coefficient Giving's "GiveWell-recommended charities" focus area grants (~147 grants), which would otherwise double-count with GiveWell's own data.
 
 2. **Cross-source fuzzy matching:** For grants to the same recipient (normalized) within the same year with amounts within 10%, the duplicate is merged. The surviving grant gains a `funders[]` array listing all co-funding sources. This catches ~43 duplicates.
 
@@ -171,10 +171,12 @@ A residual grant is generated only if the gap exceeds both $100K and 5% of the p
 | GH | Global Health | Global health & development, malaria, nutrition, deworming |
 | AW | Animal Welfare | Farm animal welfare, cage-free campaigns |
 | Meta | EA Meta | EA infrastructure, effective giving, careers, capacity building |
-| Other | Other | Scientific research, criminal justice, immigration, climate, policy |
+| Science | Scientific Research | Scientific research grants |
+| Policy | Policy Reform | Criminal justice, immigration, housing, macroeconomic policy |
+| Other | Other | Grants that don't fit other categories |
 
 Mappings from source-specific categories to this taxonomy are in:
-- `scripts/mappings/op-focus-areas.json` (Open Phil focus areas → category)
+- `scripts/mappings/op-focus-areas.json` (Coefficient Giving focus areas → category)
 - `scripts/mappings/eaf-funds.json` (EA Funds fund names → category)
 
 ---
@@ -190,7 +192,7 @@ Not all grantmakers publish individual grant data. The database has full itemiza
 | EA Funds | ~100% | Full individual grant data via API |
 | GiveWell | ~90%+ | Full for 2019+, sparse for earlier years; Airtable CSV may not include all historical grants |
 | SFF | ~100% | Full via HTML table |
-| Coefficient Giving | ~58% for 2024 | GitHub archive ends Oct 2024. The original grants page now redirects to coefficientgiving.org with no public database. Earlier years are well-covered. |
+| Coefficient Giving | Partial for 2024+ | The official archive CSV is updated periodically as grants are published. Earlier years are well-covered. |
 | Founders Pledge | 0% | No public grant-level data with amounts. 100% residual. |
 | ACE | 0% | No public grant-level data. 100% residual. |
 
@@ -199,7 +201,7 @@ Residual grants fill the dollar-amount gaps but cannot provide recipient/project
 ### Sparse metadata fields
 
 - **SFF:** No country, topics, or URL data published. Description is limited to "General support" in many cases.
-- **Open Phil:** No country or topics data in the archived CSV. Only 5 columns available (Grant, Organization, Focus Area, Amount, Date).
+- **Coefficient Giving:** No country or topics data in the archive CSV. Only 5 columns available (Grant, Organization, Focus Area, Amount, Date).
 - **EA Funds:** No country or topics. Description quality varies (some entries are detailed, many are brief).
 
 These fields are empty because the upstream sources don't provide them, not because of scraping failures.
@@ -224,6 +226,10 @@ The Coefficient Giving archive at `coefficientgiving.org/wp-content/uploads/Coef
 
 Founders Pledge grants span multiple cause areas (climate, global health, biosecurity, AI safety) but we don't have per-grant category data. All FP residuals are categorized as "Other" since we can't determine the breakdown.
 
+### FTX Future Fund
+
+The FTX Future Fund committed approximately $160M in grants during 2022 before the collapse of FTX. These grants are excluded because it is unclear which commitments were actually disbursed and which were clawed back during bankruptcy proceedings. There is no authoritative source distinguishing paid grants from unfulfilled commitments.
+
 ---
 
 ## Validation
@@ -232,34 +238,13 @@ The pipeline prints a validation report comparing scraped totals against publish
 
 ---
 
-## Monthly Refresh Process
-
-```bash
-# 1. (Optional) Re-download GiveWell CSV from Airtable
-#    Save to data/raw/givewell-grants.csv
-
-# 2. Run the scraping pipeline
-npm run scrape
-
-# 3. Build the site data
-npm run build:data
-
-# 4. (Optional) Export CSV
-npx tsx scripts/export-csv.ts
-
-# 5. Start dev server to verify
-npm run dev
-```
-
----
-
 ## Output Files
 
 | File | Description |
 |------|-------------|
-| `data/raw/all-grants.json` | Full grant data with all fields (4,705 grants) |
+| `data/raw/all-grants.json` | Full grant data with all fields |
 | `data/ea-grants-database.csv` | CSV export for external use |
 | `lib/scraped-grants.json` | Lean JSON consumed by the build pipeline |
 | `data/raw/{source}-result.json` | Per-source scrape results with error logs |
 | `data/raw/{source}-{date}.json` | Raw data snapshots for debugging |
-| `public/data/grants.min.json` | Minimized grants for the UI |
+| `public/data/grants.min.json` | Grant data for the UI (includes descriptions) |
