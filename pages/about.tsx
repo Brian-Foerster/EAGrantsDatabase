@@ -27,6 +27,7 @@ export default function About() {
         <title>About - EA Grants Database</title>
         <meta name="description" content="About the EA Grants Database — data sources, methodology, and limitations" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href="https://brian-foerster.github.io/EAGrantsDatabase/about" />
         {process.env.NODE_ENV === 'production' && CACHE_BUST_VERSION && (
           <script
             dangerouslySetInnerHTML={{

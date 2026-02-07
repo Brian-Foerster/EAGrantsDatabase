@@ -984,6 +984,7 @@ export default function Home() {
         <title>EA Grants Database</title>
         <meta name="description" content="Aggregated database of Effective Altruism grants" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link rel="canonical" href="https://brian-foerster.github.io/EAGrantsDatabase/" />
         {process.env.NODE_ENV === 'production' && CACHE_BUST_VERSION && (
           <script
             dangerouslySetInnerHTML={{
