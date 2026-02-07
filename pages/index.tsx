@@ -93,6 +93,17 @@ export default function Home() {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
+  // Remove legacy cache-bust query param without reloading
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('v')) {
+      url.searchParams.delete('v');
+      const next = url.pathname + url.search + url.hash;
+      window.history.replaceState({}, '', next);
+    }
+  }, []);
+
   // Responsive breakpoints
   const isPhonePortrait = windowWidth < 480;
   const isPhoneLandscape = windowWidth >= 480 && windowWidth < 768;
@@ -100,10 +111,11 @@ export default function Home() {
   const isMobile = windowWidth < 768;
   const isCompact = windowWidth < 1024;
   const canOverlayChartTotal = !isMobile && windowWidth >= 1200;
-  const expandedLabelWidth = isMobile
-    ? Math.min(110, Math.max(70, Math.round(windowWidth * 0.28)))
-    : 110;
-  const expandedLabelStyle = isMobile
+  const shouldAlignExpandedLabels = isMobile && windowWidth >= 360;
+  const expandedLabelWidth = shouldAlignExpandedLabels
+    ? Math.min(90, Math.max(60, Math.round(windowWidth * 0.22)))
+    : 0;
+  const expandedLabelStyle = shouldAlignExpandedLabels
     ? { minWidth: expandedLabelWidth, flexBasis: expandedLabelWidth, flexShrink: 0 }
     : {};
 

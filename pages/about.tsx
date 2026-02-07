@@ -16,6 +16,17 @@ export default function About() {
     return () => window.removeEventListener('resize', updateWidth);
   }, []);
 
+  // Remove legacy cache-bust query param without reloading
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('v')) {
+      url.searchParams.delete('v');
+      const next = url.pathname + url.search + url.hash;
+      window.history.replaceState({}, '', next);
+    }
+  }, []);
+
   const isPhonePortrait = windowWidth < 480;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
   const isMobile = windowWidth < 768;
