@@ -144,8 +144,6 @@ npm start
 ├── public/
 │   └── data/              # Generated at build time
 │       ├── grants.min.json        # Minimized grant data
-│       ├── grants.full.json       # Full grant data
-│       ├── search-index.json      # MiniSearch index
 │       ├── metadata.json          # Statistics
 │       └── agg/                   # Pre-aggregated data
 │           ├── by_year.json
@@ -165,8 +163,6 @@ The application uses pre-generated JSON files instead of dynamic API endpoints:
 
 **Data Files:**
 - `/data/grants.min.json` - Minimized grant data for UI
-- `/data/grants.full.json` - Complete grant data with descriptions
-- `/data/search-index.json` - Pre-built search index
 - `/data/metadata.json` - Statistics and metadata
 - `/data/agg/by_year.json` - Grants aggregated by year
 - `/data/agg/by_year_month.json` - Monthly timeline

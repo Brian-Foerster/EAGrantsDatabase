@@ -13,8 +13,6 @@ This EA Grants Database has been architected to efficiently handle thousands of 
 The build pipeline runs at compile time and generates:
 
 - **`grants.min.json`**: Minimized grant data (only essential fields for UI)
-- **`grants.full.json`**: Complete grant data with descriptions
-- **`search-index.json`**: Pre-built MiniSearch index for instant search
 - **`metadata.json`**: Overall statistics and metadata
 - **Pre-aggregated data cubes**:
   - `agg/by_year.json` - Grants aggregated by year
@@ -100,8 +98,6 @@ The build pipeline runs at compile time and generates:
 | File | Size | Purpose |
 |------|------|---------|
 | grants.min.json | ~800KB | UI listing |
-| grants.full.json | ~1.2MB | Detail views (load on-demand) |
-| search-index.json | ~300KB | Client-side search |
 | agg/*.json | ~50KB total | Chart data |
 
 ## Build Process

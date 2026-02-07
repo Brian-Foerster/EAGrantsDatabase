@@ -295,11 +295,6 @@ export default function Home() {
     return result;
   }, [grants]);
 
-  const availableSubcategories = useMemo(() => {
-    const subs = new Set(grants.map(g => g.focus_area).filter(Boolean) as string[]);
-    return Array.from(subs).sort();
-  }, [grants]);
-
   const nonCoreOnlyCategories = useMemo(() => {
     const info: Record<string, { hasCore: boolean; hasNonCore: boolean }> = {};
     grants.forEach(g => {
@@ -335,6 +330,31 @@ export default function Home() {
         .map(([k]) => k)
     );
   }, [grants]);
+
+  const duplicateCoefficientSubcategories = useMemo(() => {
+    const info: Record<string, { grantmakers: Set<string>; funds: Set<string> }> = {};
+    grants.forEach(g => {
+      if (!g.focus_area) return;
+      if (!info[g.focus_area]) {
+        info[g.focus_area] = { grantmakers: new Set(), funds: new Set() };
+      }
+      info[g.focus_area].grantmakers.add(g.grantmaker);
+      if (g.fund) info[g.focus_area].funds.add(g.fund);
+    });
+    return new Set(
+      Object.entries(info)
+        .filter(([, v]) => v.grantmakers.size === 1 && v.grantmakers.has('Coefficient Giving') && v.funds.size === 1)
+        .filter(([sub, v]) => v.funds.has(sub))
+        .map(([sub]) => sub)
+    );
+  }, [grants]);
+
+  const availableSubcategories = useMemo(() => {
+    const subs = new Set(grants.map(g => g.focus_area).filter(Boolean) as string[]);
+    return Array.from(subs)
+      .filter(sub => !duplicateCoefficientSubcategories.has(sub))
+      .sort();
+  }, [grants, duplicateCoefficientSubcategories]);
 
   const nonCoreCategoryTooltip = 'Excluded by default — only appears in non-core funds.';
 

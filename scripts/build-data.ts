@@ -8,7 +8,6 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import MiniSearch from 'minisearch';
 import { Grant } from '../types/grants';
 import { aggregateAllGrants } from '../lib/aggregator';
 
@@ -192,32 +191,6 @@ function aggregateByYearAndCategory(grants: Grant[]) {
     .sort((a, b) => a.year - b.year || a.category.localeCompare(b.category));
 }
 
-// Create search index
-function createSearchIndex(grants: Grant[]) {
-  const miniSearch = new MiniSearch({
-    fields: ['title', 'recipient', 'description', 'category', 'grantmaker'],
-    storeFields: ['id', 'title', 'recipient', 'amount', 'date', 'grantmaker', 'category'],
-    searchOptions: {
-      boost: { title: 2, recipient: 1.5, description: 1 },
-      fuzzy: 0.2,
-      prefix: true,
-    }
-  });
-
-  miniSearch.addAll(grants.map(grant => ({
-    id: grant.id,
-    title: grant.title,
-    recipient: grant.recipient,
-    description: grant.description || '',
-    category: grant.category || '',
-    grantmaker: grant.grantmaker,
-    amount: grant.amount,
-    date: grant.date,
-  })));
-
-  return JSON.stringify(miniSearch);
-}
-
 // Create minimized grant data (only essential fields for listing)
 function createMinimizedGrants(grants: Grant[]) {
   return grants.map(grant => ({
@@ -259,23 +232,8 @@ async function buildData() {
   );
   console.log('✅ Created grants.min.json');
   
-  // Generate full grants (with descriptions)
-  console.log('📝 Generating full grants data...');
-  fs.writeFileSync(
-    path.join(PUBLIC_DATA_DIR, 'grants.full.json'),
-    JSON.stringify(grants)
-  );
-  console.log('✅ Created grants.full.json');
-  
-  // Generate search index
-  console.log('🔍 Creating search index...');
-  const searchIndex = createSearchIndex(grants);
-  fs.writeFileSync(
-    path.join(PUBLIC_DATA_DIR, 'search-index.json'),
-    searchIndex
-  );
-  console.log('✅ Created search-index.json');
-  
+  // Full grants and prebuilt search index removed to reduce payload size.
+  // If needed later, re-enable here.
   // Generate aggregations
   console.log('📊 Generating aggregations...');
   

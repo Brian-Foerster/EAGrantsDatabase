@@ -263,4 +263,3 @@ npm run dev
 | `data/raw/{source}-result.json` | Per-source scrape results with error logs |
 | `data/raw/{source}-{date}.json` | Raw data snapshots for debugging |
 | `public/data/grants.min.json` | Minimized grants for the UI |
-| `public/data/grants.full.json` | Full grants with descriptions |
