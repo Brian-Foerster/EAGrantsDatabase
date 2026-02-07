@@ -35,6 +35,7 @@ jobs:
         run: npm run build
         env:
           NEXT_PUBLIC_BUILD_TIME: ${{ github.run_id }}
+          NEXT_PUBLIC_BASE_PATH: /EAGrantsDatabase
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
