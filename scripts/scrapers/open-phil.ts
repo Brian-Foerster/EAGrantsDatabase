@@ -79,8 +79,18 @@ function parseDateString(raw: string): string {
   return normalizeDate(raw);
 }
 
+function decodeHtmlEntities(raw: string): string {
+  if (!raw) return '';
+  return raw
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>');
+}
+
 function normalizeOrgName(raw: string): string {
-  return (raw || '')
+  return decodeHtmlEntities(raw || '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
@@ -181,7 +191,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
       continue;
     }
 
-    const focusArea = r['Focus Area'] || '';
+    const focusArea = decodeHtmlEntities(r['Focus Area'] || '');
     const category = mapFocusArea(focusArea);
 
     // Flag GiveWell-recommended charity grants for dedup
@@ -189,14 +199,15 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
 
     // Build description from metadata rather than duplicating title
     const descParts: string[] = [];
-    if (r.Grant) descParts.push(r.Grant);
+    const grantTitle = decodeHtmlEntities(r.Grant || '');
+    if (grantTitle) descParts.push(grantTitle);
     if (focusArea) descParts.push(`Focus area: ${focusArea}`);
     const description = descParts.length > 1 ? descParts.join('. ') : '';
 
     const grant: Grant = {
       id: `cg-${String(i).padStart(5, '0')}`,
-      title: r.Grant || `Grant to ${r['Organization Name']}`,
-      recipient: r['Organization Name'] || 'Unknown',
+      title: grantTitle || `Grant to ${decodeHtmlEntities(r['Organization Name'] || 'Unknown')}`,
+      recipient: decodeHtmlEntities(r['Organization Name'] || 'Unknown'),
       amount,
       currency: 'USD',
       date,
@@ -226,20 +237,20 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
   // Add Algolia grants not present in the CSV
   let algoliaAdded = 0;
   for (const hit of algoliaGrants) {
-    const org = hit.organization_name?.[0] || '';
+    const org = decodeHtmlEntities(hit.organization_name?.[0] || '');
     const amount = hit.grant_amount || 0;
     const date = toMonthStartFromEpoch(hit.award_date);
     if (!org || !amount || !date) continue;
     const key = `${normalizeOrgName(org)}|${amount}|${date}`;
     if (existingKeys.has(key)) continue;
 
-    const focusArea = hit['focus-area']?.[0] || '';
+    const focusArea = decodeHtmlEntities(hit['focus-area']?.[0] || '');
     const category = mapFocusArea(focusArea);
     const isGiveWellRecommended = focusArea.toLowerCase().includes('givewell');
 
     grants.push({
       id: `cg-alg-${String(algoliaAdded).padStart(5, '0')}`,
-      title: hit.title || `Grant to ${org}`,
+      title: decodeHtmlEntities(hit.title || '') || `Grant to ${org}`,
       recipient: org,
       amount,
       currency: 'USD',
