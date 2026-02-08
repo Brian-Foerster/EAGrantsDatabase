@@ -45,11 +45,11 @@ The EA Grants Database aggregates individual grant data from the major Effective
 | **Coverage** | 2012–2025 |
 | **Update frequency** | Updated periodically by Coefficient Giving |
 
-**How it works:** We scrape the official Coefficient Giving Grants Archive CSV, which is published at `coefficientgiving.org`. This replaced the previous GitHub archive which only had data through October 2024.
+**How it works:** We scrape the official Coefficient Giving Grants Archive CSV, which is published at `coefficientgiving.org`. This replaced the previous GitHub archive which only had data through October 2024. To capture newer grants not yet reflected in the CSV (and to attach per-grant URLs), we also pull the public Algolia grants index used on Coefficient’s site and merge any additional grants.
 
 CSV columns: `Grant, Organization Name, Focus Area, Amount, Date, Details`. The `Focus Area` field is mapped to the sector taxonomy via `scripts/mappings/op-focus-areas.json`. Date is in "Month Year" format (e.g., "October 2024").
 
-**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~147 grants.
+**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~152 grants.
 
 **2024 annual total ($650M):** Multiple sources support this figure:
 
@@ -149,7 +149,7 @@ CSV columns: `Grant, Recipient, Amount, Date, Link to grant description, Topics,
 
 Two layers:
 
-1. **Source-level flags:** Grants marked `exclude_from_total = true` are removed. Currently used for Coefficient Giving's "GiveWell-recommended charities" focus area grants (~147 grants), which would otherwise double-count with GiveWell's own data.
+1. **Source-level flags:** Grants marked `exclude_from_total = true` are removed. Currently used for Coefficient Giving's "GiveWell-recommended charities" focus area grants (~152 grants), which would otherwise double-count with GiveWell's own data.
 
 2. **Cross-source fuzzy matching:** For grants to the same recipient (normalized) within the same year with amounts within 10%, the duplicate is merged. The surviving grant gains a `funders[]` array listing all co-funding sources. This catches ~43 duplicates.
 

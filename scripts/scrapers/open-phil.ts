@@ -12,6 +12,20 @@ import { fetchWithRetry, normalizeDate, saveRawData, parseDollarAmount } from '.
 import focusAreaMapping from '../mappings/op-focus-areas.json';
 
 const CSV_URL = 'https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv';
+const ALGOLIA_APP_ID = 'WBC743WF65';
+const ALGOLIA_API_KEY = 'da168b7a254a1f18a8fd0e6b65d7e0e2';
+const ALGOLIA_INDEX = 'coefficientgiving_grants_award_date_desc';
+const ALGOLIA_URL = `https://${ALGOLIA_APP_ID}-dsn.algolia.net/1/indexes/${ALGOLIA_INDEX}/query`;
+
+interface AlgoliaGrant {
+  title?: string;
+  url?: string;
+  grant_amount?: number;
+  award_date?: number;
+  award_year?: number;
+  organization_name?: string[];
+  'focus-area'?: string[];
+}
 
 interface CGRawGrant {
   Grant: string;
@@ -64,11 +78,59 @@ function parseDateString(raw: string): string {
   return normalizeDate(raw);
 }
 
+function normalizeOrgName(raw: string): string {
+  return (raw || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function toMonthStartFromEpoch(epochSeconds?: number): string {
+  if (!epochSeconds) return '';
+  const d = new Date(epochSeconds * 1000);
+  if (isNaN(d.getTime())) return '';
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+  return `${y}-${m}-01`;
+}
+
+async function fetchAlgoliaGrants(): Promise<AlgoliaGrant[]> {
+  const hits: AlgoliaGrant[] = [];
+  let page = 0;
+  let nbPages = 1;
+  const hitsPerPage = 1000;
+
+  while (page < nbPages) {
+    const response = await fetchWithRetry(ALGOLIA_URL, {
+      method: 'POST',
+      headers: {
+        'X-Algolia-Application-Id': ALGOLIA_APP_ID,
+        'X-Algolia-API-Key': ALGOLIA_API_KEY,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query: '', hitsPerPage, page }),
+    });
+
+    const data = await response.json();
+    nbPages = data.nbPages || 0;
+    if (Array.isArray(data.hits)) {
+      hits.push(...data.hits);
+    }
+    page += 1;
+  }
+
+  return hits;
+}
+
 export async function scrapeOpenPhil(): Promise<ScrapeResult> {
   const errors: string[] = [];
   console.log('[Coefficient] Fetching grants CSV from coefficientgiving.org...');
 
-  const response = await fetchWithRetry(CSV_URL);
+  const response = await fetchWithRetry(CSV_URL, {
+    headers: {
+      'User-Agent': 'Mozilla/5.0',
+    },
+  });
   const csvText = await response.text();
   console.log(`[Coefficient] Received ${(csvText.length / 1024).toFixed(0)}KB of CSV data`);
 
@@ -84,7 +146,25 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
 
   console.log(`[Coefficient] Parsed ${records.length} records`);
 
+  console.log('[Coefficient] Fetching Algolia grant index for URLs...');
+  const algoliaGrants = await fetchAlgoliaGrants();
+  console.log(`[Coefficient] Retrieved ${algoliaGrants.length} Algolia grant records`);
+
+  const algoliaByKey = new Map<string, AlgoliaGrant[]>();
+  for (const hit of algoliaGrants) {
+    const org = hit.organization_name?.[0] || '';
+    const amount = hit.grant_amount || 0;
+    const date = toMonthStartFromEpoch(hit.award_date);
+    if (!org || !amount || !date) continue;
+    const key = `${normalizeOrgName(org)}|${amount}|${date}`;
+    const list = algoliaByKey.get(key) || [];
+    list.push(hit);
+    algoliaByKey.set(key, list);
+  }
+
   const grants: Grant[] = [];
+  const existingKeys = new Set<string>();
+  let urlMatches = 0;
   for (let i = 0; i < records.length; i++) {
     const r = records[i];
 
@@ -128,13 +208,63 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
       exclude_from_total: isGiveWellRecommended,
     };
 
+    const matchKey = `${normalizeOrgName(grant.recipient)}|${amount}|${date}`;
+    existingKeys.add(matchKey);
+    const candidates = algoliaByKey.get(matchKey);
+    if (candidates && candidates.length > 0) {
+      const preferred = candidates.find(c => (c['focus-area'] || []).includes(focusArea)) || candidates[0];
+      if (preferred?.url) {
+        grant.url = preferred.url;
+        urlMatches += 1;
+      }
+    }
+
     grants.push(grant);
+  }
+
+  // Add Algolia grants not present in the CSV
+  let algoliaAdded = 0;
+  for (const hit of algoliaGrants) {
+    const org = hit.organization_name?.[0] || '';
+    const amount = hit.grant_amount || 0;
+    const date = toMonthStartFromEpoch(hit.award_date);
+    if (!org || !amount || !date) continue;
+    const key = `${normalizeOrgName(org)}|${amount}|${date}`;
+    if (existingKeys.has(key)) continue;
+
+    const focusArea = hit['focus-area']?.[0] || '';
+    const category = mapFocusArea(focusArea);
+    const isGiveWellRecommended = focusArea.toLowerCase().includes('givewell');
+
+    grants.push({
+      id: `cg-alg-${String(algoliaAdded).padStart(5, '0')}`,
+      title: hit.title || `Grant to ${org}`,
+      recipient: org,
+      amount,
+      currency: 'USD',
+      date,
+      grantmaker: 'Coefficient Giving',
+      description: focusArea ? `Focus area: ${focusArea}` : '',
+      category,
+      focus_area: focusArea,
+      fund: focusArea || undefined,
+      url: hit.url,
+      source_id: `cg-alg-${hit.post_id ?? algoliaAdded}`,
+      exclude_from_total: isGiveWellRecommended,
+    });
+    algoliaAdded += 1;
   }
 
   console.log(`[Coefficient] Processed ${grants.length} grants (${errors.length} errors)`);
   const gwExcluded = grants.filter(g => g.exclude_from_total).length;
   if (gwExcluded > 0) {
     console.log(`[Coefficient] ${gwExcluded} GiveWell-recommended grants flagged for dedup`);
+  }
+  if (urlMatches > 0) {
+    console.log(`[Coefficient] Matched ${urlMatches} grants to Algolia URLs`);
+  }
+  if (algoliaAdded > 0) {
+    console.log(`[Coefficient] Added ${algoliaAdded} newer Algolia grants not in CSV`);
   }
 
   // Log year breakdown
