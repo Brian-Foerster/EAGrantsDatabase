@@ -18,6 +18,7 @@ const ALGOLIA_INDEX = 'coefficientgiving_grants_award_date_desc';
 const ALGOLIA_URL = `https://${ALGOLIA_APP_ID}-dsn.algolia.net/1/indexes/${ALGOLIA_INDEX}/query`;
 
 interface AlgoliaGrant {
+  post_id?: number;
   title?: string;
   url?: string;
   grant_amount?: number;
