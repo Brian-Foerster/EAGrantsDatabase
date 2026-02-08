@@ -36,11 +36,11 @@ npm start
 ## Key Components
 
 ### Data Flow
-1. Frontend calls `/api/grants` endpoint
-2. API calls `aggregateAllGrants()` from `lib/aggregator.ts`
-3. Aggregator fetches from all sources in parallel
-4. Data is returned as unified `Grant[]` array
-5. Frontend renders with search, filters, and charts
+1. `npm run scrape` pulls source data into `data/raw/`
+2. `npm run build:data` generates `public/data/*.json`
+3. Frontend fetches `public/data/grants.min.json` and `metadata.json`
+4. Client builds a MiniSearch index in the browser
+5. UI renders search, filters, charts, and the virtualized list
 
 ### Adding a New Grantmaker
 
@@ -68,18 +68,9 @@ export async function aggregateAllGrants(): Promise<Grant[]> {
 }
 ```
 
-3. **Update sources** in `pages/api/grants.ts`:
-```typescript
-const sources: GrantSource[] = [
-  // ... existing sources
-  {
-    name: 'New Grantmaker',
-    url: 'https://example.com/grants'
-  }
-];
-```
+3. **Update mappings** if needed (category maps, annual totals) in `scripts/mappings/`
 
-## Implementing Real Data Fetching
+## Implementing Data Fetching
 
 ### Option 1: REST APIs
 If the grantmaker has a public API:
@@ -97,8 +88,7 @@ export async function fetchGrantmakerGrants(): Promise<Grant[]> {
     grantmaker: 'Grantmaker Name',
     description: item.description,
     url: item.url,
-    category: item.category,
-    focus_area: item.focus_area
+    category: item.category
   }));
 }
 ```
@@ -211,7 +201,7 @@ The workflow is defined in `.github/workflows/deploy.yml`.
 
 - [ ] Real-time data updates
 - [ ] More advanced charts (by category, by grantmaker, etc.)
-- [ ] Export to CSV/Excel
+- [x] Export to CSV/Excel
 - [ ] Saved searches (requires authentication)
 - [ ] Email notifications for new grants
 - [ ] Compare grants side-by-side

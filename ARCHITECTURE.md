@@ -34,7 +34,7 @@ The build pipeline runs at compile time and generates:
 - Lightweight (~7KB gzipped)
 - Fast full-text search
 - Fuzzy matching and prefix search
-- Search index generated at build time
+- Search index generated in the browser at runtime (client-side)
 
 **Why MiniSearch?**
 - For ~4,000 rows, client-side search is faster than any API call
@@ -53,9 +53,9 @@ The build pipeline runs at compile time and generates:
 
 **Chart Views**:
 - Timeline: Monthly grant amounts over time
-- By Year: Annual grant counts
+- By Year: Annual grant amounts over time
 - By Funder: Top grantmakers comparison
-- By Category: Distribution across focus areas
+- By Category: Distribution across categories
 
 ### 4. Virtualized Table Rendering
 
@@ -121,7 +121,6 @@ npm run build
    - Fetches data from sources
    - Normalizes and cleans data
    - Generates minimized files
-   - Creates search index
    - Computes aggregations
 
 2. **Next.js Build**
@@ -146,7 +145,7 @@ Still works well with current architecture:
 
 Consider these optimizations:
 - Use NDJSON (newline-delimited JSON) for streaming
-- Implement binary search index format
+- Implement binary search index format (if search performance becomes a bottleneck)
 - Add more granular pre-aggregations
 - Consider server-side API for complex queries
 
@@ -204,13 +203,7 @@ The data build happens automatically when you run the full build, but for develo
 
 ### Generating Mock Data
 
-For testing with large datasets:
-
-```bash
-npm run generate-mock  # Generates 4,000 mock grants
-npm run build:data     # Process the data
-npm run dev           # Start dev server
-```
+Mock data generation is not wired up by default. If you want mock data for load testing, add your own generator and feed it into `build-data`.
 
 ### Adding Real Data Sources
 
@@ -251,7 +244,7 @@ For datasets under ~10,000 records:
 
 ### Near Term (No Architecture Change)
 
-- [ ] Export to CSV functionality
+- [x] Export to CSV functionality
 - [ ] Bookmark/share specific filters
 - [ ] More chart types (stacked, scatter)
 - [ ] Dark mode

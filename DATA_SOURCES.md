@@ -4,7 +4,7 @@
 
 The EA Grants Database aggregates individual grant data from the major Effective Altruism grantmakers. Where individual grant data is unavailable, residual grants are computed from published annual totals to ensure complete coverage of the EA funding universe.
 
-**Current totals:** 5,051 grants, $6.2B, spanning 2012–2026.
+**Current totals:** See the live site for the latest totals (counts and amounts change with each data refresh).
 
 **Pipeline:** `npm run scrape` → `npm run build:data` → site rebuild
 
@@ -49,7 +49,7 @@ The EA Grants Database aggregates individual grant data from the major Effective
 
 CSV columns: `Grant, Organization Name, Focus Area, Amount, Date, Details`. The `Focus Area` field is mapped to the sector taxonomy via `scripts/mappings/op-focus-areas.json`. Date is in "Month Year" format (e.g., "October 2024").
 
-**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~152 grants.
+**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~147 grants.
 
 **2024 annual total ($650M):** Multiple sources support this figure:
 
