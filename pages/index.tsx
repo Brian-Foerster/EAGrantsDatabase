@@ -624,9 +624,24 @@ export default function Home() {
       monthCategory[ym][cg] = (monthCategory[ym][cg] || 0) + g.amount;
     });
 
-    const byYear = Object.entries(byYearMap)
+    let byYear = Object.entries(byYearMap)
       .map(([y, d]) => ({ year: parseInt(y), count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
       .sort((a, b) => a.year - b.year);
+    if (byYear.length >= 2) {
+      const minYear = byYear[0].year;
+      const maxYear = byYear[byYear.length - 1].year;
+      const byYearLookup = new Map(byYear.map(d => [d.year, d]));
+      const fullByYear: { year: number; count: number; total: number; average: number }[] = [];
+      for (let y = minYear; y <= maxYear; y++) {
+        const found = byYearLookup.get(y);
+        if (found) {
+          fullByYear.push(found);
+        } else {
+          fullByYear.push({ year: y, count: 0, total: 0, average: 0 });
+        }
+      }
+      byYear = fullByYear;
+    }
     const byYearMonth = Object.entries(byMonthMap)
       .map(([ym, d]) => ({ yearMonth: ym, count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
       .sort((a, b) => a.yearMonth.localeCompare(b.yearMonth));
