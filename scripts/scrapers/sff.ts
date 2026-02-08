@@ -86,7 +86,7 @@ export async function scrapeSFF(): Promise<ScrapeResult> {
 
         // Build distinct title and description
         const titleText = org
-          ? `${org} — ${purpose || round}`
+          ? `${org} - ${purpose || round}`
           : purpose || `SFF Grant (${round})`;
         const descParts: string[] = [];
         if (purpose) descParts.push(purpose);
@@ -106,6 +106,7 @@ export async function scrapeSFF(): Promise<ScrapeResult> {
           category: 'LTXR',
           focus_area: 'Long-Term & X-Risk',
           fund: source || 'SFF',
+          url: RECOMMENDATIONS_URL,
           source_id: `sff-${round}-${org.replace(/\s+/g, '-').slice(0, 40)}`,
         };
 
@@ -151,6 +152,7 @@ export async function scrapeSFF(): Promise<ScrapeResult> {
               grantmaker: 'SFF',
               category: 'LTXR',
               focus_area: 'Long-Term & X-Risk',
+              url: RECOMMENDATIONS_URL,
               source_id: `sff-${currentRound}-${grants.length}`,
             };
             grants.push(grant);
@@ -169,3 +171,4 @@ export async function scrapeSFF(): Promise<ScrapeResult> {
     scrapedAt: new Date().toISOString(),
   };
 }
+

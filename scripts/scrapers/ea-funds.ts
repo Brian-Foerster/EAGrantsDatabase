@@ -12,6 +12,12 @@ import fundMapping from '../mappings/eaf-funds.json';
 
 const API_URL = 'https://funds.effectivealtruism.org/api/grants';
 const PAYOUT_SITEMAP_URL = 'https://funds.effectivealtruism.org/sitemap.xml';
+const FUND_URLS: Record<string, string> = {
+  'Long-Term Future Fund': 'https://funds.effectivealtruism.org/funds/far-future',
+  'EA Infrastructure Fund': 'https://funds.effectivealtruism.org/funds/ea-community',
+  'Animal Welfare Fund': 'https://funds.effectivealtruism.org/funds/animal-welfare',
+  'Global Health and Development Fund': 'https://funds.effectivealtruism.org/funds/global-development',
+};
 
 interface EAFRawGrant {
   id: string;
@@ -55,6 +61,10 @@ function parseRound(round: string): string {
     return `${year}-${month}-01`;
   }
   return normalizeDate(round);
+}
+
+function fundUrl(fund: string): string | undefined {
+  return FUND_URLS[fund] || 'https://funds.effectivealtruism.org/grants';
 }
 
 function normalizeRecipient(name: string): string {
@@ -267,6 +277,7 @@ export async function scrapeEAFunds(): Promise<ScrapeResult> {
       description: descText,
       category: mapFundToCategory(fundName),
       fund: fundName,
+      url: fundUrl(fundName),
       source_id: r.id,
     };
 

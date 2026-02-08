@@ -1640,7 +1640,7 @@ export default function Home() {
           paddingTop: isMobile ? '20px' : '40px'
         }}>
           <p style={styles.footerText}>
-            Last updated: {format(parseISO(metadata.lastUpdated), 'MMM d, yyyy')}
+            Data last updated on {format(parseISO(metadata.lastUpdated), 'MMM d, yyyy')}
           </p>
           <p style={styles.footerLinks}>
             <a href="https://github.com/Brian-Foerster/EAGrantsDatabase" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>GitHub</a>
