@@ -16,14 +16,15 @@ The EA Grants Database aggregates individual grant data from the major Effective
 
 | Field | Value |
 |-------|-------|
-| **Endpoint** | `https://funds.effectivealtruism.org/api/grants` |
+| **Endpoint** | `https://funds.effectivealtruism.org/api/grants` (CSV) |
+| **Supplement** | Payout reports listed in `https://funds.effectivealtruism.org/sitemap.xml` (`/payouts/` pages) |
 | **Format** | CSV (served directly from API) |
 | **Scraper** | `scripts/scrapers/ea-funds.ts` |
 | **Grants** | ~1,595 |
 | **Coverage** | 2017–2025 |
 | **Update frequency** | Quarterly (after each funding round) |
 
-**How it works:** A single HTTP GET to the API returns a CSV with columns: `id, fund, description, grantee, amount, round, published, year, highlighted`. The `round` field (e.g., "2025 Q3") is converted to a date. Funds are mapped to the sector taxonomy via `scripts/mappings/eaf-funds.json`:
+**How it works:** A single HTTP GET to the API returns a CSV with columns: `id, fund, description, grantee, amount, round, published, year, highlighted`. The `round` field (e.g., "2025 Q3") is converted to a date. Funds are mapped to the sector taxonomy via `scripts/mappings/eaf-funds.json`. We also scrape payout report pages (from the public sitemap) to capture grants that appear on the site before they land in the API. Payout grants are parsed from the "All Grants We Approved" lists on each report page and deduplicated against the API.
 
 - Long-Term Future Fund → LTXR
 - EA Infrastructure Fund → Meta
@@ -130,16 +131,16 @@ CSV columns: `Grant, Recipient, Amount, Date, Link to grant description, Topics,
 
 ---
 
-### 6. Animal Charity Evaluators (Residuals Only)
+### 6. Animal Charity Evaluators (Movement Grants + Residuals)
 
 | Field | Value |
 |-------|-------|
-| **Source** | Annual totals from EA historical grantmaking spreadsheet |
-| **Grants** | Residual entries only |
-| **Coverage** | 2014–2024 |
+| **Source** | Movement grants recipients page + annual totals from EA historical grantmaking spreadsheet |
+| **Grants** | Itemized movement grants + residual entries |
+| **Coverage** | 2014–2025 (movement grants), 2014–2024 (totals) |
 | **Category** | AW (Animal Welfare) |
 
-**How it works:** ACE publishes giving metrics but no machine-readable grant database. Annual totals are stored in `scripts/mappings/annual-totals.json` and used to generate residual grants.
+**How it works:** ACE publishes a "past movement grants recipients" page with recipient + amount lines. We scrape those into itemized grants and use annual totals from `scripts/mappings/annual-totals.json` to compute residuals for remaining unitemized grantmaking.
 
 ---
 
@@ -189,12 +190,12 @@ Not all grantmakers publish individual grant data. The database has full itemiza
 
 | Source | Itemization | Notes |
 |--------|-------------|-------|
-| EA Funds | ~100% | Full individual grant data via API |
+| EA Funds | ~100% | Full individual grant data via API + payout reports |
 | GiveWell | ~90%+ | Full for 2019+, sparse for earlier years; Airtable CSV may not include all historical grants |
 | SFF | ~100% | Full via HTML table |
 | Coefficient Giving | Partial for 2024+ | The official archive CSV is updated periodically as grants are published. Earlier years are well-covered. |
 | Founders Pledge | 0% | No public grant-level data with amounts. 100% residual. |
-| ACE | 0% | No public grant-level data. 100% residual. |
+| ACE | Partial | Movement grants are itemized; remaining funding is residual. |
 
 Residual grants fill the dollar-amount gaps but cannot provide recipient/project-level detail. ~100% dollar coverage does not mean ~100% itemization.
 

@@ -5,9 +5,12 @@ A web application that aggregates grants databases from multiple Effective Altru
 ## Features
 
 - **Data Aggregation**: Collects grants data from multiple EA grantmakers:
-  - EA Funds (https://funds.effectivealtruism.org/grants)
-  - GiveWell (https://www.givewell.org/research/all-grants)
-  - Coefficient Giving (https://coefficientgiving.org/funds/)
+  - EA Funds (API + payout reports)
+  - GiveWell (Airtable CSV export)
+  - Coefficient Giving (official grants archive + Algolia index)
+  - Survival and Flourishing Fund (recommendations table)
+  - Animal Charity Evaluators (movement grants recipients page + residuals)
+  - Founders Pledge (residuals from published totals)
 
 - **Search & Filter**: 
   - Full-text search across grant titles, recipients, and descriptions
@@ -200,7 +203,7 @@ For detailed architecture documentation, see [ARCHITECTURE.md](./ARCHITECTURE.md
 
 ## Performance
 
-With ~4,000 grants:
+With ~5,000+ grants:
 - **Initial Load**: < 2 seconds
 - **Search**: Instant (~10-50ms)
 - **Charts**: Instant (pre-aggregated data)
@@ -239,8 +242,6 @@ The deployment workflow is configured in `.github/workflows/deploy.yml`.
 The current implementation uses real grant data built at deploy time via the scraping pipeline and `build-data` step.
 
 ## Future Enhancements
-
-- [ ] Real data fetching from grantmaker sources
 - [ ] Database integration for data persistence
 - [ ] Automated data refresh (scheduled jobs)
 - [ ] More advanced filtering options
@@ -264,5 +265,8 @@ This project aggregates publicly available grants data from:
 - Effective Altruism Funds
 - GiveWell
 - Coefficient Giving
+- Survival and Flourishing Fund
+- Animal Charity Evaluators
+- Founders Pledge
 
 Please respect their terms of service and rate limits when implementing real data fetching.

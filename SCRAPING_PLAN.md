@@ -1,5 +1,7 @@
 # EA Grants Universe - Comprehensive Scraping & Data Plan
 
+> Note: This document captures the original planning assumptions and may contain outdated counts or coverage notes. For the current, authoritative sources and pipeline behavior, see `DATA_SOURCES.md`.
+
 ## The Universe We're Tracking
 
 Based on the [PUBLIC] EA historical grantmaking spreadsheet, the EA grants universe

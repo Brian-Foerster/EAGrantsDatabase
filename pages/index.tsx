@@ -1371,7 +1371,7 @@ export default function Home() {
               </label>
             </div>
           <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px' }}>
-            2025 data is partial and reflects only grants published to date.
+            2025 and 2026 data are partial and reflect only grants published to date.
           </div>
           <div style={{
             ...styles.chartContainer,
