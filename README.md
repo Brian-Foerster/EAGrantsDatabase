@@ -12,8 +12,9 @@ A web application that aggregates grants databases from multiple Effective Altru
 - **Search & Filter**: 
   - Full-text search across grant titles, recipients, and descriptions
   - Filter by grantmaker organization
-  - Filter by grant category/focus area
+  - Filter by grant category
   - Sort by date or amount (ascending/descending)
+  - Download filtered results as CSV
 
 - **Data Visualization**:
   - Interactive charts showing grants over time
@@ -82,7 +83,7 @@ npm run build
 
 #### Option 3: Use Mock Data
 
-The application will automatically use mock data if no real data is available. This is useful for development and testing.
+Mock data is not used by default. If you want mock data for local development, add your own generator or load a small CSV.
 
 ### Building for Production
 
@@ -95,7 +96,7 @@ The application uses a build-time data pipeline to generate optimized static ass
 npm run build
 
 # This runs two steps:
-# 1. npm run build:data  - Generates JSON files and search index
+# 1. npm run build:data  - Generates JSON files
 # 2. next build          - Creates static export in out/
 ```
 
@@ -103,9 +104,8 @@ The build process:
 1. Fetches grant data from sources
 2. Normalizes and cleans data
 3. Generates minimized JSON files
-4. Creates search index with MiniSearch
-5. Pre-aggregates data for charts
-6. Builds static Next.js pages
+4. Pre-aggregates data for charts
+5. Builds static Next.js pages
 
 Output directory: `out/` (ready for static hosting)
 
@@ -219,7 +219,7 @@ This repository is configured with GitHub Actions to automatically deploy to Git
 1. Go to your repository's Settings > Pages
 2. Under "Build and deployment", select "GitHub Actions" as the source
 3. Push to the `main` branch - the site will automatically build and deploy
-4. Your site will be available at `https://[username].github.io/[repository-name]`
+4. Your site will be available at `https://[username].github.io/[repository-name]` or your custom domain
 
 The deployment workflow is configured in `.github/workflows/deploy.yml`.
 
@@ -236,13 +236,7 @@ The deployment workflow is configured in `.github/workflows/deploy.yml`.
 
 ## Current Implementation
 
-The current implementation uses mock data for demonstration purposes. In production, you would:
-
-1. Implement actual API calls or web scraping for each grantmaker
-2. Add proper rate limiting and caching
-3. Store data in a database for persistence
-4. Implement automated data refresh mechanisms
-5. Add proper error handling and retry logic
+The current implementation uses real grant data built at deploy time via the scraping pipeline and `build-data` step.
 
 ## Future Enhancements
 
@@ -250,7 +244,7 @@ The current implementation uses mock data for demonstration purposes. In product
 - [ ] Database integration for data persistence
 - [ ] Automated data refresh (scheduled jobs)
 - [ ] More advanced filtering options
-- [ ] Export functionality (CSV, JSON)
+- [x] Export functionality (CSV)
 - [ ] Individual grant detail pages
 - [ ] Additional grantmaker sources
 - [ ] User authentication for saved searches
