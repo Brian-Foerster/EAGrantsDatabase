@@ -229,6 +229,10 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
         grant.url = preferred.url;
         urlMatches += 1;
       }
+      const algoliaTitle = decodeHtmlEntities(preferred?.title || '');
+      if (algoliaTitle && (algoliaTitle.length > grant.title.length || /^Grant to\s+/i.test(grant.title))) {
+        grant.title = algoliaTitle;
+      }
     }
 
     grants.push(grant);
