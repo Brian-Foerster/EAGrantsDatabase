@@ -36,6 +36,7 @@ interface MinGrant {
   grantmaker: string;
   category?: string;
   fund?: string;
+  focus_area?: string;
   url?: string;
   description?: string;
   is_residual?: boolean;
@@ -181,6 +182,26 @@ export default function Home() {
     setSearchResults(results.map(r => r.id).slice(0, 1000));
   }, [miniSearch, searchTerm]);
 
+  const getYearFromDate = (dateString: string): number => {
+    if (dateString && /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return parseInt(dateString.slice(0, 4), 10);
+    }
+    const d = new Date(dateString);
+    return d.getFullYear();
+  };
+
+  const getYearMonthFromDate = (dateString: string): { year: string; yearMonth: string } => {
+    if (dateString && /^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const year = dateString.slice(0, 4);
+      const month = dateString.slice(5, 7);
+      return { year, yearMonth: `${year}-${month}` };
+    }
+    const d = new Date(dateString);
+    const year = d.getFullYear().toString();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return { year, yearMonth: `${year}-${month}` };
+  };
+
   // Filter and sort grants
   const filteredAndSortedGrants = useMemo(() => {
     let filtered = grants;
@@ -248,7 +269,7 @@ export default function Home() {
 
     // Apply year filter
     if (selectedYears.length > 0) {
-      filtered = filtered.filter(grant => selectedYears.includes(new Date(grant.date).getFullYear()));
+      filtered = filtered.filter(grant => selectedYears.includes(getYearFromDate(grant.date)));
     }
 
     // Apply amount filter
@@ -614,9 +635,7 @@ export default function Home() {
     const byCatMap: { [c: string]: { count: number; total: number } } = {};
 
     data.forEach(g => {
-      const d = new Date(g.date);
-      const year = d.getFullYear().toString();
-      const ym = `${year}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const { year, yearMonth: ym } = getYearMonthFromDate(g.date);
       const funder = displayGrantmaker(g.grantmaker);
       const cat = displayCategory(g.category) || 'Uncategorized';
 
@@ -655,9 +674,7 @@ export default function Home() {
     const monthCategory: { [ym: string]: { [g: string]: number } } = {};
 
     data.forEach(g => {
-      const d = new Date(g.date);
-      const year = d.getFullYear().toString();
-      const ym = `${year}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const { year, yearMonth: ym } = getYearMonthFromDate(g.date);
       const fg = displayGrantmaker(g.grantmaker);
       const cg = displayCategory(g.category) || 'Uncategorized';
 
