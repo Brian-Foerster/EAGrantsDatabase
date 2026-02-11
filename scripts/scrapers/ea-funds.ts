@@ -139,16 +139,51 @@ function extractGrantItems($: cheerio.CheerioAPI): string[] {
 
 function parseGrantItem(text: string): { recipient: string; amount: number; description: string } | null {
   const cleaned = text.replace(/\s+/g, ' ').trim();
-  const matches = cleaned.match(/\$[0-9][0-9,]*(?:\.\d+)?/g);
-  if (!matches || matches.length === 0) return null;
-  const amountStr = matches[matches.length - 1];
-  const amount = parseDollarAmount(amountStr);
-  if (amount <= 0) return null;
-  const splitIndex = cleaned.lastIndexOf(amountStr);
-  const before = cleaned.slice(0, splitIndex).replace(/[-–—:\s]+$/, '').trim();
-  const after = cleaned.slice(splitIndex + amountStr.length).replace(/^[:\-\u2013\u2014]\s*/, '').trim();
-  const recipient = before || 'Anonymous';
-  return { recipient, amount, description: after };
+  if (!cleaned.includes('$')) return null;
+
+  const parseMoney = (rawAmount: string, suffix?: string): number => {
+    const base = parseDollarAmount(rawAmount);
+    if (base <= 0) return 0;
+    const s = (suffix || '').toLowerCase();
+    if (s === 'k') return base * 1_000;
+    if (s === 'm') return base * 1_000_000;
+    if (s === 'b') return base * 1_000_000_000;
+    return base;
+  };
+
+  const extract = (
+    match: RegExpMatchArray,
+    recipientIndex: number,
+    amountIndex: number,
+    suffixIndex: number,
+    descIndex: number
+  ) => {
+    const recipient = (match[recipientIndex] || '').trim().replace(/[:\-–—\s]+$/, '');
+    const amount = parseMoney(match[amountIndex] || '', match[suffixIndex] || '');
+    const description = (match[descIndex] || '').trim();
+    if (!recipient || amount <= 0) return null;
+    if (recipient.length > 120) return null;
+    // Filter narrative sentence fragments that are not organizations.
+    if (/^(we|in|by|if|of|for|our|their|these|this|it)\b/i.test(recipient)) return null;
+    if (/[.!?]{2,}/.test(recipient)) return null;
+    return { recipient, amount, description };
+  };
+
+  // Common payout format: "Recipient $123,456: Description"
+  const formatA = cleaned.match(/^(.{1,120}?)\s+\$([0-9][0-9,]*(?:\.\d+)?)\s*([kKmMbB]?)\s*[:\-–—]\s*(.+)$/);
+  if (formatA) {
+    const parsed = extract(formatA, 1, 2, 3, 4);
+    if (parsed) return parsed;
+  }
+
+  // Format: "Recipient ($123,456) - Description"
+  const formatB = cleaned.match(/^(.{1,120}?)\s*\(\s*\$([0-9][0-9,]*(?:\.\d+)?)\s*([kKmMbB]?)\s*\)\s*[:\-–—]\s*(.+)$/);
+  if (formatB) {
+    const parsed = extract(formatB, 1, 2, 3, 4);
+    if (parsed) return parsed;
+  }
+
+  return null;
 }
 
 async function fetchPayoutUrls(): Promise<string[]> {

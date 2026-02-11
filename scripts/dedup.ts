@@ -12,6 +12,7 @@ import { Grant } from '../types/grants';
 interface DedupStats {
   totalBefore: number;
   excluded: number;
+  exactRemoved: number;
   fuzzyMerged: number;
   totalAfter: number;
 }
@@ -56,10 +57,35 @@ export function deduplicateGrants(grants: Grant[]): { grants: Grant[]; stats: De
     console.log(`[Dedup] Layer 1: Excluded ${excluded} flagged grants`);
   }
 
-  // Layer 2: Cross-source fuzzy matching
+  // Layer 2: Exact duplicate removal (same grant data repeated in source exports)
+  const exactSeen = new Set<string>();
+  const layer2: Grant[] = [];
+  let exactRemoved = 0;
+  for (const g of layer1) {
+    const exactKey = [
+      g.grantmaker,
+      g.recipient,
+      g.title,
+      g.amount,
+      g.date,
+      g.fund || '',
+      g.category || '',
+    ].join('|').toLowerCase();
+    if (exactSeen.has(exactKey)) {
+      exactRemoved++;
+      continue;
+    }
+    exactSeen.add(exactKey);
+    layer2.push(g);
+  }
+  if (exactRemoved > 0) {
+    console.log(`[Dedup] Layer 2: Removed ${exactRemoved} exact duplicate rows`);
+  }
+
+  // Layer 3: Cross-source fuzzy matching
   // Group by normalized recipient name
   const byRecipient = new Map<string, Grant[]>();
-  for (const g of layer1) {
+  for (const g of layer2) {
     const key = normalizeRecipient(g.recipient);
     if (!byRecipient.has(key)) byRecipient.set(key, []);
     byRecipient.get(key)!.push(g);
@@ -108,12 +134,13 @@ export function deduplicateGrants(grants: Grant[]): { grants: Grant[]; stats: De
   }
 
   if (fuzzyMerged > 0) {
-    console.log(`[Dedup] Layer 2: Merged ${fuzzyMerged} fuzzy duplicates`);
+    console.log(`[Dedup] Layer 3: Merged ${fuzzyMerged} fuzzy duplicates`);
   }
 
   const stats: DedupStats = {
     totalBefore: grants.length,
     excluded,
+    exactRemoved,
     fuzzyMerged,
     totalAfter: dedupedGrants.length,
   };

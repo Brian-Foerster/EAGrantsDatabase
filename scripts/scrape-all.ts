@@ -167,7 +167,7 @@ async function main() {
   console.log(`Total grants: ${finalGrants.length}`);
   console.log(`  Itemized: ${dedupedGrants.length}`);
   console.log(`  Residual: ${residuals.length}`);
-  console.log(`  Excluded (dedup): ${dedupStats.excluded + dedupStats.fuzzyMerged}`);
+  console.log(`  Excluded (dedup): ${dedupStats.excluded + dedupStats.exactRemoved + dedupStats.fuzzyMerged}`);
   console.log(`Total amount: $${(finalGrants.reduce((s, g) => s + g.amount, 0) / 1e6).toFixed(1)}M`);
   console.log(`Output: ${outputPath}`);
   console.log(`Lean output: ${leanPath}`);
