@@ -142,7 +142,16 @@ function parseGrantItem(text: string): { recipient: string; amount: number; desc
   if (!cleaned.includes('$')) return null;
 
   const parseMoney = (rawAmount: string, suffix?: string): number => {
-    const base = parseDollarAmount(rawAmount);
+    let normalized = rawAmount.trim();
+    // Handle occasional upstream thousands separator typo, e.g. "30.000" -> "30000".
+    if (/^\d{1,3}(?:\.\d{3})+$/.test(normalized)) {
+      normalized = normalized.replace(/\./g, '');
+    }
+    // Handle european-style formatting if it appears, e.g. "12.345,67" -> "12345.67".
+    if (/^\d{1,3}(?:\.\d{3})+,\d{1,2}$/.test(normalized)) {
+      normalized = normalized.replace(/\./g, '').replace(',', '.');
+    }
+    const base = parseDollarAmount(normalized);
     if (base <= 0) return 0;
     const s = (suffix || '').toLowerCase();
     if (s === 'k') return base * 1_000;
