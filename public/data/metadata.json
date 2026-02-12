@@ -1,6 +1,6 @@
 {
-  "totalGrants": 5729,
-  "totalAmount": 6403274970.98,
+  "totalGrants": 5730,
+  "totalAmount": 6410473259.98,
   "grantmakers": [
     "GiveWell",
     "Coefficient Giving",
@@ -22,5 +22,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-01-12"
   },
-  "lastUpdated": "2026-02-11T04:29:07.540Z"
+  "lastUpdated": "2026-02-12T01:13:28.272Z"
 }

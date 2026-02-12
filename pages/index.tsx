@@ -531,63 +531,72 @@ export default function Home() {
     return fund;
   };
 
+  const isBrokenCoefficientGrantUrl = (url?: string): boolean => {
+    if (!url) return false;
+    return /^https?:\/\/coefficientgiving\.org\/grants\//i.test(url);
+  };
+
+  const getCoefficientFallbackUrl = (grant: MinGrant): string => {
+    const focus = (grant.fund || grant.focus_area || '').trim();
+    if (focus) {
+      const COEFFICIENT_FUND_URLS: Record<string, string> = {
+        'Navigating Transformative AI': 'https://coefficientgiving.org/funds/navigating-transformative-ai',
+        'Potential Risks from Advanced Artificial Intelligence': 'https://coefficientgiving.org/funds/navigating-transformative-ai',
+        'Global Catastrophic Risks': 'https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities/',
+        'Global Catastrophic Risks Opportunities': 'https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities/',
+        'Global Catastrophic Risks Capacity Building': 'https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities/',
+        'Biosecurity & Pandemic Preparedness': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
+        'Biosecurity and Pandemic Preparedness': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
+        'Science Supporting Biosecurity': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
+        'Science Supporting Biosecurity and Pandemic Preparedness': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
+        'Farm Animal Welfare': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
+        'Farm Animal Welfare in Asia': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
+        'Broiler Chicken Welfare': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
+        'Cage-Free Reforms': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
+        'Alternatives to Animal Products': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
+        'Fish Welfare': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
+        'Global Health & Development': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Global Health & Wellbeing': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Human Health and Wellbeing': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Global Health R&D': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
+        'Science for Global Health': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
+        'Global Public Health Policy': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Global Aid Policy': 'https://coefficientgiving.org/funds/global-aid-policy/',
+        'Economic Growth in LMICs': 'https://coefficientgiving.org/funds/global-growth',
+        'Global Growth': 'https://coefficientgiving.org/funds/global-growth',
+        'South Asian Air Quality': 'https://coefficientgiving.org/funds/air-quality',
+        'Air Quality': 'https://coefficientgiving.org/funds/air-quality',
+        'Lead Exposure Action Fund': 'https://coefficientgiving.org/funds/lead-exposure-action-fund/',
+        'Effective Giving': 'https://coefficientgiving.org/funds/effective-giving-and-careers/',
+        'Effective Giving & Careers': 'https://coefficientgiving.org/funds/effective-giving-and-careers/',
+        'Forecasting': 'https://coefficientgiving.org/funds/forecasting/',
+        'Criminal Justice Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
+        'Immigration Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
+        'Land Use Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
+        'Housing Policy Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
+        'Macroeconomic Stabilization Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
+        'Abundance & Growth': 'https://coefficientgiving.org/funds/abundance-and-growth/',
+        'Innovation Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
+        'Scientific Research': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
+        'Transformative Basic Science': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
+        'Scientific Innovation: Tools and Techniques': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
+        'Other Scientific Research Areas': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
+      };
+      const direct = COEFFICIENT_FUND_URLS[focus];
+      if (direct) return direct;
+    }
+    return 'https://coefficientgiving.org/funds/';
+  };
+
   // Get URL for grant - use grant URL if available, otherwise link to grantmaker page
   const getGrantUrl = (grant: MinGrant): string | undefined => {
+    if (grant.grantmaker === 'Coefficient Giving') {
+      if (grant.url && !isBrokenCoefficientGrantUrl(grant.url)) return grant.url;
+      return getCoefficientFallbackUrl(grant);
+    }
     if (grant.url) return grant.url;
     // Fallback to grantmaker's grants page
     switch (grant.grantmaker) {
-      case 'Coefficient Giving':
-        {
-          const focus = (grant.fund || grant.focus_area || '').trim();
-          if (focus) {
-            const COEFFICIENT_FUND_URLS: Record<string, string> = {
-              'Navigating Transformative AI': 'https://coefficientgiving.org/funds/navigating-transformative-ai',
-              'Potential Risks from Advanced Artificial Intelligence': 'https://coefficientgiving.org/funds/navigating-transformative-ai',
-              'Global Catastrophic Risks': 'https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities/',
-              'Global Catastrophic Risks Opportunities': 'https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities/',
-              'Global Catastrophic Risks Capacity Building': 'https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities/',
-              'Biosecurity & Pandemic Preparedness': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
-              'Biosecurity and Pandemic Preparedness': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
-              'Science Supporting Biosecurity': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
-              'Science Supporting Biosecurity and Pandemic Preparedness': 'https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness/',
-              'Farm Animal Welfare': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
-              'Farm Animal Welfare in Asia': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
-              'Broiler Chicken Welfare': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
-              'Cage-Free Reforms': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
-              'Alternatives to Animal Products': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
-              'Fish Welfare': 'https://coefficientgiving.org/funds/farm-animal-welfare/',
-              'Global Health & Development': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
-              'Global Health & Wellbeing': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
-              'Human Health and Wellbeing': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
-              'Global Health R&D': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
-              'Science for Global Health': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
-              'Global Public Health Policy': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
-              'Global Aid Policy': 'https://coefficientgiving.org/funds/global-aid-policy/',
-              'Economic Growth in LMICs': 'https://coefficientgiving.org/funds/global-growth',
-              'Global Growth': 'https://coefficientgiving.org/funds/global-growth',
-              'South Asian Air Quality': 'https://coefficientgiving.org/funds/air-quality',
-              'Air Quality': 'https://coefficientgiving.org/funds/air-quality',
-              'Lead Exposure Action Fund': 'https://coefficientgiving.org/funds/lead-exposure-action-fund/',
-              'Effective Giving': 'https://coefficientgiving.org/funds/effective-giving-and-careers/',
-              'Effective Giving & Careers': 'https://coefficientgiving.org/funds/effective-giving-and-careers/',
-              'Forecasting': 'https://coefficientgiving.org/funds/forecasting/',
-              'Criminal Justice Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-              'Immigration Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-              'Land Use Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-              'Housing Policy Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-              'Macroeconomic Stabilization Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-              'Abundance & Growth': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-              'Innovation Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-              'Scientific Research': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
-              'Transformative Basic Science': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
-              'Scientific Innovation: Tools and Techniques': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
-              'Other Scientific Research Areas': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
-            };
-            const direct = COEFFICIENT_FUND_URLS[focus];
-            if (direct) return direct;
-          }
-          return 'https://coefficientgiving.org/funds/';
-        }
       case 'GiveWell':
         return 'https://www.givewell.org/research/all-grants';
       case 'EA Funds':

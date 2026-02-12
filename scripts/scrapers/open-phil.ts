@@ -105,6 +105,11 @@ function toMonthStartFromEpoch(epochSeconds?: number): string {
   return `${y}-${m}-01`;
 }
 
+function isBrokenCoefficientGrantUrl(url?: string): boolean {
+  if (!url) return false;
+  return /^https?:\/\/coefficientgiving\.org\/grants\//i.test(url);
+}
+
 async function fetchAlgoliaGrants(): Promise<AlgoliaGrant[]> {
   const hits: AlgoliaGrant[] = [];
   let page = 0;
@@ -225,7 +230,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
     const candidates = algoliaByKey.get(matchKey);
     if (candidates && candidates.length > 0) {
       const preferred = candidates.find(c => (c['focus-area'] || []).includes(focusArea)) || candidates[0];
-      if (preferred?.url) {
+      if (preferred?.url && !isBrokenCoefficientGrantUrl(preferred.url)) {
         grant.url = preferred.url;
         urlMatches += 1;
       }
@@ -264,7 +269,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
       category,
       focus_area: focusArea,
       fund: focusArea || undefined,
-      url: hit.url,
+      url: isBrokenCoefficientGrantUrl(hit.url) ? undefined : hit.url,
       source_id: `cg-alg-${hit.post_id ?? algoliaAdded}`,
       exclude_from_total: isGiveWellRecommended,
     });
