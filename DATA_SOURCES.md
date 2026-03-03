@@ -162,7 +162,7 @@ For each grantmaker with published annual totals in `scripts/mappings/annual-tot
 Residual = Published Annual Total − Sum(Itemized Grants for that year)
 ```
 
-A residual grant is generated only if the gap exceeds both $100K and 5% of the published total. Residual grants are marked `is_residual = true` with the calculation in `residual_note`.
+A residual grant is generated only if the gap exceeds $100K. Baseline total is `max(published annual total, known itemized total)` to prevent stale annual totals from creating negative coverage artifacts. Residual grants are marked `is_residual = true` with the calculation in `residual_note`.
 
 ### Category Taxonomy
 
@@ -235,7 +235,7 @@ The FTX Future Fund committed approximately $160M in grants during 2022 before t
 
 ## Validation
 
-The pipeline prints a validation report comparing scraped totals against published annual totals. Dollar coverage should be ~100% (within rounding). This validates that the combination of itemized grants + residuals accounts for the full published funding universe. It does not validate itemization depth.
+The pipeline prints a validation report comparing scraped totals against baseline annual totals. Baseline uses `max(published, known itemized)` for each grantmaker-year and reports stale published baselines when itemized grants exceed published totals. Dollar coverage should be ~100% (within rounding). This validates that itemized grants + residuals account for the baseline funding universe. It does not validate itemization depth.
 
 ---
 

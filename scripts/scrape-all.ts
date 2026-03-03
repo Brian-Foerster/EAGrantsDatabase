@@ -22,6 +22,7 @@ import { scrapeACE } from './scrapers/ace';
 import { deduplicateGrants } from './dedup';
 import { computeResiduals } from './residuals';
 import { summarize, saveScrapeResult } from './scraper-utils';
+import { computeKnownTotals, findStaleBaselines, getEffectivePublishedTotal } from './annual-totals-utils';
 import annualTotals from './mappings/annual-totals.json';
 
 async function main() {
@@ -101,6 +102,7 @@ async function main() {
 
   // Summarize by grantmaker and year
   const byGM = new Map<string, Map<string, number>>();
+  const knownByGM = computeKnownTotals(dedupedGrants);
   for (const g of finalGrants) {
     const year = g.date.slice(0, 4);
     if (!byGM.has(g.grantmaker)) byGM.set(g.grantmaker, new Map());
@@ -129,7 +131,6 @@ async function main() {
       const publishedValue = (published as Record<string, unknown>)[y];
       const pub = typeof publishedValue === 'number' ? publishedValue : 0;
       if (pub === 0 && scraped === 0) return padL('-', 10);
-      const pct = pub > 0 ? Math.round((scraped / pub) * 100) : 0;
       return padL(`${fmtM(scraped)}`, 10);
     });
 
@@ -146,21 +147,37 @@ async function main() {
   });
   console.log(padR('TOTAL (scraped)', 20) + yearTotals.map(t => padL(fmtM(t), 10)).join(''));
 
-  const pubTotals = years.map(y => {
+  const baselineTotals = years.map(y => {
     let total = 0;
     for (const gm of Object.keys(totals)) {
       if (gm.startsWith('_')) continue;
-      total += ((totals[gm] as Record<string, number>)[y] || 0);
+      const published = ((totals[gm] as Record<string, number>)[y] || 0);
+      const known = knownByGM.get(gm)?.get(y) || 0;
+      total += getEffectivePublishedTotal(published, known);
     }
     return total;
   });
-  console.log(padR('TOTAL (published)', 20) + pubTotals.map(t => padL(fmtM(t), 10)).join(''));
+  console.log(padR('TOTAL (baseline)', 20) + baselineTotals.map(t => padL(fmtM(t), 10)).join(''));
 
   const coverageRow = years.map((_, i) => {
-    const pct = pubTotals[i] > 0 ? Math.round((yearTotals[i] / pubTotals[i]) * 100) : 0;
+    const pct = baselineTotals[i] > 0 ? Math.round((yearTotals[i] / baselineTotals[i]) * 100) : 0;
     return padL(`${pct}%`, 10);
   });
   console.log(padR('Coverage', 20) + coverageRow.join(''));
+
+  const staleBaselines = findStaleBaselines(totals, knownByGM);
+  if (staleBaselines.length > 0) {
+    console.log();
+    console.log(`Stale annual baselines detected (${staleBaselines.length} year(s)); baseline math used max(published, known):`);
+    staleBaselines.slice(0, 10).forEach(entry => {
+      console.log(
+        `  - ${entry.grantmaker} ${entry.year}: published ${fmtM(entry.published)}, known ${fmtM(entry.known)}`
+      );
+    });
+    if (staleBaselines.length > 10) {
+      console.log(`  - ...and ${staleBaselines.length - 10} more`);
+    }
+  }
 
   console.log();
   console.log('── Summary ──');

@@ -9,21 +9,13 @@
 
 import { Grant } from '../types/grants';
 import annualTotals from './mappings/annual-totals.json';
+import { computeKnownTotals, getEffectivePublishedTotal } from './annual-totals-utils';
 
 interface ResidualStats {
   generated: number;
   byGrantmaker: Record<string, { years: number; totalResidual: number }>;
+  staleBaselinesAdjusted: number;
 }
-
-// Map grantmaker names to their keys in annual-totals.json
-const GRANTMAKER_KEYS: Record<string, string> = {
-  'EA Funds': 'EA Funds',
-  'Coefficient Giving': 'Coefficient Giving',
-  'GiveWell': 'GiveWell',
-  'SFF': 'SFF',
-  'ACE': 'ACE',
-  'Founders Pledge': 'Founders Pledge',
-};
 
 // Category distribution hints for residual grants (when we don't know the breakdown)
 const RESIDUAL_CATEGORIES: Record<string, string> = {
@@ -35,20 +27,11 @@ const RESIDUAL_CATEGORIES: Record<string, string> = {
 
 export function computeResiduals(grants: Grant[]): { residuals: Grant[]; stats: ResidualStats } {
   console.log('[Residuals] Computing residual grants...');
-
-  // Sum known grants by grantmaker and year
-  const knownTotals = new Map<string, Map<string, number>>();
-  for (const g of grants) {
-    if (g.is_residual || g.exclude_from_total) continue;
-
-    const year = g.date.slice(0, 4);
-    if (!knownTotals.has(g.grantmaker)) knownTotals.set(g.grantmaker, new Map());
-    const yearMap = knownTotals.get(g.grantmaker)!;
-    yearMap.set(year, (yearMap.get(year) || 0) + g.amount);
-  }
+  const knownTotals = computeKnownTotals(grants);
 
   const residuals: Grant[] = [];
   const byGrantmaker: Record<string, { years: number; totalResidual: number }> = {};
+  let staleBaselinesAdjusted = 0;
 
   const totalsData = annualTotals as Record<string, unknown>;
 
@@ -66,12 +49,14 @@ export function computeResiduals(grants: Grant[]): { residuals: Grant[]; stats: 
       if (year.startsWith('_')) continue; // skip comments
       if (typeof publishedTotal !== 'number') continue; // skip non-numeric values
       const knownTotal = known.get(year) || 0;
-      const residualAmount = publishedTotal - knownTotal;
+      const effectivePublishedTotal = getEffectivePublishedTotal(publishedTotal, knownTotal);
+      if (effectivePublishedTotal > publishedTotal) staleBaselinesAdjusted++;
+      const residualAmount = effectivePublishedTotal - knownTotal;
 
-      // Only create a residual if there's a meaningful gap (>$100k and >5%)
-      if (residualAmount > 100000 && residualAmount / publishedTotal > 0.05) {
+      // Only create a residual if there's a meaningful gap (> $100k).
+      if (residualAmount > 100000) {
         const category = RESIDUAL_CATEGORIES[grantmakerKey] || 'Other';
-        const pctNotItemized = ((residualAmount / publishedTotal) * 100).toFixed(0);
+        const pctNotItemized = ((residualAmount / effectivePublishedTotal) * 100).toFixed(0);
 
         const grant: Grant = {
           id: `residual-${grantmakerKey.toLowerCase().replace(/\s+/g, '-')}-${year}`,
@@ -81,11 +66,11 @@ export function computeResiduals(grants: Grant[]): { residuals: Grant[]; stats: 
           currency: 'USD',
           date: `${year}-07-01`,
           grantmaker: grantmakerKey,
-          description: `${pctNotItemized}% of ${grantmakerKey}'s ${year} grantmaking ($${(publishedTotal / 1e6).toFixed(1)}M published total) is not available as individual grant records.`,
+          description: `${pctNotItemized}% of ${grantmakerKey}'s ${year} grantmaking ($${(effectivePublishedTotal / 1e6).toFixed(1)}M baseline total) is not available as individual grant records.`,
           category,
           fund: `${grantmakerKey} (Unitemized)`,
           is_residual: true,
-          residual_note: `Published total: $${(publishedTotal / 1e6).toFixed(1)}M, Unitemized: $${(residualAmount / 1e6).toFixed(1)}M (${pctNotItemized}%)`,
+          residual_note: `Baseline total: $${(effectivePublishedTotal / 1e6).toFixed(1)}M, Unitemized: $${(residualAmount / 1e6).toFixed(1)}M (${pctNotItemized}%)`,
         };
 
         residuals.push(grant);
@@ -103,8 +88,12 @@ export function computeResiduals(grants: Grant[]): { residuals: Grant[]; stats: 
   const stats: ResidualStats = {
     generated: residuals.length,
     byGrantmaker,
+    staleBaselinesAdjusted,
   };
 
+  if (staleBaselinesAdjusted > 0) {
+    console.log(`[Residuals] Adjusted ${staleBaselinesAdjusted} stale annual baselines where known itemized grants exceed published totals`);
+  }
   console.log(`[Residuals] Generated ${residuals.length} residual grants`);
   return { residuals, stats };
 }
