@@ -86,6 +86,11 @@ export default function About() {
               totaling approximately $6.2 billion, spanning 2012 to 2026.
             </p>
             <p style={styles.paragraph}>
+              Grantmakers, grants, and grantees are included in this database on the basis that
+              information about them will be useful to the EA community. Whether a grantee or
+              grant is actually "EA" is a question outside the scope of this project.
+            </p>
+            <p style={styles.paragraph}>
               The database is updated monthly via an automated scraping pipeline. The source
               code and full methodology documentation are available on{' '}
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={styles.link}>GitHub</a>.
