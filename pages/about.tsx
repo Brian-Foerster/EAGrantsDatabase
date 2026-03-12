@@ -115,6 +115,11 @@ export default function About() {
               </a>.
               All grants are categorized as Global Health &amp; Development.
             </p>
+            <p style={styles.paragraph}>
+              Public grant listings can lag behind internal grantmaking and may be incomplete or
+              filtered for usability. As a result, public totals and counts may differ from
+              grantmaker announcements that draw on internal systems or newer approvals.
+            </p>
 
             <h3 style={styles.subheading}>Effective Altruism Funds</h3>
             <p style={styles.paragraph}>
@@ -182,6 +187,11 @@ export default function About() {
               matching identifies grants to the same recipient in the same year with amounts
               within 10%, merging approximately 43 additional duplicates.
             </p>
+            <p style={styles.paragraph}>
+              These safeguards prioritize consistent totals over perfect attribution when the
+              same grant appears in multiple sources. Some grants may therefore appear under a
+              different grantmaker than the original announcement.
+            </p>
 
             <h3 style={styles.subheading}>Residual grants</h3>
             <p style={styles.paragraph}>
@@ -220,6 +230,11 @@ export default function About() {
               publish grants months after they are made, and some grants may never be
               published. As a result, recent years will systematically undercount actual
               grantmaking until databases catch up.
+            </p>
+            <p style={styles.paragraph}>
+              Publication timing issues also affect completeness within a year. A grantmaker may
+              publish a subset of approvals, revise entries later, or maintain internal records
+              that are more comprehensive than public listings.
             </p>
             <p style={styles.paragraph}>
               This timing issue affects year-over-year trend analysis. A decline in grants
