@@ -1,25 +1,25 @@
 {
   "_comment": "Published annual totals in nominal USD. Used for residual computation and validation.",
   "Coefficient Giving": {
-    "_sources": "2014-2023: EA historical grantmaking spreadsheet (as Open Philanthropy). 2024: Good Ventures 2024 report ($593M via OP recommendations incl $113M to GiveWell charities) + Coefficient Giving/Inside Philanthropy (>$100M from non-Good Ventures donors). Conservative estimate $650M. Open Philanthropy rebranded to Coefficient Giving in 2025. See DATA_SOURCES.md.",
+    "_sources": "Initial baselines from EA historical grantmaking spreadsheet (as Open Philanthropy). Updated where scraped itemized grants exceed published totals (2017, 2019, 2021, 2023). 2024: Good Ventures 2024 report ($593M via OP recommendations incl $113M to GiveWell charities) + Coefficient Giving/Inside Philanthropy (>$100M from non-Good Ventures donors). Conservative estimate $650M. Open Philanthropy rebranded to Coefficient Giving in 2025. See DATA_SOURCES.md.",
     "2014": 87700000,
     "2015": 105700000,
     "2016": 156700000,
-    "2017": 186300000,
+    "2017": 209000000,
     "2018": 163800000,
-    "2019": 270000000,
-    "2020": 185000000,
-    "2021": 444000000,
-    "2022": 433000000,
-    "2023": 531000000,
+    "2019": 272600000,
+    "2020": 192300000,
+    "2021": 452400000,
+    "2022": 495000000,
+    "2023": 594800000,
     "2024": 650000000
   },
   "GiveWell": {
     "2014": 27800000,
     "2015": 47800000,
     "2016": 73800000,
-    "2017": 74000000,
-    "2018": 78100000,
+    "2017": 89300000,
+    "2018": 89000000,
     "2019": 93000000,
     "2020": 124000000,
     "2021": 325000000,
@@ -32,18 +32,18 @@
     "2019": 1800000,
     "2020": 5400000,
     "2021": 19400000,
-    "2022": 18200000,
+    "2022": 18300000,
     "2023": 31200000,
-    "2024": 36500000
+    "2024": 40100000
   },
   "EA Funds": {
-    "2018": 2900000,
-    "2019": 5300000,
-    "2020": 1200000,
-    "2021": 19800000,
-    "2022": 31000000,
+    "2018": 3800000,
+    "2019": 8600000,
+    "2020": 5600000,
+    "2021": 29500000,
+    "2022": 42000000,
     "2023": 13800000,
-    "2024": 11700000
+    "2024": 13600000
   },
   "ACE": {
     "2014": 100000,

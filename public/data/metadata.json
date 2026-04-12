@@ -1,26 +1,26 @@
 {
-  "totalGrants": 5764,
-  "totalAmount": 6453383205.7,
+  "totalGrants": 6097,
+  "totalAmount": 6921375552.7,
   "grantmakers": [
-    "GiveWell",
     "Coefficient Giving",
+    "GiveWell",
     "EA Funds",
     "ACE",
     "SFF",
     "Founders Pledge"
   ],
   "categories": [
+    "Other",
     "GH",
+    "Policy",
+    "LTXR",
     "AW",
     "Meta",
-    "LTXR",
-    "Policy",
-    "Other",
     "Science"
   ],
   "dateRange": {
     "earliest": "2012-07-01",
-    "latest": "2026-01-12"
+    "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-03-03T02:14:54.997Z"
+  "lastUpdated": "2026-04-12T18:48:49.403Z"
 }

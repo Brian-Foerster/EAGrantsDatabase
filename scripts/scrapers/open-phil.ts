@@ -111,28 +111,57 @@ function isBrokenCoefficientGrantUrl(url?: string): boolean {
 }
 
 async function fetchAlgoliaGrants(): Promise<AlgoliaGrant[]> {
+  // Algolia enforces a paginationLimitedTo cap of 1,000 retrievable hits.
+  // To get all ~2,500+ grant records we partition by award_year, since no
+  // single year exceeds 1,000 grants.
+
+  // First, discover all available years via a facet query
+  const facetResponse = await fetchWithRetry(ALGOLIA_URL, {
+    method: 'POST',
+    headers: {
+      'X-Algolia-Application-Id': ALGOLIA_APP_ID,
+      'X-Algolia-API-Key': ALGOLIA_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      query: '',
+      hitsPerPage: 0,
+      facets: ['award_year'],
+      facetFilters: ['post_type:Grants'],
+    }),
+  });
+  const facetData = await facetResponse.json();
+  const years = Object.keys(facetData.facets?.award_year || {}).sort();
+
   const hits: AlgoliaGrant[] = [];
-  let page = 0;
-  let nbPages = 1;
-  const hitsPerPage = 1000;
 
-  while (page < nbPages) {
-    const response = await fetchWithRetry(ALGOLIA_URL, {
-      method: 'POST',
-      headers: {
-        'X-Algolia-Application-Id': ALGOLIA_APP_ID,
-        'X-Algolia-API-Key': ALGOLIA_API_KEY,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ query: '', hitsPerPage, page }),
-    });
+  // Fetch all grants for each year (each well under the 1,000 cap)
+  for (const year of years) {
+    let page = 0;
+    let nbPages = 1;
+    while (page < nbPages) {
+      const response = await fetchWithRetry(ALGOLIA_URL, {
+        method: 'POST',
+        headers: {
+          'X-Algolia-Application-Id': ALGOLIA_APP_ID,
+          'X-Algolia-API-Key': ALGOLIA_API_KEY,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: '',
+          hitsPerPage: 1000,
+          page,
+          facetFilters: ['post_type:Grants', `award_year:${year}`],
+        }),
+      });
 
-    const data = await response.json();
-    nbPages = data.nbPages || 0;
-    if (Array.isArray(data.hits)) {
-      hits.push(...data.hits);
+      const data = await response.json();
+      nbPages = data.nbPages || 0;
+      if (Array.isArray(data.hits)) {
+        hits.push(...data.hits);
+      }
+      page += 1;
     }
-    page += 1;
   }
 
   return hits;
