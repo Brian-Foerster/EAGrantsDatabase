@@ -61,6 +61,7 @@ export async function scrapeACE(): Promise<ScrapeResult> {
   const html = await response.text();
   const $ = cheerio.load(html);
 
+  $('sup').remove();
   const mainText = $('main').text() || $('article').text() || $('body').text();
   const rawLines = mainText.split('\n').map(l => l.trim()).filter(Boolean);
 

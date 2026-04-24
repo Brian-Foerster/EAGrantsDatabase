@@ -340,7 +340,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '16px',
     border: '1px solid #e5e7eb',
     background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #fef3c7 100%)',
-    boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
   },
   nav: {
     display: 'flex',
@@ -349,17 +348,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: '18px',
   },
   navLink: {
-    fontSize: '13px',
-    fontWeight: '700',
+    fontSize: '14px',
+    fontWeight: '600',
     color: '#1f2937',
     textDecoration: 'none',
-    padding: '6px 10px',
-    borderRadius: '999px',
-    border: '1px solid #d1d5db',
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-    transition: 'background-color 0.2s',
   },
   title: {
     fontSize: '48px',
@@ -380,8 +372,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   content: {
     backgroundColor: 'white',
     padding: '40px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    borderRadius: '4px',
+    border: '1px solid #e5e7eb',
   },
   sectionTitle: {
     fontSize: '24px',
@@ -404,7 +396,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: '16px',
   },
   link: {
-    color: '#3b82f6',
+    color: '#3a6ea5',
     textDecoration: 'none',
   },
   list: {
@@ -428,7 +420,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     color: '#666',
   },
   footerLink: {
-    color: '#3b82f6',
+    color: '#3a6ea5',
     textDecoration: 'none',
   },
 };

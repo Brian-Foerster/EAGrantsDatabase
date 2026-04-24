@@ -472,7 +472,7 @@ export default function Home() {
 
   // Color constants
   const CHART_COLORS = [
-    '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
+    '#3a6ea5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6',
     '#06b6d4', '#f97316', '#84cc16', '#ec4899', '#14b8a6',
     '#9ca3af',
   ];
@@ -1063,7 +1063,7 @@ export default function Home() {
           series: [{
             name: 'Amount', type: 'bar',
             data: byYearMonth.map(d => (d.total * inflationMultiplier(d.yearMonth) / 1000000).toFixed(2)),
-            itemStyle: { color: '#3b82f6' },
+            itemStyle: { color: '#3a6ea5' },
           }],
           grid: gridMonth,
         };
@@ -1753,7 +1753,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '50px',
     height: '50px',
     border: '4px solid #e5e7eb',
-    borderTop: '4px solid #3b82f6',
+    borderTop: '4px solid #3a6ea5',
     borderRadius: '50%',
     margin: '0 auto 20px',
     animation: 'spin 1s linear infinite',
@@ -1768,7 +1768,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '16px',
     fontWeight: '600',
     color: 'white',
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#3a6ea5',
     border: 'none',
     borderRadius: '6px',
     cursor: 'pointer',
@@ -1784,7 +1784,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '16px',
     border: '1px solid #e5e7eb',
     background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #fef3c7 100%)',
-    boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
   },
   nav: {
     display: 'flex',
@@ -1793,17 +1792,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: '18px',
   },
   navLink: {
-    fontSize: '13px',
-    fontWeight: '700',
+    fontSize: '14px',
+    fontWeight: '600',
     color: '#1f2937',
     textDecoration: 'none',
-    padding: '6px 10px',
-    borderRadius: '999px',
-    border: '1px solid #d1d5db',
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    letterSpacing: '0.08em',
-    textTransform: 'uppercase',
-    transition: 'background-color 0.2s',
   },
   title: {
     fontSize: '48px',
@@ -1853,8 +1845,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   chartContainer: {
     backgroundColor: 'white',
     padding: '6px 0',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    borderRadius: '4px',
+    border: '1px solid #e5e7eb',
     position: 'relative',
   },
   chartTotalOverlay: {
@@ -1921,9 +1913,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     transition: 'all 0.2s',
   },
   chartTabActive: {
-    backgroundColor: '#3b82f6',
+    backgroundColor: '#3a6ea5',
     color: 'white',
-    borderColor: '#3b82f6',
+    borderColor: '#3a6ea5',
   },
   breakdownLabel: {
     fontSize: '14px',
@@ -1962,8 +1954,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   filtersContainer: {
     backgroundColor: 'white',
     padding: '20px',
-    borderRadius: '8px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    borderRadius: '4px',
+    border: '1px solid #e5e7eb',
   },
   searchContainer: {
     display: 'flex',
@@ -2043,8 +2035,8 @@ const styles: { [key: string]: React.CSSProperties } = {
     cursor: 'pointer',
   },
   selectAllButtonActive: {
-    backgroundColor: '#3b82f6',
-    borderColor: '#3b82f6',
+    backgroundColor: '#3a6ea5',
+    borderColor: '#3a6ea5',
     color: 'white',
   },
   fundGroupOptions: {
@@ -2064,7 +2056,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     width: '18px',
     height: '18px',
     cursor: 'pointer',
-    accentColor: '#3b82f6',
+    accentColor: '#3a6ea5',
   },
   nonCoreIndicator: {
     marginLeft: '4px',
@@ -2155,9 +2147,9 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   virtualListContainer: {
     backgroundColor: 'white',
-    borderRadius: '8px',
+    borderRadius: '4px',
     padding: '0 16px',
-    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+    border: '1px solid #e5e7eb',
   },
   virtualListScroll: {
     height: '800px',
@@ -2273,7 +2265,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     lineHeight: '1.4',
   },
   expandedLink: {
-    color: '#3b82f6',
+    color: '#3a6ea5',
     textDecoration: 'none',
     fontSize: '12px',
     fontWeight: '500',
@@ -2403,7 +2395,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: '10px',
   },
   footerLink: {
-    color: '#3b82f6',
+    color: '#3a6ea5',
     textDecoration: 'none',
   },
 };
