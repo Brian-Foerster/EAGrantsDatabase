@@ -1448,9 +1448,6 @@ export default function Home() {
                 {isMobile ? 'Inflation-adjusted (2024$)' : 'Adjust for inflation (constant 2024 dollars)'}
               </label>
             </div>
-          <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px' }}>
-            2025 and 2026 data are partial and reflect only grants published to date.
-          </div>
           <div style={{
             ...styles.chartContainer,
             padding: isPhonePortrait ? '4px 0' : isMobile ? '4px 0' : '6px 0',
@@ -1468,6 +1465,9 @@ export default function Home() {
               style={{ height: isPhonePortrait ? '260px' : isMobile ? '300px' : '400px', width: '100%' }}
               opts={{ renderer: 'canvas' }}
             />
+            <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px', padding: '0 16px 8px' }}>
+              2025 and 2026 data are partial and reflect only grants published to date.
+            </div>
           </div>
           {!canOverlayChartTotal && (
             <div style={{
@@ -1949,7 +1949,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontSize: '12px',
     color: '#999',
     fontStyle: 'italic',
-    marginBottom: '6px',
   },
   filtersContainer: {
     backgroundColor: 'white',
