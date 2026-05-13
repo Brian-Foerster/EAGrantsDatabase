@@ -321,6 +321,8 @@ export default function About() {
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={styles.footerLink}>GitHub</a>
             {' · '}
             <a href={FEEDBACK_URL} target="_blank" rel="noopener noreferrer" style={styles.footerLink}>Feedback</a>
+            {' · '}
+            <a href="https://brianfoerster.com" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>brianfoerster.com</a>
           </p>
         </footer>
       </main>

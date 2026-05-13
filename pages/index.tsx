@@ -1724,6 +1724,8 @@ export default function Home() {
             <a href="https://github.com/Brian-Foerster/EAGrantsDatabase" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>GitHub</a>
             {' · '}
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSceNe8T97Z36LvBmepyid68MYbyairBvZucnZFlREGROSBOZA/viewform" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>Feedback</a>
+            {' · '}
+            <a href="https://brianfoerster.com" target="_blank" rel="noopener noreferrer" style={styles.footerLink}>brianfoerster.com</a>
           </p>
         </footer>
       </main>
