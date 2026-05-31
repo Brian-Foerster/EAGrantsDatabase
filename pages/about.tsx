@@ -82,8 +82,8 @@ export default function About() {
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
-              the Effective Altruism community. It currently includes approximately 6,100 grants
-              totaling approximately $6.9 billion, spanning 2012 to 2026.
+              the Effective Altruism community. It currently includes approximately 6,300 grants
+              totaling approximately $7.3 billion, spanning 2012 to 2026.
             </p>
             <p style={styles.paragraph}>
               Grantmakers, grants, and grantees are included in this database on the basis that
@@ -100,7 +100,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Coefficient Giving (formerly Open Philanthropy)</h3>
             <p style={styles.paragraph}>
-              Approximately 3,070 grants (2012 through 2026), sourced from the official{' '}
+              Approximately 3,230 grants (2012 through 2026), sourced from the official{' '}
               <a href="https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Coefficient Giving Grants Archive
               </a>.
@@ -109,7 +109,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>GiveWell</h3>
             <p style={styles.paragraph}>
-              Approximately 460 grants (2014 through 2026), exported from GiveWell's public{' '}
+              Approximately 450 grants (2014 through 2026), exported from GiveWell's public{' '}
               <a href="https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Airtable database
               </a>.
@@ -181,11 +181,11 @@ export default function About() {
 
             <h3 style={styles.subheading}>Deduplication</h3>
             <p style={styles.paragraph}>
-              Two deduplication layers are applied. First, approximately 155 Coefficient Giving
+              Two deduplication layers are applied. First, approximately 157 Coefficient Giving
               grants labeled as funding to GiveWell-recommended charities are excluded to
               avoid double-counting with GiveWell's own records. Second, cross-source fuzzy
               matching identifies grants to the same recipient in the same year with amounts
-              within 10%, merging approximately 49 additional duplicates.
+              within 10%, merging approximately 51 additional duplicates.
             </p>
             <p style={styles.paragraph}>
               These safeguards prioritize consistent totals over perfect attribution when the
@@ -213,7 +213,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Non-core EA focus areas</h3>
             <p style={styles.paragraph}>
-              Approximately 600 grants ($333M) in the Policy Reform category are excluded
+              Approximately 605 grants ($337M) in the Policy Reform category are excluded
               from the default view. These include US policy areas such as Criminal Justice
               Reform, Housing Policy Reform, Immigration Policy, Macroeconomic Stabilization
               Policy, Innovation Policy, and Abundance &amp; Growth — areas that are not

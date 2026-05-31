@@ -6,6 +6,7 @@
  * Columns: Grant, Organization Name, Focus Area, Amount, Date, Details
  */
 
+import { execSync } from 'child_process';
 import { parse } from 'csv-parse/sync';
 import { Grant, ScrapeResult } from '../../types/grants';
 import { fetchWithRetry, normalizeDate, saveRawData, parseDollarAmount } from '../scraper-utils';
@@ -171,12 +172,22 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
   const errors: string[] = [];
   console.log('[Coefficient] Fetching grants CSV from coefficientgiving.org...');
 
-  const response = await fetchWithRetry(CSV_URL, {
-    headers: {
-      'User-Agent': 'Mozilla/5.0',
-    },
-  });
-  const csvText = await response.text();
+  // Cloudflare on coefficientgiving.org blocks Node's native fetch via TLS fingerprinting.
+  // curl uses a different TLS stack that passes the WAF check.
+  let csvText: string;
+  try {
+    csvText = execSync(
+      `curl -sL` +
+      ` -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"` +
+      ` -H "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"` +
+      ` -H "Accept-Language: en-US,en;q=0.9"` +
+      ` -H "Referer: https://coefficientgiving.org/"` +
+      ` "${CSV_URL}"`,
+      { maxBuffer: 10 * 1024 * 1024 }
+    ).toString('utf-8');
+  } catch (err: any) {
+    throw new Error(`Failed to fetch Coefficient CSV via curl: ${err.message}`);
+  }
   console.log(`[Coefficient] Received ${(csvText.length / 1024).toFixed(0)}KB of CSV data`);
 
   saveRawData('coefficient-giving', csvText);

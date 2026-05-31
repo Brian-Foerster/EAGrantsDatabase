@@ -1,6 +1,6 @@
 {
-  "totalGrants": 6219,
-  "totalAmount": 7060000872.699999,
+  "totalGrants": 6314,
+  "totalAmount": 7304363572.699999,
   "grantmakers": [
     "Coefficient Giving",
     "GiveWell",
@@ -11,9 +11,9 @@
   ],
   "categories": [
     "Other",
-    "Policy",
     "GH",
     "LTXR",
+    "Policy",
     "AW",
     "Meta",
     "Science"
@@ -22,5 +22,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-04-24T01:44:39.156Z"
+  "lastUpdated": "2026-05-31T20:15:05.769Z"
 }
