@@ -19,6 +19,7 @@ import { scrapeOpenPhil } from './scrapers/open-phil';
 import { scrapeSFF } from './scrapers/sff';
 import { scrapeGiveWell } from './scrapers/givewell';
 import { scrapeACE } from './scrapers/ace';
+import { scrapeSupplemental } from './scrapers/supplemental';
 import { deduplicateGrants } from './dedup';
 import { computeResiduals } from './residuals';
 import { summarize, saveScrapeResult } from './scraper-utils';
@@ -44,6 +45,7 @@ async function main() {
     { name: 'SFF', fn: scrapeSFF },
     { name: 'GiveWell', fn: scrapeGiveWell },
     { name: 'ACE', fn: scrapeACE },
+    { name: 'Supplemental', fn: scrapeSupplemental },
   ];
 
   // Run scrapers sequentially to avoid rate limiting

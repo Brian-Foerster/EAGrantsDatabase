@@ -1,0 +1,41 @@
+[
+ {
+  "id": "nav-2023-001",
+  "title": "General Support (Food System Innovations)",
+  "recipient": "Humane America Animal Foundation",
+  "amount": 2375000,
+  "currency": "USD",
+  "date": "2023-12-31",
+  "grantmaker": "Navigation Fund",
+  "category": "AW",
+  "fund": "Farm Animal Welfare",
+  "url": "https://projects.propublica.org/nonprofits/organizations/921117448",
+  "description": "General support, farm animal welfare (Food System Innovations is fiscally hosted at Humane America Animal Foundation). Navigation Charitable Fund FY2023 Form 990 Schedule I."
+ },
+ {
+  "id": "nav-2024-001",
+  "title": "General Support (Food System Innovations)",
+  "recipient": "Humane America Animal Foundation",
+  "amount": 14240000,
+  "currency": "USD",
+  "date": "2024-12-31",
+  "grantmaker": "Navigation Fund",
+  "category": "AW",
+  "fund": "Farm Animal Welfare",
+  "url": "https://projects.propublica.org/nonprofits/organizations/921117448",
+  "description": "General support, farm animal welfare (Food System Innovations is fiscally hosted at Humane America Animal Foundation). Navigation Charitable Fund FY2024 Form 990 Schedule I."
+ },
+ {
+  "id": "nav-2024-002",
+  "title": "New Program Area (Digital Sentience)",
+  "recipient": "New York University",
+  "amount": 5000000,
+  "currency": "USD",
+  "date": "2024-12-31",
+  "grantmaker": "Navigation Fund",
+  "category": "LTXR",
+  "fund": "Digital Sentience",
+  "url": "https://projects.propublica.org/nonprofits/organizations/921117448",
+  "description": "Grant under Navigation’s new digital-sentience program area (NYU). Navigation Charitable Fund FY2024 Form 990 Schedule I."
+ }
+]

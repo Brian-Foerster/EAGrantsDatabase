@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback, memo } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
@@ -54,10 +54,185 @@ interface Metadata {
   lastUpdated: string;
 }
 
+interface RowHelpers {
+  getGrantUrl: (grant: MinGrant) => string | undefined;
+  formatCurrency: (amount: number) => string;
+  GRANTMAKER_COLORS: { [key: string]: string };
+  categoryColorMap: { [key: string]: string };
+  shortCategory: (code?: string) => string;
+  displayCategory: (code?: string) => string;
+  displayGrantmaker: (name: string) => string;
+  toggleGrantExpanded: (grantId: string) => void;
+}
+
+interface GrantRowProps {
+  grant: MinGrant;
+  isMobile: boolean;
+  expanded: boolean;
+  financialsOrg: string | undefined;
+  expandedLabelStyle: React.CSSProperties;
+  helpers: RowHelpers;
+}
+
+// Memoized so that scrolling — which re-renders the parent every frame —
+// only re-renders rows whose props actually changed (newly mounted rows and
+// the one being expanded/collapsed), not every visible row.
+const GrantRow = memo(function GrantRow({
+  grant, isMobile, expanded, financialsOrg, expandedLabelStyle, helpers,
+}: GrantRowProps) {
+  const {
+    getGrantUrl, formatCurrency, GRANTMAKER_COLORS, categoryColorMap,
+    shortCategory, displayCategory, displayGrantmaker, toggleGrantExpanded,
+  } = helpers;
+
+  if (isMobile) {
+    return (
+      <div
+        style={styles.grantRowMobile}
+        onClick={() => toggleGrantExpanded(grant.id)}
+      >
+        <div style={styles.grantMobileTop}>
+          <h3 style={styles.grantTitle}>
+            {(() => {
+              const url = getGrantUrl(grant);
+              return url
+                ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink} onClick={e => e.stopPropagation()}>{grant.recipient}</a>
+                : grant.recipient;
+            })()}
+          </h3>
+          <div style={styles.grantMobileAmount}>{formatCurrency(grant.amount)}</div>
+        </div>
+        {grant.title && grant.title !== grant.recipient && (
+          <p style={styles.grantDesc}>{grant.title}</p>
+        )}
+        <div style={styles.grantMobileMeta}>
+          <span style={{
+            ...styles.tagTiny,
+            borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+          }}>{grant.grantmaker}</span>
+          {grant.category && (
+            <span style={{
+              ...styles.tagTiny,
+              borderColor: categoryColorMap[grant.category] || '#999',
+              color: categoryColorMap[grant.category] || '#999',
+            }}>{shortCategory(grant.category)}</span>
+          )}
+          <span style={styles.grantMobileDate}>{format(parseISO(grant.date), 'MM/yyyy')}</span>
+          <span style={styles.expandIndicator}>{expanded ? '▲' : '▼'}</span>
+        </div>
+        {expanded && (
+          <div style={styles.grantMobileExpanded}>
+            <div style={styles.expandedRow}>
+              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Grantmaker:</span>
+              <span>{grant.grantmaker}</span>
+            </div>
+            {grant.fund && (
+              <div style={styles.expandedRow}>
+                <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Fund:</span>
+                <span>{grant.fund}</span>
+              </div>
+            )}
+            <div style={styles.expandedRow}>
+              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Category:</span>
+              <span>{displayCategory(grant.category)}</span>
+            </div>
+            <div style={styles.expandedRow}>
+              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Date:</span>
+              <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
+            </div>
+            {(grant.description || (grant.title && grant.title !== grant.recipient)) && (
+              <div style={styles.expandedDescRow}>
+                <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Description:</span>
+                <span style={styles.expandedDescText}>{grant.description || grant.title}</span>
+              </div>
+            )}
+            {getGrantUrl(grant) && (
+              <div style={styles.expandedRow}>
+                <a
+                  href={getGrantUrl(grant)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={styles.expandedLink}
+                  onClick={e => e.stopPropagation()}
+                >
+                  View on {grant.grantmaker} →
+                </a>
+              </div>
+            )}
+            {financialsOrg && (
+              <div style={styles.expandedRow}>
+                <a
+                  href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`}
+                  style={styles.expandedLink}
+                  onClick={e => e.stopPropagation()}
+                >
+                  View org financials →
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div style={styles.grantRow}>
+      <div style={styles.grantLeft}>
+        <h3 style={styles.grantTitle}>
+          {(() => {
+            const url = getGrantUrl(grant);
+            return url
+              ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
+              : grant.recipient;
+          })()}
+        </h3>
+        {grant.title && grant.title !== grant.recipient && (
+          <p style={styles.grantDescFull}>{grant.title}</p>
+        )}
+        {financialsOrg && (
+          <a href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.crossLink}>
+            View org financials →
+          </a>
+        )}
+      </div>
+      <div style={styles.grantFunderCol}>
+        <span style={{
+          ...styles.tagColored,
+          borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+          color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+        }}>{displayGrantmaker(grant.grantmaker)}</span>
+        {grant.fund && (
+          <span style={{
+            ...styles.subTag,
+            borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
+            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+          }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
+        )}
+      </div>
+      <div />
+      <div style={styles.grantCategoryCol}>
+        {grant.category && (
+          <span style={{
+            ...styles.tagColored,
+            borderColor: categoryColorMap[grant.category] || '#999',
+            color: categoryColorMap[grant.category] || '#999',
+          }}>{displayCategory(grant.category)}</span>
+        )}
+      </div>
+      <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
+      <div style={styles.grantDateCol}>{format(parseISO(grant.date), 'MM/dd/yyyy')}</div>
+    </div>
+  );
+});
+
 export default function Home() {
   // Data loading state
   const [grants, setGrants] = useState<MinGrant[]>([]);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
+  const [orgIndex, setOrgIndex] = useState<{ name: string; grant_names: string[] }[]>([]);
+  const [orgFilter, setOrgFilter] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingProgress, setLoadingProgress] = useState('Loading...');
   const [loadError, setLoadError] = useState(false);
@@ -78,13 +253,17 @@ export default function Home() {
   const [chartView, setChartView] = useState<'year' | 'month'>('year');
   const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
   const [adjustInflation, setAdjustInflation] = useState(false);
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 400);
+  // Constant initial value so server and first client render agree (no hydration
+  // mismatch); the effect sets the real width immediately after mount.
+  const [windowWidth, setWindowWidth] = useState(400);
   const [expandedGrants, setExpandedGrants] = useState<Set<string>>(new Set());
   const [hoverTooltip, setHoverTooltip] = useState<{ text: string; visible: boolean }>({ text: '', visible: false });
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   const tooltipRef = useRef<HTMLDivElement>(null);
 
   const parentRef = useRef<HTMLDivElement>(null);
+  const grantsSectionRef = useRef<HTMLElement>(null);
+  const didScrollToList = useRef(false);
 
   // Detect viewport width for responsive layout
   useEffect(() => {
@@ -105,20 +284,49 @@ export default function Home() {
     }
   }, []);
 
+  // Deep link from an org card: ?org=<name> shows only that org's grants
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const org = new URLSearchParams(window.location.search).get('org');
+    if (org) setOrgFilter(org);
+  }, []);
+
+  // ...and scroll the grants list into view once it's rendered (one time).
+  useEffect(() => {
+    if (!orgFilter || didScrollToList.current || isLoading) return;
+    const el = grantsSectionRef.current;
+    if (!el) return;
+    didScrollToList.current = true;
+    el.scrollIntoView({ block: 'start' });
+  }, [orgFilter, isLoading]);
+
   // Responsive breakpoints
   const isPhonePortrait = windowWidth < 480;
   const isPhoneLandscape = windowWidth >= 480 && windowWidth < 768;
   const isTablet = windowWidth >= 768 && windowWidth < 1024;
   const isMobile = windowWidth < 768;
+
+  // Uniform sizing for all chart-control tabs, shrinking together on smaller
+  // screens so they stay on one row as long as reasonable.
+  const chartTabSize = isPhonePortrait
+    ? { padding: '6px 9px', fontSize: '12px' }
+    : isMobile
+    ? { padding: '7px 12px', fontSize: '13px' }
+    : { padding: '8px 14px', fontSize: '14px' };
   const isCompact = windowWidth < 1024;
   const canOverlayChartTotal = !isMobile && windowWidth >= 1200;
   const shouldAlignExpandedLabels = isMobile && windowWidth >= 360;
   const expandedLabelWidth = shouldAlignExpandedLabels
     ? Math.min(90, Math.max(60, Math.round(windowWidth * 0.22)))
     : 0;
-  const expandedLabelStyle = shouldAlignExpandedLabels
-    ? { minWidth: expandedLabelWidth, flexBasis: expandedLabelWidth, flexShrink: 0 }
-    : {};
+  // Memoized so it stays referentially stable across scroll renders (keeps the
+  // memoized GrantRow from re-rendering every frame).
+  const expandedLabelStyle = useMemo<React.CSSProperties>(
+    () => shouldAlignExpandedLabels
+      ? { minWidth: expandedLabelWidth, flexBasis: expandedLabelWidth, flexShrink: 0 }
+      : {},
+    [shouldAlignExpandedLabels, expandedLabelWidth]
+  );
 
   // Fetch data client-side only
   useEffect(() => {
@@ -137,6 +345,19 @@ export default function Home() {
         if (!Array.isArray(grantsData)) {
           throw new Error('Invalid grants data format');
         }
+
+        // Merge manually identified per-grant writeup links (keyed by grant id).
+        // Mostly archived Open Phil grant pages, matched to their grants by slug.
+        try {
+          const wRes = await fetch(`${BASE_PATH}/data/grant-writeups.json?v=${BUILD_VERSION}`);
+          if (wRes.ok) {
+            const writeups: Record<string, string> = await wRes.json();
+            grantsData.forEach((g: MinGrant) => { if (writeups[g.id]) g.url = writeups[g.id]; });
+          }
+        } catch {
+          /* writeup links are an optional enhancement */
+        }
+
         setGrants(grantsData);
 
         setLoadingProgress('Loading metadata...');
@@ -146,6 +367,23 @@ export default function Home() {
         }
         const metaData = await metaRes.json();
         setMetadata(metaData);
+
+        // Org financials index — used to cross-link grants to org cards.
+        // Optional enhancement: a failure here must not break the grants page.
+        try {
+          const orgsRes = await fetch(`${BASE_PATH}/data/recipient-orgs.json?v=${BUILD_VERSION}`);
+          if (orgsRes.ok) {
+            const orgsData = await orgsRes.json();
+            setOrgIndex(
+              (orgsData.orgs || []).map((o: { name: string; grant_names?: string[] }) => ({
+                name: o.name,
+                grant_names: o.grant_names || [],
+              }))
+            );
+          }
+        } catch {
+          /* cross-linking disabled if org data unavailable */
+        }
 
         setLoadingProgress('Building search index...');
         // Build search index client-side (saves 2.5MB download)
@@ -202,9 +440,33 @@ export default function Home() {
     return { year, yearMonth: `${year}-${month}` };
   };
 
+  // Cross-link maps between grant recipients and org financial cards
+  const { recipientToOrg, orgGrantNameSet } = useMemo(() => {
+    const r2o = new Map<string, string>();
+    const ogn = new Map<string, Set<string>>();
+    orgIndex.forEach(o => {
+      const set = new Set<string>();
+      o.grant_names.forEach(gn => {
+        const key = gn.toLowerCase();
+        set.add(key);
+        r2o.set(key, o.name);
+      });
+      ogn.set(o.name, set);
+    });
+    return { recipientToOrg: r2o, orgGrantNameSet: ogn };
+  }, [orgIndex]);
+
   // Filter and sort grants
   const filteredAndSortedGrants = useMemo(() => {
     let filtered = grants;
+
+    // Restrict to a single org's grants (deep link from an org card)
+    if (orgFilter) {
+      const set = orgGrantNameSet.get(orgFilter);
+      filtered = set
+        ? filtered.filter(g => set.has(g.recipient.toLowerCase()))
+        : filtered.filter(g => g.recipient.toLowerCase().includes(orgFilter.toLowerCase()));
+    }
 
     // Apply search filter
     if (searchTerm.trim()) {
@@ -228,6 +490,13 @@ export default function Home() {
     const hasTopicFilter = hasCatFilter;
 
     filtered = filtered.filter(grant => {
+      // An explicit category selection opts into the otherwise-hidden non-core EA
+      // funds for grants of that category (e.g. selecting the Policy category, whose
+      // grants live entirely in non-core US-policy funds). Applies whether or not a
+      // Source filter is also active.
+      const optedInViaCategory =
+        hasCatFilter && !!grant.category && selectedCategories.includes(grant.category);
+
       // --- Source group (Grantmaker / Fund) ---
       let passesSource: boolean;
       if (hasSourceFilter) {
@@ -245,14 +514,15 @@ export default function Home() {
           if (grantmakerHasSelectedFunds) {
             passesSource = !!grant.fund && selectedFunds.includes(grant.fund);
           } else {
-            passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS);
+            passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaCategory;
           }
         } else {
           passesSource = false;
         }
       } else {
-        // No source filter — exclude non-core EA funds by default
-        passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS);
+        // No source filter — exclude non-core EA funds by default, unless opted in
+        // via an explicit category selection.
+        passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaCategory;
       }
 
       // --- Topic group (Category / Sub-category) ---
@@ -301,7 +571,7 @@ export default function Home() {
     });
 
     return sorted;
-  }, [grants, searchTerm, searchResults, selectedGrantmakers, selectedFunds, selectedCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+  }, [grants, orgFilter, orgGrantNameSet, searchTerm, searchResults, selectedGrantmakers, selectedFunds, selectedCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
 
   const fundsByGrantmaker = useMemo(() => {
     const gmDisplayNames: Record<string, string> = {
@@ -477,13 +747,29 @@ export default function Home() {
     '#9ca3af',
   ];
 
+  // Grantmaker colors. Funders that work in a single cause area echo that cause's
+  // color (see CATEGORY_COLORS); diversified funders and the crowded LTXR space
+  // use distinct brand-ish colors that deliberately avoid the cause palette.
   const GRANTMAKER_COLORS: { [key: string]: string } = {
+    // Cause-tied (sole funder of a distinct cause)
+    'GiveWell': '#10b981',             // Global Health
+    'ACE': '#8b5cf6',                  // Animal Welfare
+    'Meta Charity Funders': '#06b6d4', // EA Meta
+    // Branding / distinct (diversified, or contested LTXR space)
+    'Coefficient Giving': '#2563eb',
     'EA Funds': '#0a7b8a',
-    'GiveWell': '#c44a2d',
-    'Coefficient Giving': '#5b6abf',
-    'SFF': '#8b5cf6',
-    'Founders Pledge': '#06b6d4',
-    'ACE': '#f59e0b',
+    'Founders Pledge': '#1e3a8a',
+    'SFF': '#ec4899',
+    'FLI': '#84cc16',
+    'Navigation Fund': '#0ea5e9',
+    'Macroscopic': '#78716c',
+  };
+
+  // Fixed per-cause palette, matching the org-financials database so a funder's
+  // cause-tied color lines up with its category color across both databases.
+  const CATEGORY_COLORS: Record<string, string> = {
+    GH: '#10b981', LTXR: '#f59e0b', AW: '#8b5cf6', Meta: '#06b6d4',
+    Science: '#14b8a6', Policy: '#ef4444', Other: '#3a6ea5',
   };
 
   const CATEGORY_DISPLAY: Record<string, string> = {
@@ -500,6 +786,8 @@ export default function Home() {
     'EA Funds': 'Effective Altruism Funds',
     'SFF': 'Survival and Flourishing Fund',
     'ACE': 'Animal Charity Evaluators',
+    'FLI': 'Future of Life Institute',
+    'Macroscopic': 'Macroscopic Ventures',
   };
 
   const displayCategory = (code?: string): string => code ? (CATEGORY_DISPLAY[code] || code) : '';
@@ -561,6 +849,12 @@ export default function Home() {
         'Global Health R&D': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
         'Science for Global Health': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
         'Global Public Health Policy': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Global Health & Wellbeing Opportunities': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Infectious Diseases': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Noninfectious Diseases': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Maternal and Newborn Health': 'https://coefficientgiving.org/funds/global-health-wellbeing-opportunities/',
+        'Science and Global Health R&D': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
+        'Strep A Vaccine Fund': 'https://coefficientgiving.org/funds/strep-a-vaccine-fund/',
         'Global Aid Policy': 'https://coefficientgiving.org/funds/global-aid-policy/',
         'Economic Growth in LMICs': 'https://coefficientgiving.org/funds/global-growth',
         'Global Growth': 'https://coefficientgiving.org/funds/global-growth',
@@ -631,9 +925,36 @@ export default function Home() {
   const categoryColorMap = useMemo(() => {
     const cats = Array.from(new Set(grants.map(g => g.category).filter(Boolean))) as string[];
     const map: { [key: string]: string } = {};
-    cats.forEach((c, i) => { map[c] = CHART_COLORS[i % CHART_COLORS.length]; });
+    let fallback = 0;
+    cats.forEach((c) => {
+      map[c] = CATEGORY_COLORS[c] ?? CHART_COLORS[fallback++ % CHART_COLORS.length];
+    });
     return map;
   }, [grants]);
+
+  // Same per-category colors as the badges/filters, but keyed by display name
+  // so the stacked chart (whose series are display names) stays consistent.
+  const categoryDisplayColors = useMemo(() => {
+    const map: { [displayName: string]: string } = { Uncategorized: '#9ca3af' };
+    Object.keys(categoryColorMap).forEach(code => {
+      map[displayCategory(code) || code] = categoryColorMap[code];
+    });
+    return map;
+    // displayCategory is a stable pure helper; categoryColorMap is the real input
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [categoryColorMap]);
+
+  // Grantmaker colors keyed by display name, so the by-funder stacked chart
+  // (whose series are display names) matches the grant-list badge colors.
+  const grantmakerDisplayColors = useMemo(() => {
+    const map: { [displayName: string]: string } = {};
+    Object.keys(GRANTMAKER_COLORS).forEach(key => {
+      map[displayGrantmaker(key)] = GRANTMAKER_COLORS[key];
+    });
+    return map;
+    // GRANTMAKER_COLORS and displayGrantmaker are stable pure constants.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const chartData = useMemo(() => {
     const data = filteredAndSortedGrants;
@@ -828,13 +1149,23 @@ export default function Home() {
     }).format(amount);
   };
 
+  // Stable bundle of row helpers for the memoized GrantRow. The captured
+  // functions are pure (or use stable setters), so capturing them once is
+  // safe; only categoryColorMap can change, so it is the sole dependency.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const rowHelpers = useMemo<RowHelpers>(() => ({
+    getGrantUrl, formatCurrency, GRANTMAKER_COLORS, categoryColorMap,
+    shortCategory, displayCategory, displayGrantmaker, toggleGrantExpanded,
+  }), [categoryColorMap]);
+
 
   // US CPI-U annual averages, indexed so that the most recent full year = 1.0
-  // Source: Bureau of Labor Statistics, CPI-U All Items, adjusted to 2024 base
+  // Source: Bureau of Labor Statistics, CPI-U All Items, adjusted to 2025 base
+  // (2025 annual avg ≈ 322.6 vs 2024 ≈ 314.2). 2026 is partial → held at 1.0.
   const CPI_MULTIPLIERS: { [year: string]: number } = {
-    '2012': 1.38, '2013': 1.36, '2014': 1.34, '2015': 1.34,
-    '2016': 1.32, '2017': 1.29, '2018': 1.26, '2019': 1.23,
-    '2020': 1.22, '2021': 1.16, '2022': 1.08, '2023': 1.04, '2024': 1.00, '2025': 1.00,
+    '2012': 1.42, '2013': 1.40, '2014': 1.38, '2015': 1.38,
+    '2016': 1.36, '2017': 1.32, '2018': 1.29, '2019': 1.26,
+    '2020': 1.25, '2021': 1.19, '2022': 1.11, '2023': 1.07, '2024': 1.03, '2025': 1.00, '2026': 1.00,
   };
 
   const inflationMultiplier = (yearOrYm: string): number => {
@@ -847,6 +1178,7 @@ export default function Home() {
     timeLabels: string[],
     crossTab: { [time: string]: { [group: string]: number } },
     groups: string[],
+    colorMap?: { [group: string]: string },
   ) => {
     return groups.map((group, i) => ({
       name: group,
@@ -856,7 +1188,7 @@ export default function Home() {
         const val = crossTab[t]?.[group] || 0;
         return parseFloat((val * inflationMultiplier(t) / 1000000).toFixed(2));
       }),
-      itemStyle: { color: CHART_COLORS[i % CHART_COLORS.length] },
+      itemStyle: { color: colorMap?.[group] ?? CHART_COLORS[i % CHART_COLORS.length] },
     }));
   };
 
@@ -947,7 +1279,7 @@ export default function Home() {
       const paddedMax = max * buffer;
       return {
       type: 'value' as const,
-      name: isMobile ? '' : (adjustInflation ? '2024 USD ($M)' : 'Amount ($M)'),
+      name: isMobile ? '' : (adjustInflation ? '2025 USD ($M)' : 'Amount ($M)'),
       max: niceMax(paddedMax), // Smaller padding so scale tracks bars more closely
       nameTextStyle: { fontSize: 12 },
       axisLabel: {
@@ -974,7 +1306,7 @@ export default function Home() {
             legend: legendConfig,
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
             yAxis: yAxisConfig(yearMax),
-            series: buildStackedSeries(yearLabels, yearFunder, funderGroups),
+            series: buildStackedSeries(yearLabels, yearFunder, funderGroups, grantmakerDisplayColors),
             grid: gridYear,
           };
         }
@@ -986,7 +1318,7 @@ export default function Home() {
             legend: legendConfig,
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
             yAxis: yAxisConfig(yearMax),
-            series: buildStackedSeries(yearLabels, yearCategory, categoryGroups),
+            series: buildStackedSeries(yearLabels, yearCategory, categoryGroups, categoryDisplayColors),
             grid: gridYear,
           };
         }
@@ -1030,7 +1362,7 @@ export default function Home() {
             legend: legendConfig,
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
             yAxis: yAxisConfig(monthMax),
-            series: buildStackedSeries(monthLabels, monthFunder, funderGroups),
+            series: buildStackedSeries(monthLabels, monthFunder, funderGroups, grantmakerDisplayColors),
             grid: gridMonth,
           };
         }
@@ -1042,7 +1374,7 @@ export default function Home() {
             legend: legendConfig,
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
             yAxis: yAxisConfig(monthMax),
-            series: buildStackedSeries(monthLabels, monthCategory, categoryGroups),
+            series: buildStackedSeries(monthLabels, monthCategory, categoryGroups, categoryDisplayColors),
             grid: gridMonth,
           };
         }
@@ -1127,29 +1459,24 @@ export default function Home() {
       }}>
         <header style={{
           ...styles.header,
+          minHeight: isMobile ? '196px' : '244px',
           padding: isMobile ? '18px 16px' : '32px 36px',
           marginBottom: isMobile ? '32px' : '40px'
         }}>
           <nav style={styles.nav}>
-            <Link
-              href="/"
-              style={styles.navLink}
-            >
-              Home
+            <Link href="/" style={{ ...styles.navLink, ...styles.navLinkActive }}>
+              Grants Database
             </Link>
-            <Link
-              href="/about"
-              style={styles.navLink}
-            >
+            <Link href="/recipients" style={styles.navLink}>
+              Org Financials
+            </Link>
+            <Link href="/about" style={styles.navLink}>
               About
             </Link>
           </nav>
           <h1 style={{ ...styles.title, fontSize: isPhonePortrait ? '24px' : isMobile ? '28px' : '48px' }}>EA Grants Database</h1>
           <p style={{ ...styles.subtitle, fontSize: isMobile ? '13px' : '18px' }}>
-            {isMobile
-              ? `${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)}B from ${metadata.grantmakers.length} grantmakers`
-              : `${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)} billion from ${metadata.grantmakers.length} EA-aligned grantmakers (2012–present)`
-            }
+            {`${metadata.totalGrants.toLocaleString()} grants totaling $${(metadata.totalAmount / 1e9).toFixed(1)} billion from ${metadata.grantmakers.length} EA-aligned grantmakers (2012–present)`}
           </p>
         </header>
 
@@ -1266,7 +1593,7 @@ export default function Home() {
                       );
                     })}
                     <p style={styles.nonCoreNote}>
-                      * Excluded by default — Policy Reform areas not generally considered part of the EA movement. Hover for details.
+                      * Excluded by default — US policy reform areas not generally considered part of the EA movement. Hover for details.
                     </p>
                   </div>
                 )}
@@ -1387,7 +1714,7 @@ export default function Home() {
                 style={{
                   ...styles.chartTab,
                   ...(chartView === 'year' ? styles.chartTabActive : {}),
-                  ...(isMobile ? { padding: '10px 14px', fontSize: '14px' } : {}),
+                  ...chartTabSize,
                 }}
               >
                 {isPhonePortrait ? 'Year' : 'By Year'}
@@ -1397,19 +1724,19 @@ export default function Home() {
                 style={{
                   ...styles.chartTab,
                   ...(chartView === 'month' ? styles.chartTabActive : {}),
-                  ...(isMobile ? { padding: '10px 14px', fontSize: '14px' } : {}),
+                  ...chartTabSize,
                 }}
               >
                 {isPhonePortrait ? 'Month' : 'By Month'}
               </button>
-              {!isPhonePortrait && <span style={styles.controlsDivider} />}
+              <span style={{ ...styles.controlsDivider, ...(isPhonePortrait ? { height: '18px', margin: '0 3px' } : {}) }} />
               {!isPhonePortrait && <span style={styles.breakdownLabel}>Break down by:</span>}
               <button
                 onClick={() => setTimeBreakdown('total')}
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'total' ? styles.breakdownTabActive : {}),
-                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {}),
+                  ...chartTabSize,
                 }}
               >
                 Total
@@ -1419,7 +1746,7 @@ export default function Home() {
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'byFunder' ? styles.breakdownTabActive : {}),
-                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {}),
+                  ...chartTabSize,
                 }}
               >
                 {isPhonePortrait ? 'Funder' : 'By Funder'}
@@ -1429,7 +1756,7 @@ export default function Home() {
                 style={{
                   ...styles.breakdownTab,
                   ...(timeBreakdown === 'byCategory' ? styles.breakdownTabActive : {}),
-                  ...(isMobile ? { padding: '8px 12px', fontSize: '13px' } : {}),
+                  ...chartTabSize,
                 }}
               >
                 {isPhonePortrait ? 'Category' : 'By Category'}
@@ -1445,7 +1772,7 @@ export default function Home() {
                   onChange={() => setAdjustInflation(!adjustInflation)}
                   style={{ cursor: 'pointer' }}
                 />
-                {isMobile ? 'Inflation-adjusted (2024$)' : 'Adjust for inflation (constant 2024 dollars)'}
+                {isMobile ? 'Inflation-adjusted (2025$)' : 'Adjust for inflation (constant 2025 dollars)'}
               </label>
             </div>
           <div style={{
@@ -1467,6 +1794,7 @@ export default function Home() {
             />
             <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px', padding: '0 16px 8px' }}>
               2025 and 2026 data are partial and reflect only grants published to date.
+              Only publicly disclosed grants are included; grants made privately are not captured.
             </div>
           </div>
           {!canOverlayChartTotal && (
@@ -1483,7 +1811,7 @@ export default function Home() {
         </section>
 
         {/* Grants List with Virtualization */}
-        <section style={styles.section}>
+        <section ref={grantsSectionRef} style={{ ...styles.section, scrollMarginTop: '12px' }}>
           <div style={{
             ...styles.grantsHeader,
             ...(isMobile ? { flexDirection: 'column', alignItems: 'flex-start', gap: '10px' } : {})
@@ -1526,7 +1854,18 @@ export default function Home() {
               Download Results CSV
             </button>
           </div>
-          
+
+          {orgFilter && (
+            <div style={styles.orgFilterBanner}>
+              <span>
+                Showing grants to <strong>{orgFilter}</strong>
+              </span>
+              <button onClick={() => setOrgFilter(null)} style={styles.orgFilterClear}>
+                Clear ✕
+              </button>
+            </div>
+          )}
+
           <div style={{
             ...styles.virtualListContainer,
             padding: isMobile ? '0 10px' : '0 16px'
@@ -1557,6 +1896,7 @@ export default function Home() {
             >
               {rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const grant = filteredAndSortedGrants[virtualRow.index];
+                const financialsOrg = recipientToOrg.get(grant.recipient.toLowerCase());
                 return (
                   <div
                     key={virtualRow.key}
@@ -1570,126 +1910,14 @@ export default function Home() {
                       transform: `translateY(${virtualRow.start}px)`,
                     }}
                   >
-                    {isMobile ? (
-                      <div
-                        style={styles.grantRowMobile}
-                        onClick={() => toggleGrantExpanded(grant.id)}
-                      >
-                        <div style={styles.grantMobileTop}>
-                          <h3 style={styles.grantTitle}>
-                            {(() => {
-                              const url = getGrantUrl(grant);
-                              return url
-                                ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink} onClick={e => e.stopPropagation()}>{grant.recipient}</a>
-                                : grant.recipient;
-                            })()}
-                          </h3>
-                          <div style={styles.grantMobileAmount}>{formatCurrency(grant.amount)}</div>
-                        </div>
-                        {grant.title && grant.title !== grant.recipient && (
-                          <p style={styles.grantDesc}>{grant.title}</p>
-                        )}
-                        <div style={styles.grantMobileMeta}>
-                          <span style={{
-                            ...styles.tagTiny,
-                            borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                          }}>{grant.grantmaker}</span>
-                          {grant.category && (
-                            <span style={{
-                              ...styles.tagTiny,
-                              borderColor: categoryColorMap[grant.category] || '#999',
-                              color: categoryColorMap[grant.category] || '#999',
-                            }}>{shortCategory(grant.category)}</span>
-                          )}
-                          <span style={styles.grantMobileDate}>{format(parseISO(grant.date), 'MM/yyyy')}</span>
-                          <span style={styles.expandIndicator}>{expandedGrants.has(grant.id) ? '▲' : '▼'}</span>
-                        </div>
-                        {expandedGrants.has(grant.id) && (
-                          <div style={styles.grantMobileExpanded}>
-                            <div style={styles.expandedRow}>
-                              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Grantmaker:</span>
-                              <span>{grant.grantmaker}</span>
-                            </div>
-                            {grant.fund && (
-                              <div style={styles.expandedRow}>
-                                <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Fund:</span>
-                                <span>{grant.fund}</span>
-                              </div>
-                            )}
-                            <div style={styles.expandedRow}>
-                              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Category:</span>
-                              <span>{displayCategory(grant.category)}</span>
-                            </div>
-                            <div style={styles.expandedRow}>
-                              <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Date:</span>
-                              <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
-                            </div>
-                            {(grant.description || (grant.title && grant.title !== grant.recipient)) && (
-                              <div style={styles.expandedDescRow}>
-                                <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Description:</span>
-                                <span style={styles.expandedDescText}>{grant.description || grant.title}</span>
-                              </div>
-                            )}
-                            {getGrantUrl(grant) && (
-                              <div style={styles.expandedRow}>
-                                <a
-                                  href={getGrantUrl(grant)}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  style={styles.expandedLink}
-                                  onClick={e => e.stopPropagation()}
-                                >
-                                  View on {grant.grantmaker} →
-                                </a>
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div style={styles.grantRow}>
-                        <div style={styles.grantLeft}>
-                          <h3 style={styles.grantTitle}>
-                            {(() => {
-                              const url = getGrantUrl(grant);
-                              return url
-                                ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
-                                : grant.recipient;
-                            })()}
-                          </h3>
-                          {grant.title && grant.title !== grant.recipient && (
-                            <p style={styles.grantDescFull}>{grant.title}</p>
-                          )}
-                        </div>
-                        <div style={styles.grantFunderCol}>
-                          <span style={{
-                            ...styles.tagColored,
-                            borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                          }}>{displayGrantmaker(grant.grantmaker)}</span>
-                          {grant.fund && (
-                            <span style={{
-                              ...styles.subTag,
-                              borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
-                              color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-                            }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
-                          )}
-                        </div>
-                        <div />
-                        <div style={styles.grantCategoryCol}>
-                          {grant.category && (
-                            <span style={{
-                              ...styles.tagColored,
-                              borderColor: categoryColorMap[grant.category] || '#999',
-                              color: categoryColorMap[grant.category] || '#999',
-                            }}>{displayCategory(grant.category)}</span>
-                          )}
-                        </div>
-                        <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
-                        <div style={styles.grantDateCol}>{format(parseISO(grant.date), 'MM/dd/yyyy')}</div>
-                      </div>
-                    )}
+                    <GrantRow
+                      grant={grant}
+                      isMobile={isMobile}
+                      expanded={expandedGrants.has(grant.id)}
+                      financialsOrg={financialsOrg}
+                      expandedLabelStyle={expandedLabelStyle}
+                      helpers={rowHelpers}
+                    />
                   </div>
                 );
               })}
@@ -1785,19 +2013,26 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: '40px',
     borderRadius: '16px',
     border: '1px solid #e5e7eb',
-    background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #fef3c7 100%)',
+    background: 'radial-gradient(82% 150% at 88% 22%, #bfdbfe 0%, #f8fafc 88%)',
   },
   nav: {
     display: 'flex',
     justifyContent: 'flex-start',
-    gap: '18px',
+    gap: '8px',
     marginBottom: '18px',
+    flexWrap: 'wrap',
   },
   navLink: {
     fontSize: '14px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#64748b',
     textDecoration: 'none',
+    padding: '5px 10px',
+    borderRadius: '6px',
+  },
+  navLinkActive: {
+    color: '#0f172a',
+    backgroundColor: 'rgba(15,23,42,0.06)',
   },
   title: {
     fontSize: '48px',
@@ -2306,6 +2541,38 @@ const styles: { [key: string]: React.CSSProperties } = {
   grantTitleLink: {
     color: '#1a202c',
     textDecoration: 'none',
+  },
+  crossLink: {
+    display: 'inline-block',
+    marginTop: '4px',
+    fontSize: '12px',
+    fontWeight: 600,
+    color: '#059669',
+    textDecoration: 'none',
+  },
+  orgFilterBanner: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    margin: '0 16px 12px',
+    padding: '10px 14px',
+    backgroundColor: '#ecfdf5',
+    border: '1px solid #a7f3d0',
+    borderRadius: '6px',
+    fontSize: '14px',
+    color: '#065f46',
+  },
+  orgFilterClear: {
+    fontSize: '13px',
+    fontWeight: 600,
+    color: '#065f46',
+    backgroundColor: 'white',
+    border: '1px solid #a7f3d0',
+    borderRadius: '6px',
+    padding: '5px 10px',
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   grantDesc: {
     margin: '3px 0 0 0',

@@ -34,11 +34,19 @@ next-env.d.ts
 
 # old backup
 index-old.tsx
+.env.local.bak
+
+# local scratch + dev-only tooling (not part of the app)
+/tmp_work/
+/public/mobile-viewer.html
 
 # data directories (source data, not built artifacts)
 /data/source/
 /data/processed/
-/data/raw/
+/data/raw/*
+# ...except manually-curated supplemental grant inputs (FLI, Meta Charity Funders,
+# Macroscopic, Navigation), which cannot be re-fetched from the web and must be versioned.
+!/data/raw/supplemental/
 
 # NOTE: lib/scraped-grants.json IS tracked in git so GitHub Actions can build the site
 # Run "npm run scrape" locally to update it, then commit the changes

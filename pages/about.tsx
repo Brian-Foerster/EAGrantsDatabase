@@ -7,7 +7,10 @@ const FEEDBACK_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSceNe8T97Z36LvBme
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 
 export default function About() {
-  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 800);
+  // Initialize to a constant (not window.innerWidth) so the server and the first
+  // client render agree — avoids a hydration mismatch that can otherwise leave the
+  // width state stuck. The effect below sets the real width immediately after mount.
+  const [windowWidth, setWindowWidth] = useState(400);
 
   useEffect(() => {
     const updateWidth = () => setWindowWidth(window.innerWidth);
@@ -45,32 +48,30 @@ export default function About() {
       }}>
         <header style={{
           ...styles.header,
+          minHeight: isMobile ? '196px' : '244px',
           padding: isMobile ? '18px 16px' : '32px 36px',
           marginBottom: isMobile ? '20px' : '40px'
         }}>
           <nav style={styles.nav}>
-            <Link
-              href="/"
-              style={styles.navLink}
-            >
-              Home
+            <Link href="/" style={styles.navLink}>
+              Grants Database
             </Link>
-            <Link
-              href="/about"
-              style={styles.navLink}
-            >
+            <Link href="/recipients" style={styles.navLink}>
+              Org Financials
+            </Link>
+            <Link href="/about" style={{ ...styles.navLink, ...styles.navLinkActive }}>
               About
             </Link>
           </nav>
           <h1 style={{
             ...styles.title,
-            fontSize: isMobile ? '32px' : '48px'
+            fontSize: isPhonePortrait ? '24px' : isMobile ? '28px' : '48px'
           }}>About</h1>
           <p style={{
             ...styles.subtitle,
-            fontSize: isMobile ? '14px' : '18px'
+            fontSize: isMobile ? '13px' : '18px'
           }}>
-            Sources, methodology, and known limitations of the EA Grants Database.
+            Sources, methodology, and known limitations of the EA Grants Database and its companion org financials data.
           </p>
         </header>
 
@@ -82,8 +83,14 @@ export default function About() {
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
-              the Effective Altruism community. It currently includes approximately 6,300 grants
-              totaling approximately $7.3 billion, spanning 2012 to 2026.
+              the Effective Altruism community. It currently includes over 6,300 grants
+              totaling approximately $7.4 billion, spanning 2012 to 2026.
+            </p>
+            <p style={styles.paragraph}>
+              The site has two complementary parts: this grants database of individual grants, and a
+              companion org financials database showing the annual revenues and expenses of the
+              organizations that receive them. The grants database is described first, followed by
+              the org financials database.
             </p>
             <p style={styles.paragraph}>
               Grantmakers, grants, and grantees are included in this database on the basis that
@@ -133,7 +140,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Survival and Flourishing Fund</h3>
             <p style={styles.paragraph}>
-              Approximately 470 grants (2019 through 2025), parsed from the HTML table on
+              Approximately 470 grants (2018 through 2025), parsed from the HTML table on
               the{' '}
               <a href="https://survivalandflourishing.fund/recommendations" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 recommendations page
@@ -141,9 +148,67 @@ export default function About() {
               All grants are categorized as Long-Term &amp; Existential Risk.
             </p>
 
+            <h3 style={styles.subheading}>Animal Charity Evaluators</h3>
+            <p style={styles.paragraph}>
+              Approximately 320 grants (2015 through 2026) from{' '}
+              <a href="https://animalcharityevaluators.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>ACE</a>'s
+              Movement Grants program, scraped from its{' '}
+              <a href="https://animalcharityevaluators.org/movement-grants/past-movement-grants-recipients/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                past grant recipients page
+              </a>. All grants are categorized as Animal Welfare. Where itemized coverage falls
+              short of ACE's published annual giving, a residual entry tops up the difference.
+            </p>
+
+            <h3 style={styles.subheading}>Future of Life Institute</h3>
+            <p style={styles.paragraph}>
+              Grants with individually published amounts from FLI's{' '}
+              <a href="https://futureoflife.org/grant-program/2024-grants/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                grant program pages
+              </a>, manually curated. FLI's fellowship cohorts and request-for-proposal
+              programs do not publish per-grant amounts and are therefore not included,
+              so FLI's totals here understate its grantmaking.
+            </p>
+
+            <h3 style={styles.subheading}>Meta Charity Funders</h3>
+            <p style={styles.paragraph}>
+              All grants from this funding circle's round retrospectives published on the{' '}
+              <a href="https://forum.effectivealtruism.org/topics/meta-charity-funders-mcf" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                EA Forum
+              </a>{' '}
+              (approximately $3.6M across four rounds since 2023), manually curated.
+              Some grantees are anonymous in the source and are listed as anonymous here.
+              One grant made in pounds is converted at the round's exchange rate.
+            </p>
+
+            <h3 style={styles.subheading}>The Navigation Fund</h3>
+            <p style={styles.paragraph}>
+              Grants in EA-relevant program areas from the Navigation Charitable Fund's
+              complete IRS Form 990 Schedule I, manually classified. Both filed years were
+              reviewed (FY2023 and FY2024); the included grants are farm-animal-welfare
+              support (via Food System Innovations / Humane America Animal Foundation) and a
+              digital-sentience grant. Excluded from every year are large transfers to a
+              donor-advised fund (Vanguard Charitable), open-science and criminal-justice
+              grants, and operational/PR vendor payments. The fund publishes no grants list
+              of its own and its filings carry no award dates beyond the fiscal year-end, so
+              dates are approximate and coverage lags by a year.
+            </p>
+
+            <h3 style={styles.subheading}>Macroscopic Ventures</h3>
+            <p style={styles.paragraph}>
+              Formerly Polaris Ventures and the Center for Emerging Risk Research.
+              Its{' '}
+              <a href="https://macroscopic.org/grants" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                grants page
+              </a>{' '}
+              lists about a dozen grantees but discloses amounts for only two grants
+              (the Cooperative AI Foundation's founding commitment and Carnegie Mellon's
+              FOCAL lab); only those two are included. As a Swiss foundation it files no
+              public accounts, so coverage cannot be verified against totals.
+            </p>
+
             <h2 style={styles.sectionTitle}>Data sources with annual totals only</h2>
             <p style={styles.paragraph}>
-              The following grantmakers do not publish individual grant data with dollar
+              The following grantmaker does not publish individual grant data with dollar
               amounts. Annual totals are used to generate residual entries that represent
               each year's total disbursements as a single record.
             </p>
@@ -156,16 +221,6 @@ export default function About() {
               </a>. These figures represent grants paid, not "money
               moved" (which is a larger figure). Grants span multiple cause areas but cannot
               be broken out by category.
-            </p>
-
-            <h3 style={styles.subheading}>Animal Charity Evaluators</h3>
-            <p style={styles.paragraph}>
-              Annual totals (2014 through 2024) from the EA historical grantmaking spreadsheet.{' '}
-              <a href="https://animalcharityevaluators.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                ACE
-              </a>{' '}
-              publishes giving metrics but no machine-readable grant database.
-              All entries are categorized as Animal Welfare.
             </p>
 
             <h2 style={styles.sectionTitle}>Processing</h2>
@@ -192,6 +247,15 @@ export default function About() {
               same grant appears in multiple sources. Some grants may therefore appear under a
               different grantmaker than the original announcement.
             </p>
+            <p style={styles.paragraph}>
+              A direct consequence is that <strong>Coefficient Giving's (Open Philanthropy's)
+              total understates its actual grantmaking</strong>. The roughly $0.9 billion it has
+              granted to GiveWell-recommended charities is attributed to GiveWell — the proximate
+              grantmaker — rather than counted again under Coefficient. Per-grantmaker totals are
+              therefore de-duplicated, not additive: this avoids double-counting the GiveWell
+              funding channel, at the cost of making Open Philanthropy look smaller than its
+              headline figures, which typically include money it moves through GiveWell.
+            </p>
 
             <h3 style={styles.subheading}>Residual grants</h3>
             <p style={styles.paragraph}>
@@ -203,7 +267,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Inflation adjustment</h3>
             <p style={styles.paragraph}>
-              An optional toggle on the chart converts historical amounts to constant 2024
+              An optional toggle on the chart converts historical amounts to constant 2025
               US dollars using{' '}
               <a href="https://www.bls.gov/cpi/" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Bureau of Labor Statistics
@@ -257,8 +321,8 @@ export default function About() {
                 is updated periodically as grants are published.
               </li>
               <li style={styles.listItem}>
-                Founders Pledge and Animal Charity Evaluators entries are entirely residual —
-                they represent annual totals, not individual grants.
+                Founders Pledge entries are entirely residual — they represent annual totals,
+                not individual grants.
               </li>
               <li style={styles.listItem}>
                 Metadata fields such as country, topics, and description are sparse for many
@@ -268,6 +332,13 @@ export default function About() {
                 2025 and 2026 data is partial and reflects only grants published to date.
               </li>
               <li style={styles.listItem}>
+                Both databases contain only publicly available information — publicly
+                disclosed grants and public financial filings. Grants made privately or not
+                disclosed, funders that publish no grants list, and organizations without
+                public filings are not captured, so totals are a lower bound on actual EA
+                grantmaking and organizational revenue.
+              </li>
+              <li style={styles.listItem}>
                 The database does not include donation platforms (e.g.,{' '}
                 <a href="https://www.givingwhatwecan.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Giving What We Can</a>,{' '}
                 <a href="https://www.thelifeyoucansave.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>The Life You Can Save</a>)
@@ -275,8 +346,8 @@ export default function About() {
               </li>
               <li style={styles.listItem}>
                 Some EA-adjacent grantmakers are not yet tracked, including{' '}
-                <a href="https://www.longview.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Longview Philanthropy</a>{' '}
-                and regranting programs within CEA and Effective Ventures.
+                <a href="https://www.longview.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Longview Philanthropy</a>,
+                which sends fund reports privately to donors and publishes no grants list.
               </li>
               <li style={styles.listItem}>
                 The FTX Future Fund committed approximately $160M in grants during 2022
@@ -284,6 +355,115 @@ export default function About() {
                 which commitments were actually disbursed and which were clawed back during
                 bankruptcy proceedings. There is no authoritative source distinguishing
                 paid grants from unfulfilled commitments.
+              </li>
+            </ul>
+
+            <h2 style={styles.sectionTitle}>The org financials database</h2>
+            <p style={styles.paragraph}>
+              A companion org financials database shows the annual finances — revenue, expenses,
+              assets, and liabilities — of
+              about 100 EA-adjacent organizations that appear as grant recipients, drawn from their
+              public regulatory filings. It is meant to show how much money these organizations
+              actually take in and spend, and what share of their revenue comes from tracked EA
+              grants. Each organization card links to that organization's grants in the grants
+              database, and each grant links back to the recipient's financials.
+            </p>
+
+            <h3 style={styles.subheading}>US organizations (IRS Form 990)</h3>
+            <p style={styles.paragraph}>
+              Annual total revenue, contributions, expenses, and end-of-year assets, liabilities,
+              and net assets for approximately 87 US 501(c)(3) organizations, sourced from the{' '}
+              <a href="https://projects.propublica.org/nonprofits/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                ProPublica Nonprofit Explorer
+              </a>{' '}
+              API, which republishes the IRS's structured extract of Form 990 filings.
+            </p>
+
+            <h3 style={styles.subheading}>UK organizations (Charity Commission)</h3>
+            <p style={styles.paragraph}>
+              Gross income and total expenditure for approximately 12 England-and-Wales registered
+              charities, taken from the{' '}
+              <a href="https://register-of-charities.charitycommission.gov.uk/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Charity Commission
+              </a>{' '}
+              public bulk data extract (the master register and annual-return history). These
+              figures are reported in pounds.
+            </p>
+
+            <h3 style={styles.subheading}>Which organizations are included</h3>
+            <p style={styles.paragraph}>
+              Organizations are included when they appear as recipients in the grants database and
+              publish their own financials. Pure grantmakers and regranters — for example Open
+              Philanthropy, GiveWell, Founders Pledge, Animal Charity Evaluators, and ClimateWorks —
+              are excluded, because their reported revenue reflects pass-through donations rather
+              than programmatic income and would be misleading. Organizations whose tracked EA
+              grants were both under 1% of total revenue and under $1M overall are also omitted, to
+              keep the focus on organizations for which EA funding is material.
+            </p>
+            <p style={styles.paragraph}>
+              Some clearly EA-funded organizations cannot be included: those that are fiscally
+              sponsored by another entity and therefore have no separate filing (their finances are
+              folded into the host's return), and organizations based outside the US and UK, for
+              which no comparable open financial register is currently used.
+            </p>
+
+            <h3 style={styles.subheading}>Tracked EA grants and inferred years</h3>
+            <p style={styles.paragraph}>
+              Within each revenue bar, a darker segment marks the portion attributable to grants
+              recorded in the grants database for that organization and year. For years in which an
+              organization received tracked EA grants but has no filing on record — for instance
+              before its first Form 990 or after its most recent one — an inferred bar is shown
+              using the known grant total as a lower bound on revenue. These are drawn with a dashed
+              outline and a faded extension to signal that actual revenue was likely higher.
+            </p>
+
+            <h3 style={styles.subheading}>Grant timing and carry-forward</h3>
+            <p style={styles.paragraph}>
+              Grantmakers date grants when they are awarded, and often record a multi-year grant as
+              a single dated entry, so the grants logged for a given year can exceed an
+              organization's filed revenue for that year. Because organizations generally recognize
+              that money as revenue over the following year or two, the excess is carried forward —
+              added to the next one or two years up to each year's revenue — rather than shown above
+              revenue or discarded; affected figures are labeled in the chart tooltips. No grant
+              money is dropped. The only amounts left above revenue are those landing in an
+              organization's most recent filing year, where there is not yet a later filing to
+              absorb them.
+            </p>
+
+            <h3 style={styles.subheading}>Currency and inflation</h3>
+            <p style={styles.paragraph}>
+              Per-organization charts are shown in each organization's reporting currency. The
+              aggregate chart converts everything to US dollars using annual average GBP/USD
+              exchange rates. An inflation toggle expresses amounts in constant 2025 prices, using
+              Bureau of Labor Statistics CPI-U for dollar figures and{' '}
+              <a href="https://www.ons.gov.uk/economy/inflationandpriceindices" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                ONS
+              </a>{' '}
+              CPI for pound figures, so each currency is deflated by the appropriate index.
+            </p>
+
+            <h3 style={styles.subheading}>Limitations</h3>
+            <ul style={styles.list}>
+              <li style={styles.listItem}>
+                Regulatory filings lag much like grant publication: the most recent one to two years
+                are frequently missing or incomplete, so recent revenue is undercounted.
+              </li>
+              <li style={styles.listItem}>
+                A filing covers the organization's fiscal year, which may not match the calendar
+                year used to date grants, adding up to a year of apparent timing mismatch on top of
+                the carry-forward described above.
+              </li>
+              <li style={styles.listItem}>
+                The IRS structured extract occasionally omits a filing year, or an organization
+                entirely, even when a return was filed; affected years simply do not appear.
+              </li>
+              <li style={styles.listItem}>
+                Assets and liabilities are point-in-time, end-of-year values, whereas revenue and
+                expenses are annual flows; all are shown together but should be read accordingly.
+              </li>
+              <li style={styles.listItem}>
+                The org financials CSV export reflects the raw filed figures and is not
+                inflation-adjusted.
               </li>
             </ul>
 
@@ -341,19 +521,26 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginBottom: '40px',
     borderRadius: '16px',
     border: '1px solid #e5e7eb',
-    background: 'linear-gradient(135deg, #f8fafc 0%, #eef2ff 45%, #fef3c7 100%)',
+    background: 'radial-gradient(82% 150% at 90% 82%, #e9d5ff 0%, #f8fafc 88%)',
   },
   nav: {
     display: 'flex',
     justifyContent: 'flex-start',
-    gap: '18px',
+    gap: '8px',
     marginBottom: '18px',
+    flexWrap: 'wrap',
   },
   navLink: {
     fontSize: '14px',
     fontWeight: '600',
-    color: '#1f2937',
+    color: '#64748b',
     textDecoration: 'none',
+    padding: '5px 10px',
+    borderRadius: '6px',
+  },
+  navLinkActive: {
+    color: '#0f172a',
+    backgroundColor: 'rgba(15,23,42,0.06)',
   },
   title: {
     fontSize: '48px',
