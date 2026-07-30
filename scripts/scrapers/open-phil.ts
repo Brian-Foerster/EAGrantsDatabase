@@ -97,6 +97,83 @@ function normalizeOrgName(raw: string): string {
     .trim();
 }
 
+// Generic corporate/academic words dropped before comparing org identity, so that
+// "RAND" and "RAND Corporation", or "University of Queensland" and "The University
+// of Queensland in America", reduce to the same core.
+const ORG_STOPWORDS =
+  /\b(inc|llc|ltd|co|corp|corporation|foundation|fund|the|of|for|and|a|an|at|on|in|university|institute|center|centre|school|college|department|dept|research|america|usa)\b/g;
+
+function normalizeOrgCore(raw: string): string {
+  return decodeHtmlEntities(raw || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(ORG_STOPWORDS, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Two org names refer to the same entity if their stopword-stripped cores are equal
+// or one contains the other. The length floor keeps a short core (e.g. "ai") from
+// matching unrelated names.
+function orgCompatible(a: string, b: string): boolean {
+  const na = normalizeOrgCore(a);
+  const nb = normalizeOrgCore(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  const [shorter, longer] = na.length <= nb.length ? [na, nb] : [nb, na];
+  return shorter.length >= 5 && longer.includes(shorter);
+}
+
+function isAlgoliaGrant(g: Grant): boolean {
+  return g.id.startsWith('cg-alg-');
+}
+
+/**
+ * Collapse duplicate grants created by CSV/Algolia overlap. The CSV export and the
+ * Algolia index both list the same grants; grants that match on
+ * normalizeOrgName|amount|date are already de-duplicated inline, but name variants
+ * ("RAND" vs "RAND Corporation") and Algolia's own repeated records (the same grant
+ * indexed under two post_ids) slip through.
+ *
+ * Two Coefficient records are the same grant when they share an exact amount and
+ * month and a compatible org name AND at least one is Algolia-sourced. The
+ * "at least one Algolia" guard is essential: the CSV legitimately lists distinct
+ * grants that share org + amount + month — two different researchers both recorded
+ * as "Unknown", or two same-size grants to one university — so CSV records are never
+ * dropped. Among Algolia records, one is kept; a CSV keeper (richer "Org — Project"
+ * titles and co-funders) always wins, and inherits a URL the keeper lacked.
+ */
+export function dedupeCoefficientDuplicates(grants: Grant[]): { grants: Grant[]; removed: number } {
+  const buckets = new Map<string, Grant[]>();
+  for (const g of grants) {
+    const key = `${Math.round(g.amount)}|${g.date.slice(0, 7)}`;
+    const list = buckets.get(key);
+    if (list) list.push(g);
+    else buckets.set(key, [g]);
+  }
+
+  const drop = new Set<string>();
+  for (const list of buckets.values()) {
+    if (list.length < 2) continue;
+    const csv = list.filter(g => !isAlgoliaGrant(g));
+    const keptAlgolia: Grant[] = [];
+    for (const g of list) {
+      if (!isAlgoliaGrant(g)) continue; // CSV records are authoritative — never dropped
+      const match =
+        csv.find(c => orgCompatible(c.recipient, g.recipient)) ||
+        keptAlgolia.find(k => orgCompatible(k.recipient, g.recipient));
+      if (match) {
+        if (!match.url && g.url) match.url = g.url; // salvage a URL the keeper lacked
+        drop.add(g.id);
+      } else {
+        keptAlgolia.push(g);
+      }
+    }
+  }
+
+  return { grants: grants.filter(g => !drop.has(g.id)), removed: drop.size };
+}
+
 function toMonthStartFromEpoch(epochSeconds?: number): string {
   if (!epochSeconds) return '';
   const d = new Date(epochSeconds * 1000);
@@ -328,9 +405,15 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
     console.log(`[Coefficient] Added ${algoliaAdded} newer Algolia grants not in CSV`);
   }
 
+  // Collapse CSV/Algolia overlap duplicates that inline matching missed.
+  const { grants: dedupedGrants, removed } = dedupeCoefficientDuplicates(grants);
+  if (removed > 0) {
+    console.log(`[Coefficient] Removed ${removed} intra-source duplicates (CSV/Algolia overlap)`);
+  }
+
   // Log year breakdown
   const byYear: Record<string, number> = {};
-  grants.forEach(g => {
+  dedupedGrants.forEach(g => {
     const y = g.date.slice(0, 4);
     byYear[y] = (byYear[y] || 0) + 1;
   });
@@ -338,7 +421,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
 
   return {
     source: 'coefficient-giving',
-    grants,
+    grants: dedupedGrants,
     errors,
     scrapedAt: new Date().toISOString(),
   };
