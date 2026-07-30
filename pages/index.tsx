@@ -5,6 +5,7 @@ import { format, parseISO } from 'date-fns';
 import MiniSearch from 'minisearch';
 import ReactECharts from 'echarts-for-react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { writeupKey } from '../lib/writeup-key';
 
 // Build timestamp for cache busting (set at build time)
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
@@ -346,13 +347,18 @@ export default function Home() {
           throw new Error('Invalid grants data format');
         }
 
-        // Merge manually identified per-grant writeup links (keyed by grant id).
-        // Mostly archived Open Phil grant pages, matched to their grants by slug.
+        // Merge manually identified per-grant writeup links (mostly archived Open
+        // Phil grant pages). Keyed by a stable recipient|amount|month content key,
+        // not grant id, so re-scrapes that reassign ids don't misalign them — see
+        // lib/writeup-key.ts.
         try {
           const wRes = await fetch(`${BASE_PATH}/data/grant-writeups.json?v=${BUILD_VERSION}`);
           if (wRes.ok) {
             const writeups: Record<string, string> = await wRes.json();
-            grantsData.forEach((g: MinGrant) => { if (writeups[g.id]) g.url = writeups[g.id]; });
+            grantsData.forEach((g: MinGrant) => {
+              const wk = writeupKey(g.recipient, g.amount, g.date);
+              if (writeups[wk]) g.url = writeups[wk];
+            });
           }
         } catch {
           /* writeup links are an optional enhancement */

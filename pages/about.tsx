@@ -240,7 +240,7 @@ export default function About() {
               grants labeled as funding to GiveWell-recommended charities are excluded to
               avoid double-counting with GiveWell's own records. Second, cross-source fuzzy
               matching identifies grants to the same recipient in the same year with amounts
-              within 10%, merging approximately 51 additional duplicates.
+              within 10%, merging approximately 55 additional duplicates.
             </p>
             <p style={styles.paragraph}>
               These safeguards prioritize consistent totals over perfect attribution when the

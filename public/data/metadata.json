@@ -1,30 +1,30 @@
 {
-  "totalGrants": 6360,
-  "totalAmount": 7351755878.699999,
+  "totalGrants": 6517,
+  "totalAmount": 7424943321.939999,
   "grantmakers": [
     "Coefficient Giving",
     "GiveWell",
-    "ACE",
     "EA Funds",
+    "ACE",
     "SFF",
-    "Founders Pledge",
-    "FLI",
     "Meta Charity Funders",
-    "Macroscopic",
-    "Navigation Fund"
+    "Navigation Fund",
+    "FLI",
+    "Founders Pledge",
+    "Macroscopic"
   ],
   "categories": [
     "Other",
-    "GH",
     "LTXR",
-    "Policy",
+    "GH",
     "AW",
     "Meta",
+    "Policy",
     "Science"
   ],
   "dateRange": {
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-06-13T02:49:30.827Z"
+  "lastUpdated": "2026-07-30T07:43:29.119Z"
 }
