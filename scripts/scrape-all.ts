@@ -24,6 +24,14 @@ import { deduplicateGrants } from './dedup';
 import { computeResiduals } from './residuals';
 import { summarize, saveScrapeResult } from './scraper-utils';
 import { computeKnownTotals, findStaleBaselines, getEffectivePublishedTotal } from './annual-totals-utils';
+import {
+  checkSources,
+  updateBaselines,
+  loadBaselines,
+  saveBaselines,
+  DEFAULT_TOLERANCE,
+  SourceObservation,
+} from './source-guard';
 import annualTotals from './mappings/annual-totals.json';
 
 async function main() {
@@ -39,13 +47,16 @@ async function main() {
   console.log();
 
   const results: ScrapeResult[] = [];
+  const observations: SourceObservation[] = [];
+  // `key` is the guard's identity for a source and must stay stable: a scraper that
+  // throws never returns a ScrapeResult.source to fall back on.
   const scrapers = [
-    { name: 'EA Funds', fn: scrapeEAFunds },
-    { name: 'Open Phil', fn: scrapeOpenPhil },
-    { name: 'SFF', fn: scrapeSFF },
-    { name: 'GiveWell', fn: scrapeGiveWell },
-    { name: 'ACE', fn: scrapeACE },
-    { name: 'Supplemental', fn: scrapeSupplemental },
+    { name: 'EA Funds', key: 'ea-funds', fn: scrapeEAFunds },
+    { name: 'Open Phil', key: 'coefficient-giving', fn: scrapeOpenPhil },
+    { name: 'SFF', key: 'sff', fn: scrapeSFF },
+    { name: 'GiveWell', key: 'givewell', fn: scrapeGiveWell },
+    { name: 'ACE', key: 'ace', fn: scrapeACE },
+    { name: 'Supplemental', key: 'supplemental', fn: scrapeSupplemental },
   ];
 
   // Run scrapers sequentially to avoid rate limiting
@@ -56,17 +67,47 @@ async function main() {
       results.push(result);
       saveScrapeResult(result);
       console.log(`  ${summarize(result)}`);
+      observations.push({
+        key: scraper.key,
+        grants: result.grants.length,
+        amount: result.grants.reduce((s, g) => s + g.amount, 0),
+        errors: result.errors,
+      });
     } catch (err: any) {
       console.error(`  ERROR: ${scraper.name} failed: ${err.message}`);
       results.push({
-        source: scraper.name.toLowerCase().replace(/\s+/g, '-'),
+        source: scraper.key,
         grants: [],
         errors: [err.message],
         scrapedAt: new Date().toISOString(),
       });
+      observations.push({ key: scraper.key, grants: 0, amount: 0, errors: [err.message] });
     }
     console.log();
   }
+
+  // ─── Phase 1.5: Source Guard ────────────────────────────────
+  console.log('── Phase 1.5: Source Guard ──');
+  const allowRegression = process.argv.includes('--allow-regression');
+  const baselines = loadBaselines();
+  const violations = checkSources(observations, baselines);
+
+  if (violations.length === 0) {
+    console.log(
+      `All ${observations.length} sources within ${(DEFAULT_TOLERANCE * 100).toFixed(0)}% of baseline.`
+    );
+  } else {
+    for (const v of violations) console.error(`  ${v.key}: ${v.message}`);
+    if (!allowRegression) {
+      console.error();
+      console.error(`ABORTING: ${violations.length} source(s) look broken; no files were written.`);
+      console.error('The previous lib/scraped-grants.json is untouched. Re-run once the upstream');
+      console.error('source recovers, or pass --allow-regression if the drop is real and expected.');
+      process.exit(1);
+    }
+    console.warn('  --allow-regression passed; continuing despite the above.');
+  }
+  console.log();
 
   // ─── Phase 2: Combine and Deduplicate ───────────────────────
   console.log('── Phase 2: Deduplication ──');
@@ -97,6 +138,9 @@ async function main() {
   // Also save a lean version for the aggregator to use
   const leanPath = path.join(process.cwd(), 'lib', 'scraped-grants.json');
   fs.writeFileSync(leanPath, JSON.stringify(finalGrants));
+
+  // Only a run that got past the guard and wrote output is allowed to move the bar.
+  saveBaselines(updateBaselines(observations, baselines));
 
   // ─── Validation Report ──────────────────────────────────────
   console.log('── Validation Report ──');

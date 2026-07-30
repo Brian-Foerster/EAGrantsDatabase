@@ -1,0 +1,32 @@
+{
+  "ace": {
+    "grants": 309,
+    "amount": 8731493,
+    "updatedAt": "2026-07-30T01:49:32.061Z"
+  },
+  "coefficient-giving": {
+    "grants": 3523,
+    "amount": 5208809360,
+    "updatedAt": "2026-07-30T01:49:32.061Z"
+  },
+  "ea-funds": {
+    "grants": 1859,
+    "amount": 127801525,
+    "updatedAt": "2026-07-30T01:49:32.061Z"
+  },
+  "givewell": {
+    "grants": 493,
+    "amount": 2262055344,
+    "updatedAt": "2026-07-30T01:49:32.061Z"
+  },
+  "sff": {
+    "grants": 471,
+    "amount": 142516706,
+    "updatedAt": "2026-07-30T01:49:32.061Z"
+  },
+  "supplemental": {
+    "grants": 46,
+    "amount": 47392306,
+    "updatedAt": "2026-07-30T01:49:32.061Z"
+  }
+}
