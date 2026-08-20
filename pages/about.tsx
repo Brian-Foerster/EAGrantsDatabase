@@ -83,8 +83,8 @@ export default function About() {
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
-              the Effective Altruism community. It currently includes over 6,300 grants
-              totaling approximately $7.4 billion, spanning 2012 to 2026.
+              the Effective Altruism community. It currently includes over 6,500 grants
+              totaling approximately $7.5 billion, spanning 2012 to 2026.
             </p>
             <p style={styles.paragraph}>
               The site has two complementary parts: this grants database of individual grants, and a
