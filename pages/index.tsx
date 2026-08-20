@@ -310,10 +310,10 @@ export default function Home() {
   // Uniform sizing for all chart-control tabs, shrinking together on smaller
   // screens so they stay on one row as long as reasonable.
   const chartTabSize = isPhonePortrait
-    ? { padding: '6px 9px', fontSize: '12px' }
+    ? { padding: '8px 12px', fontSize: '13px' }
     : isMobile
-    ? { padding: '7px 12px', fontSize: '13px' }
-    : { padding: '8px 14px', fontSize: '14px' };
+    ? { padding: '9px 15px', fontSize: '14px' }
+    : { padding: '10px 17px', fontSize: '15px' };
   const isCompact = windowWidth < 1024;
   const canOverlayChartTotal = !isMobile && windowWidth >= 1200;
   const shouldAlignExpandedLabels = isMobile && windowWidth >= 360;
@@ -1723,7 +1723,7 @@ export default function Home() {
                   ...chartTabSize,
                 }}
               >
-                {isPhonePortrait ? 'Year' : 'By Year'}
+                {isMobile ? 'Year' : 'By Year'}
               </button>
               <button
                 onClick={() => setChartView('month')}
@@ -1733,10 +1733,10 @@ export default function Home() {
                   ...chartTabSize,
                 }}
               >
-                {isPhonePortrait ? 'Month' : 'By Month'}
+                {isMobile ? 'Month' : 'By Month'}
               </button>
-              <span style={{ ...styles.controlsDivider, ...(isPhonePortrait ? { height: '18px', margin: '0 3px' } : {}) }} />
-              {!isPhonePortrait && <span style={styles.breakdownLabel}>Break down by:</span>}
+              <span style={{ ...styles.controlsDivider, ...(isMobile ? { height: '18px', margin: '0 3px' } : {}) }} />
+              {!isMobile && <span style={styles.breakdownLabel}>Break down by:</span>}
               <button
                 onClick={() => setTimeBreakdown('total')}
                 style={{
@@ -1755,7 +1755,7 @@ export default function Home() {
                   ...chartTabSize,
                 }}
               >
-                {isPhonePortrait ? 'Funder' : 'By Funder'}
+                {isMobile ? 'Funder' : 'By Funder'}
               </button>
               <button
                 onClick={() => setTimeBreakdown('byCategory')}
@@ -1765,7 +1765,7 @@ export default function Home() {
                   ...chartTabSize,
                 }}
               >
-                {isPhonePortrait ? 'Category' : 'By Category'}
+                {isMobile ? 'Category' : 'By Category'}
               </button>
               {!isMobile && <span style={styles.controlsDivider} />}
               <label style={{

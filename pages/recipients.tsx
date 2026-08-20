@@ -261,11 +261,8 @@ function BarChartWithAxis({ entries, color, currency = 'USD', minYear, maxYear, 
         const barH = Math.max(0.5, (income / yMax) * CIH);
         const x = xStart + i * (barW + gap);
         const barY = CT + CIH - barH;
-        const tooltip = `${year}: ${formatIncome(income, currency)}${isInferred ? ' (known EA grants only — actual revenue likely higher)' : ''}`;
+        const tooltip = `${year}: ${formatIncome(income, currency)}${isInferred ? ' (known EA grants only — actual revenue could be higher)' : ''}`;
         if (isInferred) {
-          const lx = x + 0.75;
-          const rx2 = x + barW - 0.75;
-          const bot = barY + barH - 0.75;
           const extH = Math.min(14, Math.max(0, barY - CT));
           const extTop = barY - extH;
           const fgId = `${idPrefix}-fg-${year}`;
@@ -274,8 +271,8 @@ function BarChartWithAxis({ entries, color, currency = 'USD', minYear, maxYear, 
             <g key={year}>
               <defs>
                 <linearGradient id={fgId} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%"   stopColor={color} stopOpacity={0.32} />
-                  <stop offset="100%" stopColor={color} stopOpacity={0.42} />
+                  <stop offset="0%"   stopColor={color} stopOpacity={0.30} />
+                  <stop offset="100%" stopColor={color} stopOpacity={0.55} />
                 </linearGradient>
                 <linearGradient id={egId} x1="0" y1={extTop} x2="0" y2={barY} gradientUnits="userSpaceOnUse">
                   <stop offset="0%"   stopColor={color} stopOpacity={0} />
@@ -284,9 +281,6 @@ function BarChartWithAxis({ entries, color, currency = 'USD', minYear, maxYear, 
               </defs>
               {extH > 0 && <rect x={x} y={extTop} width={barW} height={extH} fill={`url(#${egId})`} />}
               <rect x={x} y={barY} width={barW} height={barH} fill={`url(#${fgId})`} rx={1} />
-              <line x1={lx}  y1={barY} x2={lx}  y2={bot} stroke={color} strokeOpacity={0.7} strokeWidth={1.5} strokeDasharray="3,2" />
-              <line x1={lx}  y1={bot}  x2={rx2}  y2={bot} stroke={color} strokeOpacity={0.85} strokeWidth={1.5} strokeDasharray="3,2" />
-              <line x1={rx2} y1={barY} x2={rx2}  y2={bot} stroke={color} strokeOpacity={0.7} strokeWidth={1.5} strokeDasharray="3,2" />
               {/* Full-column hit area so tooltip fires above the bar too */}
               <rect x={x} y={CT} width={barW} height={CIH} fill="transparent"
                 onMouseMove={showBar(year, x + barW / 2, barY, tooltip)} />
@@ -611,10 +605,10 @@ export default function Recipients() {
   // Uniform sizing for chart-control tabs (matches the grants database), so they
   // shrink together on smaller screens and stay on one row as long as reasonable.
   const chartTabSize = isPhonePortrait
-    ? { padding: '6px 9px', fontSize: '12px' }
+    ? { padding: '8px 12px', fontSize: '13px' }
     : isMobile
-    ? { padding: '7px 12px', fontSize: '13px' }
-    : { padding: '8px 14px', fontSize: '14px' };
+    ? { padding: '9px 15px', fontSize: '14px' }
+    : { padding: '10px 17px', fontSize: '15px' };
 
   const categories = useMemo(() => {
     const seen = new Set<string>();
@@ -1017,7 +1011,7 @@ export default function Recipients() {
             ...styles.chartControlsRow,
             ...(isPhonePortrait ? { gap: '6px' } : {}),
           }}>
-            {!isPhonePortrait && <span style={styles.breakdownLabel}>Break down by:</span>}
+            {!isMobile && <span style={styles.breakdownLabel}>Break down by:</span>}
             <button
               onClick={() => setChartBreakdown('total')}
               style={{ ...styles.breakdownTab, ...(chartBreakdown === 'total' ? styles.breakdownTabActive : {}), ...chartTabSize }}
@@ -1028,7 +1022,7 @@ export default function Recipients() {
               onClick={() => setChartBreakdown('byCategory')}
               style={{ ...styles.breakdownTab, ...(chartBreakdown === 'byCategory' ? styles.breakdownTabActive : {}), ...chartTabSize }}
             >
-              {isPhonePortrait ? 'Category' : 'By Category'}
+              {isMobile ? 'Category' : 'By Category'}
             </button>
             <button
               onClick={() => setShowEAGrants(v => !v)}
@@ -1078,7 +1072,7 @@ export default function Recipients() {
             </button>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
-            <span style={styles.breakdownLabel}>Show:</span>
+            {!isPhonePortrait && <span style={styles.breakdownLabel}>Show:</span>}
             {(['income', 'expenses', 'assets', 'liabilities'] as Metric[]).map(m => {
               const active = globalMetric === m;
               const mColor = METRIC_COLORS[m];
@@ -1092,6 +1086,9 @@ export default function Recipients() {
                     borderRadius: '4px', cursor: 'pointer',
                     backgroundColor: active ? mColor : 'white',
                     color: active ? 'white' : '#333',
+                    // On phones lay the four metrics out as a balanced 2×2 grid rather
+                    // than a 3-then-1 orphaned wrap.
+                    ...(isPhonePortrait ? { flex: '1 1 calc(50% - 4px)' } : {}),
                   }}
                 >
                   {METRIC_LABELS[m]}
@@ -1099,13 +1096,17 @@ export default function Recipients() {
               );
             })}
             {globalMetric === 'income' && (
-              <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#94a3b8', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <span style={{ display: 'inline-block', width: '10px', height: '10px', backgroundColor: METRIC_COLORS.income, borderRadius: '2px', flexShrink: 0 }} />
-                  Dark green = tracked EA grants
-                </span>
-                <span>·</span>
-                <span>Dashed = EA grants only</span>
+              <span style={{ marginLeft: isPhonePortrait ? 0 : 'auto', ...(isPhonePortrait ? { flexBasis: '100%' } : {}), fontSize: '12px', color: '#64748b', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+                {[
+                  { sw: GRANTS_COLOR, label: 'Total revenue' },
+                  { sw: METRIC_COLORS.income, label: 'From tracked EA grants' },
+                  { sw: 'linear-gradient(to top, rgba(16,185,129,0.7), rgba(16,185,129,0.04))', label: 'only EA grants available' },
+                ].map(({ sw, label }) => (
+                  <span key={label} style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                    <span style={{ display: 'inline-block', width: '11px', height: '13px', background: sw, borderRadius: '2px', flexShrink: 0 }} />
+                    {label}
+                  </span>
+                ))}
               </span>
             )}
           </div>
