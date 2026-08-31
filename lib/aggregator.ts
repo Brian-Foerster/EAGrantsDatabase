@@ -3,6 +3,29 @@ import * as path from 'path';
 import { Grant } from '../types/grants';
 
 const SCRAPED_DATA_PATH = path.join(process.cwd(), 'lib', 'scraped-grants.json');
+// PROTOTYPE: optional regrant sources (e.g. BlueDot) merged in at build time.
+// Kept out of the committed scraped data; delete the file to disable.
+const REGRANT_PROTOTYPE_PATHS = [
+  path.join(process.cwd(), 'data', 'raw', 'bluedot-regrants.json'),
+  path.join(process.cwd(), 'data', 'raw', 'manifund-regrants.json'),
+];
+
+function loadRegrantPrototypes(): Grant[] {
+  const extra: Grant[] = [];
+  for (const p of REGRANT_PROTOTYPE_PATHS) {
+    if (!fs.existsSync(p)) continue;
+    try {
+      const g = JSON.parse(fs.readFileSync(p, 'utf-8'));
+      if (Array.isArray(g) && g.length) {
+        extra.push(...g);
+        console.log(`[prototype] Merged ${g.length} regrant grants from ${path.basename(p)}`);
+      }
+    } catch (err) {
+      console.error(`[prototype] Failed to read ${p}:`, err);
+    }
+  }
+  return extra;
+}
 
 /**
  * Load grants from scraped data file if available,
@@ -14,7 +37,7 @@ export async function aggregateAllGrants(): Promise<Grant[]> {
     try {
       const data = JSON.parse(fs.readFileSync(SCRAPED_DATA_PATH, 'utf-8'));
       console.log(`Loaded ${data.length} grants from scraped data`);
-      return data;
+      return [...data, ...loadRegrantPrototypes()];
     } catch (err) {
       console.error('Error reading scraped data, falling back to mock:', err);
     }

@@ -97,6 +97,39 @@ function normalizeOrgName(raw: string): string {
     .trim();
 }
 
+// Open Phil / Coefficient funds GiveWell's recommendations, and GiveWell records the
+// disbursements — so a Coefficient grant to a GiveWell charity is the GiveWell channel
+// and is excluded to avoid double-counting. This is matched on recipient/title, not
+// just the focus-area label, because Coefficient has moved GiveWell-channel grants
+// into other funds (e.g. a $212M AMF net grant filed under "Global Health & Wellbeing
+// Opportunities" rather than the literal "GiveWell-Recommended Charities" tag).
+//
+// Orgs whose Coefficient funding is entirely their GiveWell top/standout program:
+const GIVEWELL_ORGS = [
+  'against malaria foundation',
+  'malaria consortium',
+  'new incentives',
+  'helen keller',
+  'schistosomiasis control',
+  'unlimit health',
+];
+// GiveWell programs run by orgs that ALSO take non-GiveWell (direct) Coefficient
+// funding — matched in recipient OR title so e.g. Evidence Action's Deworm the World
+// is excluded while its incubator / No Lean Season / Iron & Folic grants are not, and
+// Sightsavers deworming is excluded but its trachoma research is not.
+const GIVEWELL_PROGRAMS = [
+  'deworm the world',
+  'dispensers for safe water',
+];
+
+function isGiveWellChannel(recipient: string, title: string, focusArea: string): boolean {
+  if (focusArea.toLowerCase().includes('givewell')) return true;
+  const r = (recipient || '').toLowerCase();
+  if (GIVEWELL_ORGS.some(o => r.includes(o))) return true;
+  const rt = r + ' ' + (title || '').toLowerCase();
+  return GIVEWELL_PROGRAMS.some(p => rt.includes(p));
+}
+
 // Generic corporate/academic words dropped before comparing org identity, so that
 // "RAND" and "RAND Corporation", or "University of Queensland" and "The University
 // of Queensland in America", reduce to the same core.
@@ -316,12 +349,17 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
     const focusArea = decodeHtmlEntities(r['Focus Area'] || '');
     const category = mapFocusArea(focusArea);
 
-    // Flag GiveWell-recommended charity grants for dedup
-    const isGiveWellRecommended = focusArea.toLowerCase().includes('givewell');
-
     // Build description from metadata rather than duplicating title
     const descParts: string[] = [];
     const grantTitle = decodeHtmlEntities(r.Grant || '');
+
+    // Flag GiveWell-recommended charity grants for dedup (by focus-area label,
+    // recipient, or program title — see isGiveWellChannel).
+    const isGiveWellRecommended = isGiveWellChannel(
+      decodeHtmlEntities(r['Organization Name'] || ''),
+      grantTitle,
+      focusArea
+    );
     if (grantTitle) descParts.push(grantTitle);
     if (focusArea) descParts.push(`Focus area: ${focusArea}`);
     const description = descParts.length > 1 ? descParts.join('. ') : '';
@@ -372,7 +410,7 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
 
     const focusArea = decodeHtmlEntities(hit['focus-area']?.[0] || '');
     const category = mapFocusArea(focusArea);
-    const isGiveWellRecommended = focusArea.toLowerCase().includes('givewell');
+    const isGiveWellRecommended = isGiveWellChannel(org, decodeHtmlEntities(hit.title || ''), focusArea);
 
     grants.push({
       id: `cg-alg-${String(algoliaAdded).padStart(5, '0')}`,

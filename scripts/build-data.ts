@@ -207,6 +207,7 @@ function createMinimizedGrants(grants: Grant[]) {
     url: grant.url,
     description: grant.description || '',
     ...(grant.is_residual ? { is_residual: true } : {}),
+    ...(grant.regrant ? { regrant: true, regrant_of: grant.regrant_of } : {}),
   }));
 }
 
@@ -273,9 +274,34 @@ async function buildData() {
   console.log('✅ Created by_year_category.json');
   
   // Generate metadata
+  // Regrant apportioning (all-context). A regrantor's dollars count net of the tracked
+  // upstream grants that funded it — factor = max(0, (R - U) / R) where R is the
+  // regrantor's total regranting and U is the tracked grants to it (matched by
+  // regrant_of recipient names) — so funder -> regrantor -> recipient isn't double
+  // counted. BlueDot (U > R) floors to 0; Manifund (U << R) keeps almost all.
+  const normName = (s: string) => String(s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const regrantorTotal: Record<string, number> = {};
+  const regrantorAliases: Record<string, string[]> = {};
+  const upstreamByRecipient: Record<string, number> = {};
+  for (const g of grants) {
+    upstreamByRecipient[normName(g.recipient)] = (upstreamByRecipient[normName(g.recipient)] || 0) + g.amount;
+    if (g.regrant) {
+      regrantorTotal[g.grantmaker] = (regrantorTotal[g.grantmaker] || 0) + g.amount;
+      if (g.regrant_of) regrantorAliases[g.grantmaker] = g.regrant_of;
+    }
+  }
+  const regrantFactor: Record<string, number> = {};
+  for (const name of Object.keys(regrantorTotal)) {
+    const R = regrantorTotal[name];
+    const U = (regrantorAliases[name] || []).reduce((s, a) => s + (upstreamByRecipient[normName(a)] || 0), 0);
+    regrantFactor[name] = R > 0 ? Math.max(0, (R - U) / R) : 1;
+  }
+  const countedAmount = (g: Grant) => (g.regrant ? g.amount * (regrantFactor[g.grantmaker] ?? 1) : g.amount);
+
   const metadata = {
     totalGrants: grants.length,
-    totalAmount: grants.reduce((sum, g) => sum + g.amount, 0),
+    // Regrants contribute net of the tracked upstream funding that already counts them.
+    totalAmount: grants.reduce((sum, g) => sum + countedAmount(g), 0),
     grantmakers: Array.from(new Set(grants.map(g => g.grantmaker))),
     categories: Array.from(new Set(grants.map(g => g.category).filter(Boolean))),
     dateRange: {

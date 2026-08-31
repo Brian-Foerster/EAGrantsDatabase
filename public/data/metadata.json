@@ -1,22 +1,23 @@
 {
-  "totalGrants": 6564,
-  "totalAmount": 7529886083.939999,
+  "totalGrants": 7683,
+  "totalAmount": 7572763167.679802,
   "grantmakers": [
     "Coefficient Giving",
     "GiveWell",
     "EA Funds",
     "ACE",
     "SFF",
+    "FLI",
     "Meta Charity Funders",
     "Navigation Fund",
-    "FLI",
     "Founders Pledge",
-    "Macroscopic"
+    "BlueDot Impact",
+    "Manifund"
   ],
   "categories": [
     "Other",
-    "GH",
     "LTXR",
+    "GH",
     "Meta",
     "AW",
     "Policy",
@@ -26,5 +27,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-08-20T19:48:52.696Z"
+  "lastUpdated": "2026-08-31T20:40:33.733Z"
 }

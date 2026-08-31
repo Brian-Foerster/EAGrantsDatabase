@@ -45,8 +45,12 @@ index-old.tsx
 /data/processed/
 /data/raw/*
 # ...except manually-curated supplemental grant inputs (FLI, Meta Charity Funders,
-# Macroscopic, Navigation), which cannot be re-fetched from the web and must be versioned.
+# Navigation), which cannot be re-fetched from the web and must be versioned.
 !/data/raw/supplemental/
+# ...and the regrant source data (BlueDot, Manifund), which build-data merges in and
+# which CI needs to rebuild public/data consistently.
+!/data/raw/bluedot-regrants.json
+!/data/raw/manifund-regrants.json
 
 # NOTE: lib/scraped-grants.json IS tracked in git so GitHub Actions can build the site
 # Run "npm run scrape" locally to update it, then commit the changes

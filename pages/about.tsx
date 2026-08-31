@@ -83,8 +83,8 @@ export default function About() {
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
-              the Effective Altruism community. It currently includes over 6,500 grants
-              totaling approximately $7.5 billion, spanning 2012 to 2026.
+              the Effective Altruism community. It currently includes over 7,600 grants
+              totaling approximately $7.6 billion, spanning 2012 to 2026.
             </p>
             <p style={styles.paragraph}>
               The site has two complementary parts: this grants database of individual grants, and a
@@ -161,12 +161,12 @@ export default function About() {
 
             <h3 style={styles.subheading}>Future of Life Institute</h3>
             <p style={styles.paragraph}>
-              Grants with individually published amounts from FLI's{' '}
-              <a href="https://futureoflife.org/grant-program/2024-grants/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+              Grants with individually published amounts across FLI's annual{' '}
+              <a href="https://futureoflife.org/grant-program/" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 grant program pages
-              </a>, manually curated. FLI's fellowship cohorts and request-for-proposal
-              programs do not publish per-grant amounts and are therefore not included,
-              so FLI's totals here understate its grantmaking.
+              </a>{' '}(2015 onward), parsed from those pages. FLI's fellowship cohorts and
+              request-for-proposal programs do not publish per-grant amounts and are therefore
+              not included, so FLI's totals here understate its grantmaking.
             </p>
 
             <h3 style={styles.subheading}>Meta Charity Funders</h3>
@@ -193,17 +193,21 @@ export default function About() {
               dates are approximate and coverage lags by a year.
             </p>
 
-            <h3 style={styles.subheading}>Macroscopic Ventures</h3>
+            <h3 style={styles.subheading}>BlueDot Impact and Manifund (regrants)</h3>
             <p style={styles.paragraph}>
-              Formerly Polaris Ventures and the Center for Emerging Risk Research.
-              Its{' '}
-              <a href="https://macroscopic.org/grants" target="_blank" rel="noopener noreferrer" style={styles.link}>
-                grants page
-              </a>{' '}
-              lists about a dozen grantees but discloses amounts for only two grants
-              (the Cooperative AI Foundation's founding commitment and Carnegie Mellon's
-              FOCAL lab); only those two are included. As a Swiss foundation it files no
-              public accounts, so coverage cannot be verified against totals.
+              Rapid grants from{' '}
+              <a href="https://bluedot.org/grants/rapid" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                BlueDot Impact
+              </a>{' '}and project funding from{' '}
+              <a href="https://manifund.org" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Manifund
+              </a>, both pulled from their public data. These are regrantors whose money comes
+              largely from grantmakers already tracked here (BlueDot primarily from Coefficient
+              Giving; Manifund from a mix of donors). To avoid double-counting the
+              funder&nbsp;&rarr;&nbsp;regrantor&nbsp;&rarr;&nbsp;recipient chain, each regrantor's
+              grants are counted <strong>net of the tracked grants that funded it</strong> — so
+              they add little or nothing to the headline total, and count in full only when their
+              upstream funder is removed from the current view.
             </p>
 
             <h2 style={styles.sectionTitle}>Data sources with annual totals only</h2>
@@ -236,11 +240,13 @@ export default function About() {
 
             <h3 style={styles.subheading}>Deduplication</h3>
             <p style={styles.paragraph}>
-              Two deduplication layers are applied. First, approximately 157 Coefficient Giving
-              grants labeled as funding to GiveWell-recommended charities are excluded to
-              avoid double-counting with GiveWell's own records. Second, cross-source fuzzy
+              Two deduplication layers are applied. First, approximately 173 Coefficient Giving
+              grants to GiveWell's recommended charities (Against Malaria Foundation, Malaria
+              Consortium, New Incentives, and others) are excluded to avoid double-counting with
+              GiveWell's own records — matched by recipient and program, since Coefficient files
+              some GiveWell-channel grants under other fund labels. Second, cross-source fuzzy
               matching identifies grants to the same recipient in the same year with amounts
-              within 10%, merging approximately 55 additional duplicates.
+              within 10%, merging approximately 49 additional duplicates.
             </p>
             <p style={styles.paragraph}>
               These safeguards prioritize consistent totals over perfect attribution when the
@@ -249,7 +255,7 @@ export default function About() {
             </p>
             <p style={styles.paragraph}>
               A direct consequence is that <strong>Coefficient Giving's (Open Philanthropy's)
-              total understates its actual grantmaking</strong>. The roughly $0.9 billion it has
+              total understates its actual grantmaking</strong>. The roughly $1.25 billion it has
               granted to GiveWell-recommended charities is attributed to GiveWell — the proximate
               grantmaker — rather than counted again under Coefficient. Per-grantmaker totals are
               therefore de-duplicated, not additive: this avoids double-counting the GiveWell

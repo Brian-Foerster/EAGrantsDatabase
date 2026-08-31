@@ -13,6 +13,11 @@ const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString(
 // Base path for deployment (set via NEXT_PUBLIC_BASE_PATH when needed)
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
 
+// Normalize an org name for matching a regrant's upstream grants (`regrant_of`)
+// against recipients present in the current view.
+const normalizeRegrantName = (name: string): string =>
+  String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
 // Funds/focus areas that are excluded by default (not generally considered core EA)
 // These grants are only shown when explicitly selected in the Fund filter
 const NON_CORE_EA_FUNDS: Record<string, string> = {
@@ -41,6 +46,8 @@ interface MinGrant {
   url?: string;
   description?: string;
   is_residual?: boolean;
+  regrant?: boolean;
+  regrant_of?: string[];
 }
 
 interface Metadata {
@@ -962,6 +969,50 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // PROTOTYPE — regrant apportioning. A regrantor (BlueDot, Manifund) contributes its
+  // regranting NET of the tracked upstream grants that funded it, so
+  // funder -> regrantor -> recipient isn't double-counted. Per regrantor,
+  //   factor = max(0, (R - U_scope) / R)
+  // where R is its total regranting and U_scope is the grants TO it (matched by
+  // recipient name via `regrant_of`) that fall in the current Grantmaker scope. Scope
+  // is the Grantmaker selection ALONE — never the year/category/amount slice — because
+  // regrantor funds roll over across years. Each regrant is then counted at its
+  // regrantor's factor: BlueDot (U $32M > R $1.24M) floors to 0; Manifund
+  // (U $0.16M << R $16M) keeps ~99%.
+  const regrantFactor = useMemo(() => {
+    const total = new Map<string, number>();
+    const aliases = new Map<string, string[]>();
+    for (const g of grants) {
+      if (!g.regrant) continue;
+      total.set(g.grantmaker, (total.get(g.grantmaker) || 0) + g.amount);
+      if (g.regrant_of) aliases.set(g.grantmaker, g.regrant_of);
+    }
+    const inScope = selectedGrantmakers.length > 0
+      ? grants.filter(g => selectedGrantmakers.includes(g.grantmaker))
+      : grants;
+    const upstream = new Map<string, number>();
+    for (const g of inScope) {
+      const k = normalizeRegrantName(g.recipient);
+      upstream.set(k, (upstream.get(k) || 0) + g.amount);
+    }
+    const f = new Map<string, number>();
+    for (const [name, R] of total) {
+      const U = (aliases.get(name) || []).reduce((s, a) => s + (upstream.get(normalizeRegrantName(a)) || 0), 0);
+      f.set(name, R > 0 ? Math.max(0, (R - U) / R) : 1);
+    }
+    return f;
+  }, [grants, selectedGrantmakers]);
+  const countedAmount = useCallback(
+    (g: MinGrant) => (g.regrant ? g.amount * (regrantFactor.get(g.grantmaker) ?? 1) : g.amount),
+    [regrantFactor]
+  );
+  // True when the view contains regrants whose dollars are being netted down (factor < 1),
+  // so totals are below the sum of the listed grants — surfaced as a chart footnote.
+  const hasNettedRegrants = useMemo(
+    () => filteredAndSortedGrants.some(g => g.regrant && (regrantFactor.get(g.grantmaker) ?? 1) < 1),
+    [filteredAndSortedGrants, regrantFactor]
+  );
+
   const chartData = useMemo(() => {
     const data = filteredAndSortedGrants;
 
@@ -974,22 +1025,23 @@ export default function Home() {
       const { year, yearMonth: ym } = getYearMonthFromDate(g.date);
       const funder = displayGrantmaker(g.grantmaker);
       const cat = displayCategory(g.category) || 'Uncategorized';
+      const amt = countedAmount(g);
 
       if (!byYearMap[year]) byYearMap[year] = { count: 0, total: 0 };
       byYearMap[year].count += 1;
-      byYearMap[year].total += g.amount;
+      byYearMap[year].total += amt;
 
       if (!byMonthMap[ym]) byMonthMap[ym] = { count: 0, total: 0 };
       byMonthMap[ym].count += 1;
-      byMonthMap[ym].total += g.amount;
+      byMonthMap[ym].total += amt;
 
       if (!byFunderMap[funder]) byFunderMap[funder] = { count: 0, total: 0 };
       byFunderMap[funder].count += 1;
-      byFunderMap[funder].total += g.amount;
+      byFunderMap[funder].total += amt;
 
       if (!byCatMap[cat]) byCatMap[cat] = { count: 0, total: 0 };
       byCatMap[cat].count += 1;
-      byCatMap[cat].total += g.amount;
+      byCatMap[cat].total += amt;
     });
 
     const byFunder = Object.entries(byFunderMap)
@@ -999,8 +1051,9 @@ export default function Home() {
       .map(([c, d]) => ({ category: c, count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
       .sort((a, b) => b.total - a.total);
 
-    // Show all orgs and categories as individual series
-    const funderGroups = byFunder.map(f => f.funder);
+    // Show all orgs and categories as individual series (skip funders whose dollars
+    // are fully un-counted in this view, e.g. a regrantor while its parent is present).
+    const funderGroups = byFunder.filter(f => f.total > 0).map(f => f.funder);
     const categoryGroups = byCategory.map(c => c.category);
 
     // Cross-tabulations: time x group
@@ -1013,18 +1066,19 @@ export default function Home() {
       const { year, yearMonth: ym } = getYearMonthFromDate(g.date);
       const fg = displayGrantmaker(g.grantmaker);
       const cg = displayCategory(g.category) || 'Uncategorized';
+      const amt = countedAmount(g);
 
       if (!yearFunder[year]) yearFunder[year] = {};
-      yearFunder[year][fg] = (yearFunder[year][fg] || 0) + g.amount;
+      yearFunder[year][fg] = (yearFunder[year][fg] || 0) + amt;
 
       if (!yearCategory[year]) yearCategory[year] = {};
-      yearCategory[year][cg] = (yearCategory[year][cg] || 0) + g.amount;
+      yearCategory[year][cg] = (yearCategory[year][cg] || 0) + amt;
 
       if (!monthFunder[ym]) monthFunder[ym] = {};
-      monthFunder[ym][fg] = (monthFunder[ym][fg] || 0) + g.amount;
+      monthFunder[ym][fg] = (monthFunder[ym][fg] || 0) + amt;
 
       if (!monthCategory[ym]) monthCategory[ym] = {};
-      monthCategory[ym][cg] = (monthCategory[ym][cg] || 0) + g.amount;
+      monthCategory[ym][cg] = (monthCategory[ym][cg] || 0) + amt;
     });
 
     let byYear = Object.entries(byYearMap)
@@ -1054,11 +1108,11 @@ export default function Home() {
       funderGroups, categoryGroups,
       yearFunder, yearCategory, monthFunder, monthCategory,
     };
-  }, [filteredAndSortedGrants]);
+  }, [filteredAndSortedGrants, countedAmount]);
 
   const filteredTotal = useMemo(
-    () => filteredAndSortedGrants.reduce((sum, grant) => sum + grant.amount, 0),
-    [filteredAndSortedGrants]
+    () => filteredAndSortedGrants.reduce((sum, grant) => sum + countedAmount(grant), 0),
+    [filteredAndSortedGrants, countedAmount]
   );
 
   // Virtualization
@@ -1801,6 +1855,10 @@ export default function Home() {
             <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px', padding: '0 16px 8px' }}>
               2025 and 2026 data are partial and reflect only grants published to date.
               Only publicly disclosed grants are included; grants made privately are not captured.
+              {hasNettedRegrants && (
+                <>{' '}Regrantor totals (BlueDot, Manifund) are counted net of the tracked grants
+                that funded them.</>
+              )}
             </div>
           </div>
           {!canOverlayChartTotal && (
