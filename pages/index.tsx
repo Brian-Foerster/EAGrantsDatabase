@@ -292,12 +292,45 @@ export default function Home() {
     }
   }, []);
 
-  // Deep link from an org card: ?org=<name> shows only that org's grants
+  // Deep link: hydrate filter/sort state from the URL so a filtered view is shareable.
+  // Read (not the useState initializer) to keep server and first client render identical.
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const org = new URLSearchParams(window.location.search).get('org');
-    if (org) setOrgFilter(org);
+    const p = new URLSearchParams(window.location.search);
+    const csv = (k: string) => { const v = p.get(k); return v ? v.split(',').filter(Boolean) : null; };
+    const org = p.get('org'); if (org) setOrgFilter(org);
+    const q = p.get('q'); if (q) setSearchTerm(q);
+    const gm = csv('gm'); if (gm) setSelectedGrantmakers(gm);
+    const fund = csv('fund'); if (fund) setSelectedFunds(fund);
+    const cat = csv('cat'); if (cat) setSelectedCategories(cat);
+    const yr = csv('yr'); if (yr) setSelectedYears(yr.map(Number).filter(n => !Number.isNaN(n)));
+    const min = p.get('min'); if (min) setAmountMin(min);
+    const max = p.get('max'); if (max) setAmountMax(max);
+    const sort = p.get('sort');
+    if (sort && ['date', 'amount', 'grantmaker', 'recipient', 'category'].includes(sort)) setSortBy(sort as typeof sortBy);
+    const dir = p.get('dir'); if (dir === 'asc' || dir === 'desc') setSortOrder(dir);
   }, []);
+
+  // Reflect the current filter/sort state back into the URL (shareable / bookmarkable).
+  // Skip the first run so we never clobber the incoming URL before the reader above applies.
+  const urlSyncReady = useRef(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!urlSyncReady.current) { urlSyncReady.current = true; return; }
+    const p = new URLSearchParams();
+    if (orgFilter) p.set('org', orgFilter);
+    if (searchTerm) p.set('q', searchTerm);
+    if (selectedGrantmakers.length) p.set('gm', selectedGrantmakers.join(','));
+    if (selectedFunds.length) p.set('fund', selectedFunds.join(','));
+    if (selectedCategories.length) p.set('cat', selectedCategories.join(','));
+    if (selectedYears.length) p.set('yr', selectedYears.join(','));
+    if (amountMin) p.set('min', amountMin);
+    if (amountMax) p.set('max', amountMax);
+    if (sortBy !== 'date') p.set('sort', sortBy);
+    if (sortOrder !== 'desc') p.set('dir', sortOrder);
+    const qs = p.toString();
+    window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+  }, [orgFilter, searchTerm, selectedGrantmakers, selectedFunds, selectedCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
 
   // ...and scroll the grants list into view once it's rendered (one time).
   useEffect(() => {

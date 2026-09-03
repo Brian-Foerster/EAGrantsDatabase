@@ -557,6 +557,41 @@ export default function Recipients() {
     }
   }, []);
 
+  // Deep link: hydrate the controls from the URL (shareable views). Read in an
+  // effect — not the useState initializers — so server and first client render match.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const p = new URLSearchParams(window.location.search);
+    const csv = (k: string) => { const v = p.get(k); return v ? v.split(',').filter(Boolean) : null; };
+    const q = p.get('q'); if (q) setSearchTerm(q);
+    const cat = csv('cat'); if (cat) setSelectedCategories(cat);
+    const country = csv('country'); if (country) setSelectedCountries(country);
+    const m = p.get('metric');
+    if (m === 'income' || m === 'expenses' || m === 'assets' || m === 'liabilities') setGlobalMetric(m);
+    const bd = p.get('bd'); if (bd === 'total' || bd === 'byCategory') setChartBreakdown(bd);
+    if (p.get('ea') === '1') setShowEAGrants(true);
+    if (p.get('infl') === '1') setAdjustInflation(true);
+  }, []);
+
+  // Reflect the controls back into the URL. Skip the first run so we never clobber
+  // an incoming ?org= / filter link before the reader above applies.
+  const urlSyncReady = useRef(false);
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!urlSyncReady.current) { urlSyncReady.current = true; return; }
+    const p = new URLSearchParams();
+    if (focusOrg) p.set('org', focusOrg);
+    if (searchTerm) p.set('q', searchTerm);
+    if (selectedCategories.length) p.set('cat', selectedCategories.join(','));
+    if (selectedCountries.length) p.set('country', selectedCountries.join(','));
+    if (globalMetric !== 'income') p.set('metric', globalMetric);
+    if (chartBreakdown !== 'byCategory') p.set('bd', chartBreakdown);
+    if (showEAGrants) p.set('ea', '1');
+    if (adjustInflation) p.set('infl', '1');
+    const qs = p.toString();
+    window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+  }, [focusOrg, searchTerm, selectedCategories, selectedCountries, globalMetric, chartBreakdown, showEAGrants, adjustInflation]);
+
   useEffect(() => {
     if (fetchAttempted.current) return;
     fetchAttempted.current = true;
