@@ -1,14 +1,17 @@
 {
-  "totalGrants": 7683,
-  "totalAmount": 7572763167.679802,
+  "totalGrants": 7707,
+  "totalAmount": 7608756199.971426,
   "grantmakers": [
     "Coefficient Giving",
+    "OpenAI Foundation",
     "GiveWell",
     "EA Funds",
     "ACE",
+    "ACX Grants",
     "SFF",
     "FLI",
     "Meta Charity Funders",
+    "The Audacious Project",
     "Navigation Fund",
     "Founders Pledge",
     "BlueDot Impact",
@@ -27,5 +30,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-08-31T20:40:33.733Z"
+  "lastUpdated": "2026-09-03T01:26:21.060Z"
 }

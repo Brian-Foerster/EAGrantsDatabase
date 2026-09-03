@@ -210,6 +210,28 @@ export default function About() {
               upstream funder is removed from the current view.
             </p>
 
+            <h3 style={styles.subheading}>ACX Grants</h3>
+            <p style={styles.paragraph}>
+              Scott Alexander's{' '}
+              <a href="https://www.astralcodexten.com/p/apply-for-an-acx-grant-2025" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                ACX Grants
+              </a>{' '}
+              program, funded largely by his readers and outside donors. Later rounds
+              (2024–2025) are administered through Manifund; earlier rounds (2021–2022) were
+              run directly. All are consolidated here under ACX Grants, via{' '}
+              <a href="https://trace.manifund.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Trace</a>{' '}
+              (a public-domain funding dataset from Manifund).
+            </p>
+
+            <h3 style={styles.subheading}>The Audacious Project and OpenAI Foundation</h3>
+            <p style={styles.paragraph}>
+              Individual EA-relevant grants sourced from{' '}
+              <a href="https://trace.manifund.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Trace</a>:
+              The Audacious Project's support for METR, and the OpenAI Foundation's biosecurity
+              grant to SecureBio. The OpenAI Foundation's People-First AI Fund (community
+              nonprofits) is out of scope and not included.
+            </p>
+
             <h2 style={styles.sectionTitle}>Data sources with annual totals only</h2>
             <p style={styles.paragraph}>
               The following grantmaker does not publish individual grant data with dollar

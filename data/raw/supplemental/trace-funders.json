@@ -1,0 +1,44 @@
+[
+  {
+    "id": "aud-000",
+    "title": "Support through the Audacious Project",
+    "recipient": "METR",
+    "amount": 8500000,
+    "currency": "USD",
+    "date": "2025-01-01",
+    "grantmaker": "The Audacious Project",
+    "category": "LTXR",
+    "focus_area": "technical-ai-safety, evals, ai-safety",
+    "fund": "The Audacious Project",
+    "url": "https://metr.org/blog/2024-10-09-new-support-through-the-audacious-project/",
+    "description": "Support through the Audacious Project"
+  },
+  {
+    "id": "aud-001",
+    "title": "Support through the Audacious Project",
+    "recipient": "METR",
+    "amount": 8500000,
+    "currency": "USD",
+    "date": "2024-01-01",
+    "grantmaker": "The Audacious Project",
+    "category": "LTXR",
+    "focus_area": "technical-ai-safety, evals, ai-safety",
+    "fund": "The Audacious Project",
+    "url": "https://metr.org/blog/2024-10-09-new-support-through-the-audacious-project/",
+    "description": "Support through the Audacious Project"
+  },
+  {
+    "id": "oaif-002",
+    "title": "Cutting end-to-end pathogen detection from fourteen days to three, expanding collection, a",
+    "recipient": "SecureBio",
+    "amount": 17200000,
+    "currency": "USD",
+    "date": "2026-08-20",
+    "grantmaker": "OpenAI Foundation",
+    "category": "LTXR",
+    "focus_area": "biosecurity",
+    "fund": "AI Resilience",
+    "url": "https://securebio.org/blog/three-day-early-warning-system/",
+    "description": "Cutting end-to-end pathogen detection from fourteen days to three, expanding collection, and further validating the detection system. Restricted to SecureBio's Detection team. — AI Resilience"
+  }
+]
