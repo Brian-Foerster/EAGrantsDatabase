@@ -160,6 +160,10 @@ npm start
 
 ## API Endpoints
 
+> **Full contract:** [API.md](API.md) documents every endpoint, the per-grant
+> field schema, the `schemaVersion` versioning policy, the regrant/residual
+> accounting, and reuse license. The list below is a quick reference.
+
 ### Static Data Files (Build Output)
 
 The application uses pre-generated JSON files instead of dynamic API endpoints:
@@ -257,16 +261,26 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-ISC
+Dual-licensed:
+
+- **Code** (app, scrapers, build pipeline) — **MIT** ([LICENSE](LICENSE)).
+- **Dataset** (JSON/CSV under `public/data/`, `data/`, `lib/scraped-grants.json`) —
+  **CC BY 4.0** ([LICENSE-DATA](LICENSE-DATA)). Reuse freely with credit to
+  "EA Grants Database (www.eagrantsdatabase.org)".
+
+Grant facts are compiled from the upstream sources credited in
+[DATA_SOURCES.md](DATA_SOURCES.md); each has its own terms. Records ingested
+from Manifund's [Trace](https://trace.manifund.org) are CC0 (public domain).
+Residual and regrant-apportioned figures are derived estimates produced by this
+project's methodology — attribute those to the EA Grants Database.
 
 ## Acknowledgments
 
-This project aggregates publicly available grants data from:
-- Effective Altruism Funds
-- GiveWell
-- Coefficient Giving
-- Survival and Flourishing Fund
-- Animal Charity Evaluators
-- Founders Pledge
+This project aggregates publicly available grants data from EA Funds, GiveWell,
+Coefficient Giving, the Survival and Flourishing Fund, Animal Charity
+Evaluators, Founders Pledge, FLI, Meta Charity Funders, the Navigation Fund, and
+Manifund/Trace (which also supplies the ACX Grants, Audacious Project, and
+OpenAI Foundation records). See [DATA_SOURCES.md](DATA_SOURCES.md) for
+per-source detail, credit, and terms.
 
-Please respect their terms of service and rate limits when implementing real data fetching.
+Please respect each source's terms of service and rate limits.

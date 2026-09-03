@@ -13,6 +13,9 @@ import { fetchWithRetry, normalizeDate, saveRawData, parseDollarAmount } from '.
 import focusAreaMapping from '../mappings/op-focus-areas.json';
 
 const CSV_URL = 'https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv';
+// Coefficient Giving's own PUBLIC, read-only (search-only) Algolia key — the
+// same credentials shipped in their website's client-side JS. Not a secret; it
+// only permits querying their public grants index. Safe to commit / open-source.
 const ALGOLIA_APP_ID = 'WBC743WF65';
 const ALGOLIA_API_KEY = 'da168b7a254a1f18a8fd0e6b65d7e0e2';
 const ALGOLIA_INDEX = 'coefficientgiving_grants_award_date_desc';

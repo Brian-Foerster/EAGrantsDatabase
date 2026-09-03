@@ -1,0 +1,37 @@
+EA Grants Database — Dataset License
+=====================================
+
+The aggregated dataset produced by this project — the grant records and
+derived aggregates in public/data/, the data/ inputs, lib/scraped-grants.json,
+and the CSV exports — is licensed under the
+
+    Creative Commons Attribution 4.0 International License (CC BY 4.0)
+    https://creativecommons.org/licenses/by/4.0/
+
+You are free to share and adapt the dataset for any purpose, including
+commercially, provided you give appropriate credit:
+
+    "EA Grants Database — www.eagrantsdatabase.org"
+
+and indicate if changes were made.
+
+Scope and caveats
+-----------------
+
+- This license applies to the COMPILATION and ARRANGEMENT of the data as
+  published here. Individual grant facts (amounts, dates, recipients) are drawn
+  from upstream grantmakers and are generally factual data not subject to
+  copyright, but each upstream source has its own terms of use — see
+  DATA_SOURCES.md for per-source credit and links. Where an upstream source
+  imposes stricter terms, those govern that source's underlying records.
+
+- Some records are ingested from Manifund's Trace dataset
+  (https://trace.manifund.org), which is released into the public domain
+  (CC0). Those records carry no attribution requirement of their own, though
+  crediting Trace is appreciated.
+
+- Residual and regrant-apportioned figures are DERIVED estimates computed by
+  this project's methodology (see DATA_SOURCES.md), not values reported by the
+  grantmakers. Attribute derived figures to the EA Grants Database.
+
+The application code is licensed separately under the MIT License; see LICENSE.

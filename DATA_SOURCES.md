@@ -10,6 +10,43 @@ The EA Grants Database aggregates individual grant data from the major Effective
 
 ---
 
+## Licensing & Attribution
+
+The application **code** is MIT-licensed ([LICENSE](LICENSE)). The aggregated
+**dataset** is published under **CC BY 4.0** ([LICENSE-DATA](LICENSE-DATA)) —
+reuse freely with credit to "EA Grants Database (www.eagrantsdatabase.org)".
+The programmatic data contract is documented in [API.md](API.md).
+
+Grant *facts* are compiled from the sources below; each has its own terms.
+Credit the original grantmaker alongside this database when reusing their
+records.
+
+| Source | Grantmaker(s) surfaced | Underlying terms |
+|---|---|---|
+| Coefficient Giving grants archive (CSV + public Algolia index) | Coefficient Giving | Publicly published grants archive; facts. Algolia access uses Coefficient's own public, read-only search key. |
+| EA Funds API + payout reports | EA Funds (LTFF, EAIF, AWF, GHDF), incl. Rapid Grants | Public API, no auth. |
+| GiveWell Airtable shared view | GiveWell | Publicly shared grants database; manual CSV export. |
+| Survival and Flourishing Fund recommendations | SFF | Public recommendations table. |
+| Animal Charity Evaluators grants page | ACE | Public Movement Grants page. |
+| Founders Pledge 990 filings | Founders Pledge | IRS 990 filings (public record) via ProPublica. |
+| **Manifund / Trace** (`trace.manifund.org`) | Manifund, BlueDot (regrants), ACX Grants, The Audacious Project, OpenAI Foundation | **CC0 / public domain** — no attribution required (credit appreciated). |
+| FLI grant program pages | FLI | Publicly published grant listings; manually curated into `data/raw/supplemental/`. |
+| Meta Charity Funders; Navigation Fund | Meta Charity Funders, Navigation Fund | Publicly published grant listings; manually curated. |
+
+Records ingested from **Trace are CC0**, which is what makes the ACX Grants,
+Audacious Project, and OpenAI Foundation additions clean to redistribute.
+Residual and regrant-apportioned figures are **derived estimates** produced by
+this project's methodology (below), not values reported by the grantmakers —
+attribute those to the EA Grants Database.
+
+> **Sources not yet detailed below:** FLI, Meta Charity Funders, Navigation
+> Fund, and the Trace-sourced grantmakers (Manifund, BlueDot, ACX, Audacious,
+> OpenAI Foundation) are newer additions; the numbered sections that follow
+> predate them and describe the original six pipelines. The table above is the
+> authoritative source list.
+
+---
+
 ## Data Sources
 
 ### 1. EA Funds
