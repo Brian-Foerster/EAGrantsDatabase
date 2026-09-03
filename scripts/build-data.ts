@@ -299,6 +299,9 @@ async function buildData() {
   const countedAmount = (g: Grant) => (g.regrant ? g.amount * (regrantFactor[g.grantmaker] ?? 1) : g.amount);
 
   const metadata = {
+    // Public data API contract version. Bump the minor for additive fields, the
+    // major for breaking changes. Documented in API.md.
+    schemaVersion: '1.0',
     totalGrants: grants.length,
     // Regrants contribute net of the tracked upstream funding that already counts them.
     totalAmount: grants.reduce((sum, g) => sum + countedAmount(g), 0),
