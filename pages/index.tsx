@@ -35,12 +35,14 @@ const isNonCoreFund = (fund?: string) => !!fund && fund in NON_CORE_EA_FUNDS;
 interface MinGrant {
   id: string;
   title: string;
+  blurb?: string;
   recipient: string;
   amount: number;
   currency: string;
   date: string;
   grantmaker: string;
   category?: string;
+  sub_category?: string;
   fund?: string;
   focus_area?: string;
   url?: string;
@@ -55,12 +57,26 @@ interface Metadata {
   totalAmount: number;
   grantmakers: string[];
   categories: string[];
+  subCategories?: { id: string; label: string; category: string }[];
   dateRange: {
     earliest: string;
     latest: string;
   };
   lastUpdated: string;
 }
+
+// Fixed display order for the Sub-Category filter, frozen from the relevance (grant-count)
+// ranking so data refreshes don't reshuffle it. New sub-categories not listed here fall to
+// the end of their group. Within each group the "…(unspecified)" bucket is forced first.
+const SUBCATEGORY_ORDER = [
+  'ltxr-ai-tech', 'ltxr-gcr', 'ltxr-ai-general', 'ltxr-bio', 'ltxr-general', 'ltxr-ai-gov', 'ltxr-nuclear',
+  'aw-movement', 'aw-fish', 'aw-general', 'aw-broiler', 'aw-cagefree', 'aw-altprotein', 'aw-wild',
+  'gh-general', 'gh-rnd', 'gh-malaria', 'gh-nutrition', 'gh-policy', 'gh-vaccines', 'gh-lead', 'gh-deworming', 'gh-air', 'gh-cash',
+  'meta-community', 'meta-giving', 'meta-forecasting', 'meta-careers', 'meta-research', 'meta-general',
+  'policy-cj', 'policy-innovation', 'policy-housing', 'policy-macro', 'policy-immigration',
+  'other-general', 'other-infectious', 'other-climate',
+  'science-basic', 'science-general', 'science-tools',
+];
 
 interface RowHelpers {
   getGrantUrl: (grant: MinGrant) => string | undefined;
@@ -82,6 +98,20 @@ interface GrantRowProps {
   helpers: RowHelpers;
 }
 
+// Grantee links that describe the PERSON, not the funded project — a BlueDot grant only
+// links through when the destination could actually tell you about the work, so these
+// profile/social/aggregator hosts are treated as "no link".
+function isLowValueProfileLink(url?: string): boolean {
+  if (!url) return false;
+  let host: string;
+  try { host = new URL(url).hostname.replace(/^www\./, '').toLowerCase(); } catch { return false; }
+  const BAD = new Set([
+    'linkedin.com', 'x.com', 'twitter.com', 'instagram.com', 'facebook.com', 'threads.net',
+    'scholar.google.com', 'orcid.org', 'researchgate.net', 'linktr.ee', 'bio.link', 'beacons.ai', 'about.me',
+  ]);
+  return BAD.has(host) || host.endsWith('.linkedin.com');
+}
+
 // Memoized so that scrolling — which re-renders the parent every frame —
 // only re-renders rows whose props actually changed (newly mounted rows and
 // the one being expanded/collapsed), not every visible row.
@@ -92,6 +122,26 @@ const GrantRow = memo(function GrantRow({
     getGrantUrl, formatCurrency, GRANTMAKER_COLORS, categoryColorMap,
     shortCategory, displayCategory, displayGrantmaker, toggleGrantExpanded,
   } = helpers;
+
+  // One consolidated description (computeBlurb in build-data collapses the overlapping
+  // title/description fields into a single clean blurb). Falls back to title for any data
+  // that predates the blurb field. Desktop clamps it to 2 lines with a toggle; the toggle
+  // shows (and hooks run) only when it actually overflows. Hooks run unconditionally,
+  // before the mobile early-return, so hook order stays stable if a row changes layout.
+  const blurb = (grant.blurb ?? grant.title ?? '').trim();
+  const hasDesc = !!(blurb && blurb !== grant.recipient);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const [descOverflows, setDescOverflows] = useState(false);
+  useEffect(() => {
+    const el = descRef.current;
+    if (el && !expanded) setDescOverflows(el.scrollHeight > el.clientHeight + 2);
+  }, [expanded, grant.id, hasDesc]);
+  const canExpand = descOverflows || expanded;
+
+  // Clicking the grant (its recipient/title) already goes to getGrantUrl(grant), so a
+  // "View on {grantmaker}" panel link would always point to the same place — omit it.
+  // The expand panel only carries the org-financials cross-link (a different destination).
+  const url = getGrantUrl(grant);
 
   if (isMobile) {
     return (
@@ -110,8 +160,8 @@ const GrantRow = memo(function GrantRow({
           </h3>
           <div style={styles.grantMobileAmount}>{formatCurrency(grant.amount)}</div>
         </div>
-        {grant.title && grant.title !== grant.recipient && (
-          <p style={styles.grantDesc}>{grant.title}</p>
+        {hasDesc && (
+          <p style={styles.grantDesc}>{blurb}</p>
         )}
         <div style={styles.grantMobileMeta}>
           <span style={{
@@ -149,23 +199,10 @@ const GrantRow = memo(function GrantRow({
               <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Date:</span>
               <span>{format(parseISO(grant.date), 'MMMM d, yyyy')}</span>
             </div>
-            {(grant.description || (grant.title && grant.title !== grant.recipient)) && (
+            {hasDesc && (
               <div style={styles.expandedDescRow}>
                 <span style={{ ...styles.expandedLabel, ...expandedLabelStyle }}>Description:</span>
-                <span style={styles.expandedDescText}>{grant.description || grant.title}</span>
-              </div>
-            )}
-            {getGrantUrl(grant) && (
-              <div style={styles.expandedRow}>
-                <a
-                  href={getGrantUrl(grant)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={styles.expandedLink}
-                  onClick={e => e.stopPropagation()}
-                >
-                  View on {grant.grantmaker} →
-                </a>
+                <span style={styles.expandedDescText}>{blurb}</span>
               </div>
             )}
             {financialsOrg && (
@@ -186,51 +223,67 @@ const GrantRow = memo(function GrantRow({
   }
 
   return (
-    <div style={styles.grantRow}>
-      <div style={styles.grantLeft}>
-        <h3 style={styles.grantTitle}>
-          {(() => {
-            const url = getGrantUrl(grant);
-            return url
-              ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink}>{grant.recipient}</a>
-              : grant.recipient;
-          })()}
-        </h3>
-        {grant.title && grant.title !== grant.recipient && (
-          <p style={styles.grantDescFull}>{grant.title}</p>
-        )}
-        {financialsOrg && (
-          <a href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.crossLink}>
-            View org financials →
-          </a>
-        )}
-      </div>
-      <div style={styles.grantFunderCol}>
-        <span style={{
-          ...styles.tagColored,
-          borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-          color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-        }}>{displayGrantmaker(grant.grantmaker)}</span>
-        {grant.fund && (
-          <span style={{
-            ...styles.subTag,
-            borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
-            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-          }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
-        )}
-      </div>
-      <div />
-      <div style={styles.grantCategoryCol}>
-        {grant.category && (
+    <div
+      style={{ ...styles.grantRowWrap, ...(canExpand ? { cursor: 'pointer' } : {}) }}
+      onClick={canExpand ? () => toggleGrantExpanded(grant.id) : undefined}
+    >
+      <div style={styles.grantRow}>
+        <div style={styles.grantLeft}>
+          <h3 style={styles.grantTitle}>
+            {url
+              ? <a href={url} target="_blank" rel="noopener noreferrer" style={styles.grantTitleLink} onClick={e => e.stopPropagation()}>{grant.recipient}</a>
+              : grant.recipient}
+          </h3>
+          {hasDesc && (
+            <div style={styles.grantDescLine}>
+              <p ref={descRef} style={expanded ? styles.grantDescFull : styles.grantDescClamp}>{blurb}</p>
+              {canExpand && (
+                <span style={styles.grantExpandArrow}>{expanded ? '▲' : '▼'}</span>
+              )}
+            </div>
+          )}
+          {financialsOrg && !expanded && (
+            <a href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.crossLink} onClick={e => e.stopPropagation()}>
+              View org financials →
+            </a>
+          )}
+        </div>
+        <div style={styles.grantFunderCol}>
           <span style={{
             ...styles.tagColored,
-            borderColor: categoryColorMap[grant.category] || '#999',
-            color: categoryColorMap[grant.category] || '#999',
-          }}>{displayCategory(grant.category)}</span>
-        )}
+            borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+          }}>{displayGrantmaker(grant.grantmaker)}</span>
+          {grant.fund && (
+            <span style={{
+              ...styles.subTag,
+              borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
+              color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+            }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
+          )}
+        </div>
+        <div />
+        <div style={styles.grantCategoryCol}>
+          {grant.category && (
+            <span style={{
+              ...styles.tagColored,
+              borderColor: categoryColorMap[grant.category] || '#999',
+              color: categoryColorMap[grant.category] || '#999',
+            }}>{displayCategory(grant.category)}</span>
+          )}
+        </div>
+        <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
+        <div style={styles.grantDateCol}>{format(parseISO(grant.date), 'MM/dd/yyyy')}</div>
       </div>
-      <div style={styles.grantAmountCol}>{formatCurrency(grant.amount)}</div>
-      <div style={styles.grantDateCol}>{format(parseISO(grant.date), 'MM/dd/yyyy')}</div>
+      {expanded && financialsOrg && (
+        <div style={styles.grantDesktopExpanded}>
+          <div style={styles.grantExpandedLinks}>
+            <a href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.expandedLink} onClick={e => e.stopPropagation()}>
+              View org financials →
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 });
@@ -250,6 +303,7 @@ export default function Home() {
   const [selectedGrantmakers, setSelectedGrantmakers] = useState<string[]>([]);
   const [selectedFunds, setSelectedFunds] = useState<string[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedSubCategories, setSelectedSubCategories] = useState<string[]>([]);
   const [selectedYears, setSelectedYears] = useState<number[]>([]);
   const [amountMin, setAmountMin] = useState('');
   const [amountMax, setAmountMax] = useState('');
@@ -303,6 +357,7 @@ export default function Home() {
     const gm = csv('gm'); if (gm) setSelectedGrantmakers(gm);
     const fund = csv('fund'); if (fund) setSelectedFunds(fund);
     const cat = csv('cat'); if (cat) setSelectedCategories(cat);
+    const subcat = csv('subcat'); if (subcat) setSelectedSubCategories(subcat);
     const yr = csv('yr'); if (yr) setSelectedYears(yr.map(Number).filter(n => !Number.isNaN(n)));
     const min = p.get('min'); if (min) setAmountMin(min);
     const max = p.get('max'); if (max) setAmountMax(max);
@@ -323,6 +378,7 @@ export default function Home() {
     if (selectedGrantmakers.length) p.set('gm', selectedGrantmakers.join(','));
     if (selectedFunds.length) p.set('fund', selectedFunds.join(','));
     if (selectedCategories.length) p.set('cat', selectedCategories.join(','));
+    if (selectedSubCategories.length) p.set('subcat', selectedSubCategories.join(','));
     if (selectedYears.length) p.set('yr', selectedYears.join(','));
     if (amountMin) p.set('min', amountMin);
     if (amountMax) p.set('max', amountMax);
@@ -330,7 +386,7 @@ export default function Home() {
     if (sortOrder !== 'desc') p.set('dir', sortOrder);
     const qs = p.toString();
     window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
-  }, [orgFilter, searchTerm, selectedGrantmakers, selectedFunds, selectedCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+  }, [orgFilter, searchTerm, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
 
   // ...and scroll the grants list into view once it's rendered (one time).
   useEffect(() => {
@@ -532,16 +588,20 @@ export default function Home() {
     const hasGmFilter = selectedGrantmakers.length > 0;
     const hasFundFilter = selectedFunds.length > 0;
     const hasCatFilter = selectedCategories.length > 0;
+    const hasSubCatFilter = selectedSubCategories.length > 0;
     const hasSourceFilter = hasGmFilter || hasFundFilter;
-    const hasTopicFilter = hasCatFilter;
+    const hasTopicFilter = hasCatFilter || hasSubCatFilter;
 
     filtered = filtered.filter(grant => {
       // An explicit category selection opts into the otherwise-hidden non-core EA
       // funds for grants of that category (e.g. selecting the Policy category, whose
       // grants live entirely in non-core US-policy funds). Applies whether or not a
       // Source filter is also active.
+      const matchesSubCat = hasSubCatFilter && !!grant.sub_category && selectedSubCategories.includes(grant.sub_category);
       const optedInViaCategory =
         hasCatFilter && !!grant.category && selectedCategories.includes(grant.category);
+      // A sub-category selection also opts its matching grants into otherwise-hidden non-core funds.
+      const optedInViaTopic = optedInViaCategory || matchesSubCat;
 
       // --- Source group (Grantmaker / Fund) ---
       let passesSource: boolean;
@@ -560,22 +620,22 @@ export default function Home() {
           if (grantmakerHasSelectedFunds) {
             passesSource = !!grant.fund && selectedFunds.includes(grant.fund);
           } else {
-            passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaCategory;
+            passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaTopic;
           }
         } else {
           passesSource = false;
         }
       } else {
         // No source filter — exclude non-core EA funds by default, unless opted in
-        // via an explicit category selection.
-        passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaCategory;
+        // via an explicit category or sub-category selection.
+        passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaTopic;
       }
 
-      // --- Topic group (Category / Sub-category) ---
+      // --- Topic group (Category / Sub-category) — OR within ---
       let passesTopic: boolean;
       if (hasTopicFilter) {
         const matchesCat = hasCatFilter && !!grant.category && selectedCategories.includes(grant.category);
-        passesTopic = matchesCat;
+        passesTopic = matchesCat || matchesSubCat;
       } else {
         passesTopic = true;
       }
@@ -617,7 +677,7 @@ export default function Home() {
     });
 
     return sorted;
-  }, [grants, orgFilter, orgGrantNameSet, searchTerm, searchResults, selectedGrantmakers, selectedFunds, selectedCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+  }, [grants, orgFilter, orgGrantNameSet, searchTerm, searchResults, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
 
   const fundsByGrantmaker = useMemo(() => {
     const gmDisplayNames: Record<string, string> = {
@@ -703,6 +763,46 @@ export default function Home() {
     );
   };
 
+  const toggleSubCategory = (id: string) => {
+    setSelectedSubCategories(prev =>
+      prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]
+    );
+  };
+
+  const selectAllSubsForCategory = (ids: string[]) => {
+    setSelectedSubCategories(prev => {
+      const allSelected = ids.every(id => prev.includes(id));
+      return allSelected ? prev.filter(id => !ids.includes(id)) : Array.from(new Set([...prev, ...ids]));
+    });
+  };
+
+  // Sub-categories that actually occur in the data, grouped under their L1 category.
+  // Order is frozen (SUBCATEGORY_ORDER) so data refreshes don't reshuffle it; within each
+  // group the "…(unspecified)" bucket is forced first, then the frozen order, then any new
+  // (unlisted) sub-categories by count. Groups follow the frozen order too.
+  const subCategoriesByCategory = useMemo(() => {
+    if (!metadata?.subCategories) return [] as { category: string; subs: { id: string; label: string; count: number }[] }[];
+    const counts = new Map<string, number>();
+    for (const g of grants) if (g.sub_category) counts.set(g.sub_category, (counts.get(g.sub_category) || 0) + 1);
+    const rank = (id: string) => { const i = SUBCATEGORY_ORDER.indexOf(id); return i === -1 ? Number.MAX_SAFE_INTEGER : i; };
+    const isGeneral = (id: string) => id.endsWith('-general');
+    const byCat = new Map<string, { id: string; label: string; count: number }[]>();
+    for (const s of metadata.subCategories) {
+      const count = counts.get(s.id) || 0;
+      if (!count) continue;
+      if (!byCat.has(s.category)) byCat.set(s.category, []);
+      byCat.get(s.category)!.push({ id: s.id, label: s.label, count });
+    }
+    return Array.from(byCat.entries())
+      .map(([category, subs]) => ({
+        category,
+        subs: subs.sort((a, b) =>
+          (Number(isGeneral(b.id)) - Number(isGeneral(a.id))) || (rank(a.id) - rank(b.id)) || (b.count - a.count)),
+        order: Math.min(...subs.map(s => rank(s.id))),
+      }))
+      .sort((a, b) => a.order - b.order);
+  }, [metadata, grants]);
+
   const toggleYear = (year: number) => {
     setSelectedYears(prev =>
       prev.includes(year) ? prev.filter(y => y !== year) : [...prev, year]
@@ -769,6 +869,7 @@ export default function Home() {
     setSelectedGrantmakers([]);
     setSelectedFunds([]);
     setSelectedCategories([]);
+    setSelectedSubCategories([]);
     setSelectedYears([]);
     setAmountMin('');
     setAmountMax('');
@@ -933,6 +1034,11 @@ export default function Home() {
     if (grant.grantmaker === 'Coefficient Giving') {
       if (grant.url && !isBrokenCoefficientGrantUrl(grant.url)) return grant.url;
       return getCoefficientFallbackUrl(grant);
+    }
+    // BlueDot has no grant page: link straight to the grantee's provided link, but skip
+    // profile/social links (LinkedIn, X, Scholar, …) that describe the person, not the work.
+    if (grant.grantmaker === 'BlueDot Impact') {
+      return grant.url && !isLowValueProfileLink(grant.url) ? grant.url : undefined;
     }
     if (grant.url) return grant.url;
     // Fallback to grantmaker's grants page
@@ -1676,8 +1782,7 @@ export default function Home() {
                                   onChange={() => toggleFund(fund)}
                                   style={styles.checkbox}
                                 />
-                                {fund}
-                                {isNonCore && <span style={styles.nonCoreIndicator}>*</span>}
+                                <span>{fund}{isNonCore && <sup style={styles.nonCoreIndicator}>*</sup>}</span>
                               </label>
                             );
                           })}
@@ -1720,8 +1825,7 @@ export default function Home() {
                             onChange={() => toggleCategory(cat)}
                             style={styles.checkbox}
                           />
-                          {displayCategory(cat)}
-                          {isNonCoreOnly && <span style={styles.nonCoreIndicator}>*</span>}
+                          <span>{displayCategory(cat)}{isNonCoreOnly && <sup style={styles.nonCoreIndicator}>*</sup>}</span>
                         </label>
                       );
                     })}
@@ -1733,6 +1837,54 @@ export default function Home() {
                   </div>
                 )}
               </div>
+              {subCategoriesByCategory.length > 0 && (
+                <div style={styles.filterSection}>
+                  <button
+                    onClick={() => toggleFilter('subcategory')}
+                    style={styles.filterHeader}
+                  >
+                    <span style={styles.filterHeaderLabel}>Sub-Category</span>
+                    <span style={styles.filterHeaderIcon}>{expandedFilters.subcategory ? '−' : '+'}</span>
+                  </button>
+                  {expandedFilters.subcategory && (
+                    <div style={styles.filterOptionsGrouped}>
+                      {subCategoriesByCategory.map(group => {
+                        const ids = group.subs.map(s => s.id);
+                        const allSelected = ids.every(id => selectedSubCategories.includes(id));
+                        return (
+                          <div key={group.category} style={styles.fundGroup}>
+                            <div style={styles.fundGroupHeaderRow}>
+                              <div style={styles.fundGroupHeader}>{displayCategory(group.category)}</div>
+                              <button
+                                onClick={() => selectAllSubsForCategory(ids)}
+                                style={{
+                                  ...styles.selectAllButton,
+                                  ...(allSelected ? styles.selectAllButtonActive : {})
+                                }}
+                              >
+                                {allSelected ? 'Deselect All' : 'Select All'}
+                              </button>
+                            </div>
+                            <div style={styles.fundGroupOptions}>
+                              {group.subs.map(sub => (
+                                <label key={sub.id} style={styles.filterOption}>
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedSubCategories.includes(sub.id)}
+                                    onChange={() => toggleSubCategory(sub.id)}
+                                    style={styles.checkbox}
+                                  />
+                                  {sub.label}
+                                </label>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
               <div style={styles.filterSection}>
                 <button
                   onClick={() => toggleFilter('year')}
@@ -1872,19 +2024,21 @@ export default function Home() {
             ...styles.chartContainer,
             padding: isPhonePortrait ? '4px 0' : isMobile ? '4px 0' : '6px 0',
           }}>
-            {canOverlayChartTotal && (
-              <div style={styles.chartTotalOverlay}>
-                Total: {'$'}
-                {(filteredTotal / 1000000).toFixed(2)}M
-              </div>
-            )}
-            <ReactECharts
-              option={getChartOption()}
-              notMerge={true}
-              lazyUpdate={true}
-              style={{ height: isPhonePortrait ? '260px' : isMobile ? '300px' : '400px', width: '100%' }}
-              opts={{ renderer: 'canvas' }}
-            />
+            <div style={{ position: 'relative' }}>
+              {canOverlayChartTotal && (
+                <div style={styles.chartTotalOverlay}>
+                  Total: {'$'}
+                  {(filteredTotal / 1000000).toFixed(2)}M
+                </div>
+              )}
+              <ReactECharts
+                option={getChartOption()}
+                notMerge={true}
+                lazyUpdate={true}
+                style={{ height: isPhonePortrait ? '260px' : isMobile ? '300px' : '400px', width: '100%' }}
+                opts={{ renderer: 'canvas' }}
+              />
+            </div>
             <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px', padding: '0 16px 8px' }}>
               2025 and 2026 data are partial and reflect only grants published to date.
               Only publicly disclosed grants are included; grants made privately are not captured.
@@ -1914,7 +2068,7 @@ export default function Home() {
             ...(isMobile ? { flexDirection: 'column', alignItems: 'flex-start', gap: '10px' } : {})
           }}>
             <div style={styles.grantsHeaderLeft}>
-              <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px', marginBottom: 0 }}>Grants</h2>
+              <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px', marginBottom: 0, lineHeight: 1 }}>Grants</h2>
               <div style={styles.sortControls}>
                 <select
                   value={sortBy}
@@ -1979,6 +2133,7 @@ export default function Home() {
             )}
           <div
             ref={parentRef}
+            className="grants-scroll"
             style={{
               ...styles.virtualListScroll,
               height: isMobile ? '600px' : '800px'
@@ -2392,17 +2547,16 @@ const styles: { [key: string]: React.CSSProperties } = {
     accentColor: '#3a6ea5',
   },
   nonCoreIndicator: {
-    marginLeft: '4px',
-    color: '#999',
-    fontSize: '12px',
+    marginLeft: '1px',
+    color: '#9ca3af',
+    fontWeight: 400,
   },
   nonCoreNote: {
+    width: '100%',
+    margin: '4px 0 0 0',
     fontSize: '12px',
     color: '#888',
     fontStyle: 'italic',
-    marginTop: '12px',
-    paddingTop: '8px',
-    borderTop: '1px solid #e5e5e5',
   },
   amountFilterRow: {
     display: 'flex',
@@ -2459,7 +2613,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   grantsHeaderLeft: {
     display: 'flex',
-    alignItems: 'center',
+    alignItems: 'flex-end',
     gap: '12px',
     flexWrap: 'wrap',
   },
@@ -2506,13 +2660,56 @@ const styles: { [key: string]: React.CSSProperties } = {
     textTransform: 'uppercase',
     letterSpacing: '0.05em',
   },
+  grantRowWrap: {
+    padding: '12px 0',
+    borderBottom: '1px solid #e5e7eb',
+  },
   grantRow: {
     display: 'grid',
     gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
     alignItems: 'start',
     gap: '8px',
-    padding: '12px 0',
-    borderBottom: '1px solid #e5e7eb',
+  },
+  grantDescLine: {
+    display: 'flex',
+    alignItems: 'flex-end',
+    gap: '8px',
+  },
+  grantExpandArrow: {
+    flexShrink: 0,
+    fontSize: '10px',
+    color: '#9ca3af',
+    userSelect: 'none',
+    paddingBottom: '2px',
+  },
+  grantExpandArrowSolo: {
+    display: 'inline-block',
+    marginTop: '4px',
+    fontSize: '10px',
+    color: '#9ca3af',
+    userSelect: 'none',
+  },
+  grantDesktopExpanded: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '8px',
+    marginTop: '8px',
+    paddingTop: '8px',
+    borderTop: '1px dashed #e5e7eb',
+  },
+  grantExpandedDesc: {
+    fontSize: '14px',
+    color: '#4b5563',
+    lineHeight: '1.5',
+  },
+  grantExpandedDescLabel: {
+    fontWeight: 600,
+    color: '#374151',
+  },
+  grantExpandedLinks: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    gap: '18px',
   },
   grantRowMobile: {
     display: 'flex',
@@ -2644,7 +2841,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: '4px',
     fontSize: '12px',
     fontWeight: 600,
-    color: '#059669',
+    color: '#3a6ea5',
     textDecoration: 'none',
   },
   orgFilterBanner: {
@@ -2681,10 +2878,24 @@ const styles: { [key: string]: React.CSSProperties } = {
     whiteSpace: 'nowrap',
   },
   grantDescFull: {
+    flex: 1,
+    minWidth: 0,
     margin: '3px 0 0 0',
     fontSize: '14px',
     color: '#4b5563',
     lineHeight: '1.4',
+  },
+  grantDescClamp: {
+    flex: 1,
+    minWidth: 0,
+    margin: '3px 0 0 0',
+    fontSize: '14px',
+    color: '#4b5563',
+    lineHeight: '1.4',
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
   },
   grantTagCol: {
     display: 'flex',
