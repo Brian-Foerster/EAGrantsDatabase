@@ -1,0 +1,23 @@
+{
+  "_comment": "Hand-verified recipient -> sub_category id. Highest priority: overrides both rules and the AI map. Each id MUST belong to the recipient's L1 category. This file is also the few-shot example set fed to the tagging agent (see scripts/TAGGING_PROMPT.md).",
+  "curated": {
+    "redwood research": "ltxr-ai-tech",
+    "apollo research": "ltxr-ai-tech",
+    "metr": "ltxr-ai-tech",
+    "alignment research center": "ltxr-ai-tech",
+    "rand corporation": "ltxr-ai-gov",
+    "epoch ai": "ltxr-ai-general",
+    "johns hopkins center for health security": "ltxr-bio",
+    "against malaria foundation": "gh-malaria",
+    "malaria consortium": "gh-malaria",
+    "new incentives": "gh-vaccines",
+    "helen keller international": "gh-nutrition",
+    "givedirectly": "gh-cash",
+    "givewell": "gh-general",
+    "the humane league": "aw-movement",
+    "faunalytics": "aw-movement",
+    "wild animal initiative": "aw-wild",
+    "fish welfare initiative": "aw-fish",
+    "shrimp welfare project": "aw-fish"
+  }
+}

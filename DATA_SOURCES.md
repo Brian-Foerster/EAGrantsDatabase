@@ -217,6 +217,30 @@ Mappings from source-specific categories to this taxonomy are in:
 - `scripts/mappings/op-focus-areas.json` (Coefficient Giving focus areas → category)
 - `scripts/mappings/eaf-funds.json` (EA Funds fund names → category)
 
+### Sub-category tagging (level-2, AI-assisted)
+
+Every grant also gets a level-2 `sub_category` (e.g. `gh-malaria`, `ltxr-ai-tech`)
+within its category. The taxonomy and the assignment logic live in
+`scripts/sub-categories.ts`; `build:data` applies it automatically, so coverage
+is always 100%. Assignment is, in priority order:
+
+1. **Deterministic rules** on the structured signal (`focus_area` + `fund`), then
+   on the grant title — pure, auditable lookups (~71% of grants).
+2. **AI recipient map** (`scripts/mappings/sub-categories-ai.json`) — fills what
+   the rules leave at the broad "— general" level, keyed by recipient. This map is
+   produced by a tagging agent using the organization's identity + grant titles,
+   constrained to the fixed sub-category ids.
+3. **"— general"** bucket — honest fallback for aggregate/residual rows and
+   unidentifiable recipients (anonymous/unknown).
+
+**This step is part of the grant-update workflow.** After a scrape adds grants,
+run `npm run tag:subcats` to regenerate the work list of *new* residual
+recipients (`data/raw/subcat-worklist.json`); if any appear, have a tagging agent
+extend `sub-categories-ai.json` for them, then `npm run tag:subcats validate`
+(must report `Invalid ids: 0`) before building. Existing labels are keyed by
+recipient and reused, so each refresh only classifies genuinely new recipients —
+cheap and stable.
+
 ---
 
 ## Known Limitations
