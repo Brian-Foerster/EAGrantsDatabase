@@ -10,9 +10,18 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { Grant } from '../types/grants';
 import { aggregateAllGrants } from '../lib/aggregator';
+import { assignSubCategory, subCategoryList, type AiOverrides } from './sub-categories';
 
 // Output directories
 const PUBLIC_DATA_DIR = path.join(process.cwd(), 'public', 'data');
+
+// Level-2 sub-category tagging: deterministic rules + an AI-generated recipient map
+// (scripts/mappings/sub-categories-ai.json). Absent map → rules only (still 100% coverage).
+const AI_SUBCAT_PATH = path.join(process.cwd(), 'scripts', 'mappings', 'sub-categories-ai.json');
+const CURATED_PATH = path.join(process.cwd(), 'scripts', 'mappings', 'sub-categories-curated.json');
+const aiSubcats: AiOverrides = fs.existsSync(AI_SUBCAT_PATH)
+  ? JSON.parse(fs.readFileSync(AI_SUBCAT_PATH, 'utf8')) : {};
+if (fs.existsSync(CURATED_PATH)) aiSubcats.curated = JSON.parse(fs.readFileSync(CURATED_PATH, 'utf8')).curated;
 const AGG_DIR = path.join(PUBLIC_DATA_DIR, 'agg');
 
 // Ensure directories exist
@@ -191,17 +200,62 @@ function aggregateByYearAndCategory(grants: Grant[]) {
     .sort((a, b) => a.year - b.year || a.category.localeCompare(b.category));
 }
 
+// Boilerplate suffixes some sources append to the description field (they carry metadata
+// that duplicates other columns: focus area, country, topics, round, source).
+function stripDescSuffix(d: string): string {
+  return d
+    .replace(/\s*\.?\s*Focus area:.*$/i, '')
+    .replace(/\s*\.?\s*Countr(?:y|ies):.*$/i, '')
+    .replace(/\s*\.?\s*Topics?:.*$/i, '')
+    .replace(/\s*\.?\s*Round:.*$/i, '')
+    .replace(/\s*\.?\s*Source:.*$/i, '')
+    .replace(/\s*\.?\s*Receiving charity:.*$/i, '')
+    .trim();
+}
+
+// A description that's just comma-separated cause tags (Manifund), not prose.
+function looksLikeTags(s: string): boolean {
+  return /^[A-Za-z][\w .&/'-]*(?:,\s*[A-Za-z][\w .&/'-]*)+$/.test(s) && !/[.!?]\s/.test(s);
+}
+
+// Collapse the overlapping title/description fields into ONE clean, always-meaningful blurb.
+// The informative text lives in a different field by source: `description` for auto-titled
+// sources (EA Funds "Recipient - Fund", SFF, ACE), otherwise `title`; and where the
+// description is a fuller superset of a clipped title (GiveWell, OpenAI Foundation), the
+// full description wins so nothing is truncated mid-word.
+function computeBlurb(grant: Grant): string {
+  const title = (grant.title || '').trim();
+  const recip = (grant.recipient || '').trim();
+  const descClean = stripDescSuffix((grant.description || '').trim());
+  const autoTitle = !!recip && (title === recip || title.startsWith(recip + ' - ') || title.startsWith(recip + ' — '));
+  if (autoTitle) {
+    if (descClean && descClean.toLowerCase() !== recip.toLowerCase() && !looksLikeTags(descClean)) return descClean;
+    // No prose description — fall back to the part of the title after the recipient (the fund/program).
+    return title.slice(recip.length).replace(/^\s*[-—]\s*/, '').trim();
+  }
+  // Title is the real content; prefer a fuller description that supersets it.
+  if (descClean && descClean.length > title.length) {
+    const cut = title.lastIndexOf(' ');
+    const stem = (cut > 12 ? title.slice(0, cut) : title).toLowerCase();
+    if (stem.length > 12 && descClean.toLowerCase().startsWith(stem)) return descClean;
+  }
+  return title;
+}
+
 // Create minimized grant data (only essential fields for listing)
 function createMinimizedGrants(grants: Grant[]) {
   return grants.map(grant => ({
     id: grant.id,
     title: grant.title,
     recipient: grant.recipient,
+    // Single consolidated description shown in the UI (see computeBlurb).
+    blurb: computeBlurb(grant),
     amount: grant.amount,
     currency: grant.currency,
     date: grant.date,
     grantmaker: grant.grantmaker,
     category: grant.category,
+    sub_category: assignSubCategory(grant, aiSubcats).id,
     focus_area: grant.focus_area,
     fund: grant.fund,
     url: grant.url,
@@ -307,6 +361,8 @@ async function buildData() {
     totalAmount: grants.reduce((sum, g) => sum + countedAmount(g), 0),
     grantmakers: Array.from(new Set(grants.map(g => g.grantmaker))),
     categories: Array.from(new Set(grants.map(g => g.category).filter(Boolean))),
+    // Level-2 sub-categories: { id, label, category } — see assignSubCategory.
+    subCategories: subCategoryList(),
     dateRange: {
       earliest: grants.reduce((min, g) => g.date < min ? g.date : min, grants[0]?.date || ''),
       latest: grants.reduce((max, g) => g.date > max ? g.date : max, grants[0]?.date || ''),

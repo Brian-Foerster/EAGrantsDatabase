@@ -42,6 +42,7 @@ The index. Read this first.
   "totalAmount": 7608756199.97,
   "grantmakers": ["Coefficient Giving", "GiveWell", "..."],
   "categories": ["LTXR", "GH", "AW", "Meta", "Policy", "Science", "Other"],
+  "subCategories": [{ "id": "gh-malaria", "label": "Malaria", "category": "GH" }],
   "dateRange": { "earliest": "2012-07-01", "latest": "2026-12-01" },
   "lastUpdated": "2026-09-03T02:05:09.361Z"
 }
@@ -85,6 +86,7 @@ dataset.
 | `date` | string | `YYYY-MM-DD`. Day is often the 1st when only month/year is published. |
 | `grantmaker` | string | One of `metadata.grantmakers`. |
 | `category` | string | One of the 7 codes in `metadata.categories`. |
+| `sub_category` | string | Level-2 theme id (e.g. `gh-malaria`, `ltxr-ai-tech`); resolve the label via `metadata.subCategories`. Always present. |
 | `focus_area` | string | Raw source label (finer than `category`); may be `""`. |
 | `fund` | string | Source funding vehicle/program (e.g. "Long-Term Future Fund"); may be `""`. |
 | `url` | string | Link to the source grant page; may be `""`. |

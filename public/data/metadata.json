@@ -27,9 +27,221 @@
     "Policy",
     "Science"
   ],
+  "subCategories": [
+    {
+      "id": "ltxr-bio",
+      "label": "Biosecurity & Pandemics",
+      "category": "LTXR"
+    },
+    {
+      "id": "ltxr-nuclear",
+      "label": "Nuclear & Great-Power",
+      "category": "LTXR"
+    },
+    {
+      "id": "ltxr-ai-tech",
+      "label": "AI Safety & Alignment",
+      "category": "LTXR"
+    },
+    {
+      "id": "ltxr-ai-gov",
+      "label": "AI Governance & Policy",
+      "category": "LTXR"
+    },
+    {
+      "id": "ltxr-ai-general",
+      "label": "AI (Unspecified)",
+      "category": "LTXR"
+    },
+    {
+      "id": "ltxr-gcr",
+      "label": "GCR Capacity & Fieldbuilding",
+      "category": "LTXR"
+    },
+    {
+      "id": "ltxr-general",
+      "label": "Longtermism (Unspecified)",
+      "category": "LTXR"
+    },
+    {
+      "id": "gh-malaria",
+      "label": "Malaria",
+      "category": "GH"
+    },
+    {
+      "id": "gh-deworming",
+      "label": "Deworming",
+      "category": "GH"
+    },
+    {
+      "id": "gh-vaccines",
+      "label": "Vaccines & Immunization",
+      "category": "GH"
+    },
+    {
+      "id": "gh-nutrition",
+      "label": "Nutrition",
+      "category": "GH"
+    },
+    {
+      "id": "gh-lead",
+      "label": "Lead Exposure",
+      "category": "GH"
+    },
+    {
+      "id": "gh-air",
+      "label": "Air Quality",
+      "category": "GH"
+    },
+    {
+      "id": "gh-rnd",
+      "label": "Health R&D",
+      "category": "GH"
+    },
+    {
+      "id": "gh-cash",
+      "label": "Cash Transfers & Direct Aid",
+      "category": "GH"
+    },
+    {
+      "id": "gh-policy",
+      "label": "Aid & Growth Policy",
+      "category": "GH"
+    },
+    {
+      "id": "gh-general",
+      "label": "Global Health (Unspecified)",
+      "category": "GH"
+    },
+    {
+      "id": "aw-cagefree",
+      "label": "Cage-Free & Layer Hens",
+      "category": "AW"
+    },
+    {
+      "id": "aw-broiler",
+      "label": "Broiler & Poultry",
+      "category": "AW"
+    },
+    {
+      "id": "aw-fish",
+      "label": "Fish & Aquatic",
+      "category": "AW"
+    },
+    {
+      "id": "aw-wild",
+      "label": "Wild-Animal Welfare",
+      "category": "AW"
+    },
+    {
+      "id": "aw-altprotein",
+      "label": "Alternative Proteins",
+      "category": "AW"
+    },
+    {
+      "id": "aw-movement",
+      "label": "Movement & Advocacy",
+      "category": "AW"
+    },
+    {
+      "id": "aw-general",
+      "label": "Animal Welfare (Unspecified)",
+      "category": "AW"
+    },
+    {
+      "id": "meta-giving",
+      "label": "Effective Giving",
+      "category": "Meta"
+    },
+    {
+      "id": "meta-careers",
+      "label": "Careers & Talent",
+      "category": "Meta"
+    },
+    {
+      "id": "meta-forecasting",
+      "label": "Forecasting & Epistemics",
+      "category": "Meta"
+    },
+    {
+      "id": "meta-research",
+      "label": "Research & Prioritization",
+      "category": "Meta"
+    },
+    {
+      "id": "meta-community",
+      "label": "Community & Infrastructure",
+      "category": "Meta"
+    },
+    {
+      "id": "meta-general",
+      "label": "EA Meta (Unspecified)",
+      "category": "Meta"
+    },
+    {
+      "id": "policy-cj",
+      "label": "Criminal Justice",
+      "category": "Policy"
+    },
+    {
+      "id": "policy-immigration",
+      "label": "Immigration",
+      "category": "Policy"
+    },
+    {
+      "id": "policy-housing",
+      "label": "Housing & Land Use",
+      "category": "Policy"
+    },
+    {
+      "id": "policy-macro",
+      "label": "Macroeconomic Policy",
+      "category": "Policy"
+    },
+    {
+      "id": "policy-innovation",
+      "label": "Innovation & Abundance",
+      "category": "Policy"
+    },
+    {
+      "id": "policy-general",
+      "label": "Policy (Unspecified)",
+      "category": "Policy"
+    },
+    {
+      "id": "science-basic",
+      "label": "Basic Science",
+      "category": "Science"
+    },
+    {
+      "id": "science-tools",
+      "label": "Tools & Techniques",
+      "category": "Science"
+    },
+    {
+      "id": "science-general",
+      "label": "Scientific Research (Unspecified)",
+      "category": "Science"
+    },
+    {
+      "id": "other-infectious",
+      "label": "Infectious Disease",
+      "category": "Other"
+    },
+    {
+      "id": "other-climate",
+      "label": "Climate & Energy",
+      "category": "Other"
+    },
+    {
+      "id": "other-general",
+      "label": "Other (Unspecified)",
+      "category": "Other"
+    }
+  ],
   "dateRange": {
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-09-03T02:21:56.686Z"
+  "lastUpdated": "2026-10-02T20:02:06.998Z"
 }
