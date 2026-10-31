@@ -12,7 +12,8 @@
     "tag:subcats": "tsx scripts/tag-subcategories.ts",
     "build": "npm run build:data && next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "refresh:manifund": "tsx scripts/refresh-manifund.ts"
   },
   "keywords": [],
   "author": "",
