@@ -1,15 +1,15 @@
 {
   "schemaVersion": "1.0",
-  "totalGrants": 7707,
-  "totalAmount": 7608756199.971426,
+  "totalGrants": 8415,
+  "totalAmount": 8440652969.841458,
   "grantmakers": [
     "Coefficient Giving",
-    "OpenAI Foundation",
     "GiveWell",
-    "EA Funds",
-    "ACE",
-    "ACX Grants",
+    "OpenAI Foundation",
     "SFF",
+    "ACE",
+    "EA Funds",
+    "ACX Grants",
     "FLI",
     "Meta Charity Funders",
     "The Audacious Project",
@@ -20,11 +20,11 @@
   ],
   "categories": [
     "Other",
-    "LTXR",
     "GH",
-    "Meta",
     "AW",
+    "LTXR",
     "Policy",
+    "Meta",
     "Science"
   ],
   "subCategories": [
@@ -243,5 +243,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-10-02T20:02:06.998Z"
+  "lastUpdated": "2026-10-31T17:25:50.648Z"
 }

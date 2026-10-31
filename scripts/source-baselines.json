@@ -1,32 +1,32 @@
 {
   "ace": {
-    "grants": 309,
-    "amount": 8731493,
-    "updatedAt": "2026-09-03T01:24:01.396Z"
+    "grants": 330,
+    "amount": 9786432,
+    "updatedAt": "2026-10-31T16:45:40.670Z"
   },
   "coefficient-giving": {
-    "grants": 3569,
-    "amount": 5483508396,
-    "updatedAt": "2026-09-03T01:24:01.396Z"
+    "grants": 3692,
+    "amount": 5773001228,
+    "updatedAt": "2026-10-31T16:45:40.670Z"
   },
   "ea-funds": {
-    "grants": 1859,
-    "amount": 127801525,
-    "updatedAt": "2026-09-03T01:24:01.396Z"
+    "grants": 1890,
+    "amount": 132089813,
+    "updatedAt": "2026-10-31T16:45:40.670Z"
   },
   "givewell": {
-    "grants": 493,
-    "amount": 2262055344,
-    "updatedAt": "2026-09-03T01:24:01.396Z"
+    "grants": 570,
+    "amount": 2771380731,
+    "updatedAt": "2026-10-31T16:45:40.670Z"
   },
   "sff": {
-    "grants": 471,
-    "amount": 142516706,
-    "updatedAt": "2026-09-03T01:24:01.396Z"
+    "grants": 586,
+    "amount": 167622706,
+    "updatedAt": "2026-10-31T16:45:40.670Z"
   },
   "supplemental": {
     "grants": 241,
     "amount": 98407939,
-    "updatedAt": "2026-09-03T01:24:01.396Z"
+    "updatedAt": "2026-10-31T16:45:40.670Z"
   }
 }
