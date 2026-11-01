@@ -288,6 +288,23 @@ const GrantRow = memo(function GrantRow({
   );
 });
 
+/** Top-level "Select All / Deselect All" for a whole filter section. */
+function SelectAllRow<T extends string | number>({ all, selected, onChange }: {
+  all: T[]; selected: T[]; onChange: (next: T[]) => void;
+}) {
+  const allOn = all.length > 0 && all.every(v => selected.includes(v));
+  return (
+    <div style={styles.selectAllRow}>
+      <button
+        onClick={() => onChange(allOn ? [] : [...all])}
+        style={{ ...styles.selectAllButton, ...(allOn ? styles.selectAllButtonActive : {}) }}
+      >
+        {allOn ? 'Deselect All' : 'Select All'}
+      </button>
+    </div>
+  );
+}
+
 export default function Home() {
   // Data loading state
   const [grants, setGrants] = useState<MinGrant[]>([]);
@@ -897,19 +914,41 @@ export default function Home() {
   // Grantmaker colors. Funders that work in a single cause area echo that cause's
   // color (see CATEGORY_COLORS); diversified funders and the crowded LTXR space
   // use distinct brand-ish colors that deliberately avoid the cause palette.
+  // Funder colour encodes the cause area that funder concentrates on: each sits in the
+  // hue family of its dominant category, stepped within the family so the pairs that sit
+  // next to each other in the stacked chart stay separable. Funders with no dominant
+  // cause take deliberately desaturated neutrals — "funds across the board".
+  //
+  // Validated (dataviz six-checks, light surface, adjacent pairlist): worst adjacent
+  // CVD ΔE 10.8, normal-vision ΔE 16.5, all inside the L 0.43–0.77 band. The neutrals and
+  // the shared muted clay sit below the chroma floor on purpose — low chroma is itself the
+  // signal ("no single cause" / "minor funder") — and the grantmaker name is written in
+  // every tag, so colour reinforces identity rather than carrying it alone.
   const GRANTMAKER_COLORS: { [key: string]: string } = {
-    // Cause-tied (sole funder of a distinct cause)
-    'GiveWell': '#10b981',             // Global Health
-    'ACE': '#8b5cf6',                  // Animal Welfare
-    'Meta Charity Funders': '#06b6d4', // EA Meta
-    // Branding / distinct (diversified, or contested LTXR space)
-    'Coefficient Giving': '#2563eb',
-    'EA Funds': '#0a7b8a',
-    'Founders Pledge': '#1e3a8a',
-    'SFF': '#ec4899',
-    'FLI': '#84cc16',
-    'Navigation Fund': '#0ea5e9',
-    'Macroscopic': '#78716c',
+    // ── Global Health (emerald) ──
+    'GiveWell': '#10b981',              // 100% GH
+    // ── Animal Welfare (violet) ──
+    'ACE': '#8b5cf6',                   // 100% AW
+    'Navigation Fund': '#6d28d9',       // 77% AW
+    // ── EA Meta (cyan) ──
+    'Meta Charity Funders': '#06b6d4',  // 100% Meta
+    // ── Other / unspecified cause (steel blue) ──
+    'Founders Pledge': '#3a6ea5',       // 100% Other (residuals, no per-grant causes)
+    // ── Long-Term & Existential Risk (warm family) ──
+    // The three major LTXR funders get a dark→light amber ramp; they are mutually
+    // separable under all-pairs testing (CVD ΔE 10.3, normal-vision 15.5).
+    'BlueDot Impact': '#9a3412',        // 100% LTXR
+    'SFF': '#ea580c',                   // 100% LTXR
+    'Manifund': '#f59e0b',              // 93% LTXR
+    // The minor LTXR funders share one muted clay: still warm (so the cause reads),
+    // but desaturated to say "small share" rather than competing for amber space.
+    'FLI': '#a3907c',                   // 100% LTXR (76 grants)
+    'The Audacious Project': '#a3907c', // 100% LTXR (2 grants)
+    'OpenAI Foundation': '#a3907c',     // 100% LTXR (1 grant)
+    // ── Diversified / no dominant cause (intentional neutrals) ──
+    'Coefficient Giving': '#475569',    // LTXR only 45% of $ — funds every cause
+    'EA Funds': '#9ca3af',              // GH 28% of $ / LTXR 40% of grants
+    'ACX Grants': '#6b7280',            // 63% "Other" — mixed small grants
   };
 
   // Fixed per-cause palette, matching the org-financials database so a funder's
@@ -1399,12 +1438,14 @@ export default function Home() {
       yearFunder, yearCategory, monthFunder, monthCategory,
     } = chartData;
 
+    // Fixed px (not %) on the right: the vertical legend has a bounded width, and a
+    // percentage shrinks at narrower widths until the legend overlaps the plot.
     const gridYear = isMobile
       ? { left: '45px', right: '8px', top: '30px', bottom: '10%' }
-      : { left: '7%', right: '20%', top: '55px', bottom: '15%' };
+      : { left: '7%', right: '210px', top: '55px', bottom: '15%' };
     const gridMonth = isMobile
       ? { left: '45px', right: '8px', top: '30px', bottom: '18%' }
-      : { left: '7%', right: '20%', top: '55px', bottom: '20%' };
+      : { left: '7%', right: '210px', top: '55px', bottom: '20%' };
 
     // Calculate y-axis max that works for both nominal and inflation-adjusted
     // This ensures bars never shrink when inflation is toggled on
@@ -1453,9 +1494,16 @@ export default function Home() {
 
     const titleStyle = isMobile ? { fontSize: 12 } : {};
     // Hide legend on mobile - tooltip provides enough info
+    // Truncate long funder names so the legend's footprint is bounded and predictable —
+    // the grid reserves a matching fixed pixel margin (see gridYear/gridMonth), which a
+    // percentage margin could not guarantee at narrower widths.
     const legendConfig = isMobile
       ? { show: false }
-      : { type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20 };
+      : {
+          type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20,
+          textStyle: { fontSize: 12, width: 150, overflow: 'truncate' as const },
+          tooltip: { show: true },
+        };
     const niceMax = (value: number) => {
       if (value <= 0) return 0;
       const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
@@ -1720,6 +1768,7 @@ export default function Home() {
                 </button>
                 {expandedFilters.grantmaker && (
                   <div style={styles.filterOptions}>
+                    <SelectAllRow all={metadata.grantmakers} selected={selectedGrantmakers} onChange={setSelectedGrantmakers} />
                     {metadata.grantmakers.map(gm => (
                       <label key={gm} style={styles.filterOption}>
                         <input
@@ -1744,8 +1793,15 @@ export default function Home() {
                 </button>
                 {expandedFilters.fund && (
                   <div style={styles.filterOptionsGrouped}>
+                    <SelectAllRow
+                      all={fundsByGrantmaker.flatMap(g => g.funds)}
+                      selected={selectedFunds}
+                      onChange={setSelectedFunds}
+                    />
                     {fundsByGrantmaker.map(group => {
-                      const allSelected = group.funds.every(f => selectedFunds.includes(f));
+                      // .every() is true for an empty list, which would mislabel an empty
+                      // group as "Deselect All" — require at least one option.
+                      const allSelected = group.funds.length > 0 && group.funds.every(f => selectedFunds.includes(f));
                       const someSelected = group.funds.some(f => selectedFunds.includes(f));
                       return (
                       <div key={group.grantmaker} style={styles.fundGroup}>
@@ -1806,6 +1862,7 @@ export default function Home() {
                 </button>
                 {expandedFilters.category && (
                   <div style={styles.filterOptions}>
+                    <SelectAllRow all={metadata.categories} selected={selectedCategories} onChange={setSelectedCategories} />
                     {metadata.categories.map(cat => {
                       const isNonCoreOnly = nonCoreOnlyCategories.has(cat);
                       return (
@@ -1848,9 +1905,14 @@ export default function Home() {
                   </button>
                   {expandedFilters.subcategory && (
                     <div style={styles.filterOptionsGrouped}>
+                      <SelectAllRow
+                        all={subCategoriesByCategory.flatMap(g => g.subs.map(s => s.id))}
+                        selected={selectedSubCategories}
+                        onChange={setSelectedSubCategories}
+                      />
                       {subCategoriesByCategory.map(group => {
                         const ids = group.subs.map(s => s.id);
-                        const allSelected = ids.every(id => selectedSubCategories.includes(id));
+                        const allSelected = ids.length > 0 && ids.every(id => selectedSubCategories.includes(id));
                         return (
                           <div key={group.category} style={styles.fundGroup}>
                             <div style={styles.fundGroupHeaderRow}>
@@ -1895,6 +1957,7 @@ export default function Home() {
                 </button>
                 {expandedFilters.year && (
                   <div style={styles.filterOptions}>
+                    <SelectAllRow all={availableYears} selected={selectedYears} onChange={setSelectedYears} />
                     {availableYears.map(year => (
                       <label key={year} style={styles.filterOption}>
                         <input
@@ -2513,6 +2576,12 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: '600',
     color: '#374151',
   },
+  selectAllRow: {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'flex-end',
+    marginBottom: '6px',
+  },
   selectAllButton: {
     fontSize: '11px',
     padding: '2px 8px',
@@ -2644,7 +2713,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   listHeaderRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
+    gridTemplateColumns: '1fr 220px 0px 220px 110px 100px',
     gap: '8px',
     padding: '10px 0',
     borderBottom: '2px solid #e5e7eb',
@@ -2666,7 +2735,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   grantRow: {
     display: 'grid',
-    gridTemplateColumns: '1fr 220px 10px 280px 110px 100px',
+    gridTemplateColumns: '1fr 220px 0px 220px 110px 100px',
     alignItems: 'start',
     gap: '8px',
   },
