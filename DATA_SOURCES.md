@@ -243,6 +243,50 @@ cheap and stable.
 
 ---
 
+## Refresh workflow & cadence
+
+```
+npm run scrape             # auto sources + source guard
+npm run refresh:manifund --write   # Manifund projects (see below)
+npm run tag:subcats        # list NEW recipients needing sub-categories
+                           #   → tag them, then: npm run tag:subcats validate
+npm run build              # rebuild public/data + the site
+```
+
+**Automatic** (handled by `npm run scrape`): Coefficient Giving, EA Funds, SFF,
+ACE, and the Founders Pledge/ACE residual computation. The source guard aborts
+the run if any source returns zero or regresses more than 10%.
+
+**Manual, per refresh:**
+
+| Source | How to refresh |
+|---|---|
+| **GiveWell** | No public API. Download the CSV from the Airtable shared view to `data/raw/givewell-grants.csv` (the file is gitignored), then re-scrape. This is the only step that cannot be automated. |
+| **Manifund** | `npm run refresh:manifund -- --write` — pages Manifund's own API. Do **not** import Manifund from Trace: our rows are project-level aggregates, while Trace stores the same money as per-donation rows keyed by individual donors, so a Trace import would double-count at the wrong granularity. |
+| **BlueDot, ACX, Audacious, OpenAI Foundation** | Re-pull `https://trace.manifund.org/grants.json` and diff against the existing files. Skip zero-amount/undated rows, UUID or very short recipient names, and OpenAI's People-First AI Fund (out of EA scope). |
+| **FLI, Meta Charity Funders, Navigation Fund** | Hand-curated in `data/raw/supplemental/`; check the funders' pages for new rounds. FLI publishes grant *year* only, so dates are set to mid-year. |
+
+### IRS Form 990 timing (Founders Pledge + Org Financials)
+
+Founders Pledge is 100% residuals computed from 990 annual totals, and the Org
+Financials dataset is built from 990 filings — so both are gated by the IRS
+filing calendar, not by our scrape schedule.
+
+For a calendar fiscal year, Form 990 is due the 15th day of the 5th month after
+year end (**May 15**), and an automatic six-month extension (Form 8868) pushes
+that to **November 15**. Most larger nonprofits extend. The IRS then releases
+e-file data on a rolling, roughly monthly basis, and ProPublica/Candid ingest it
+with a further lag — so a filing typically becomes queryable one to three months
+after it is submitted.
+
+Practical cadence: **check in January and again in March** for the prior fiscal
+year's filings, which captures most extension filers; expect good coverage by
+mid-year. Organisations with non-calendar fiscal years (tracked per-org as
+`fy_end_month`) shift accordingly, so a given fiscal year never arrives all at
+once.
+
+---
+
 ## Known Limitations
 
 ### Itemization gaps
