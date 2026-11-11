@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "totalGrants": 8415,
-  "totalAmount": 8440652969.841458,
+  "totalGrants": 8465,
+  "totalAmount": 8474466440.841432,
   "grantmakers": [
     "Coefficient Giving",
     "GiveWell",
@@ -22,9 +22,9 @@
     "Other",
     "GH",
     "AW",
+    "Meta",
     "LTXR",
     "Policy",
-    "Meta",
     "Science"
   ],
   "subCategories": [
@@ -243,5 +243,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-11-01T01:44:23.464Z"
+  "lastUpdated": "2026-11-11T15:42:51.615Z"
 }

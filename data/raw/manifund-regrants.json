@@ -7252,5 +7252,59 @@
     "regrant_of": [
       "Manifund"
     ]
+  },
+  {
+    "id": "mf-01480",
+    "title": "Finish Video Game about AI Girlfriends and Social Peril",
+    "recipient": "Finish Video Game about AI Girlfriends and Social Peril",
+    "amount": 20000,
+    "currency": "USD",
+    "date": "2025-10-27",
+    "grantmaker": "Manifund",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/finish-video-game-about-ai-girlfriends-and-social-peril",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01479",
+    "title": "Mindscapes: World Building for AI Safety",
+    "recipient": "Mindscapes: World Building for AI Safety",
+    "amount": 30410,
+    "currency": "USD",
+    "date": "2026-10-19",
+    "grantmaker": "Manifund",
+    "description": "Science & technology, Technical AI safety, Global catastrophic risks, Digital minds",
+    "category": "LTXR",
+    "focus_area": "Science & technology, Technical AI safety, Global catastrophic risks, Digital minds",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/mindscapes-world-building-for-ai-safety",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01478",
+    "title": "Travel for undergrad to present first-author AI Security paper, ACML 2026 (oral)",
+    "recipient": "Travel for undergrad to present first-author AI Security paper, ACML 2026 (oral)",
+    "amount": 1800,
+    "currency": "USD",
+    "date": "2026-11-03",
+    "grantmaker": "Manifund",
+    "description": "Technical AI safety, Forecasting, AI safety advocacy",
+    "category": "LTXR",
+    "focus_area": "Technical AI safety, Forecasting, AI safety advocacy",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/travel-for-undergrad-to-present-first-author-ai-security-paper-acml-2026-oral",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
   }
 ]
