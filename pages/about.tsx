@@ -1,12 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { GetStaticProps } from 'next';
+import fs from 'fs';
+import path from 'path';
 
 const REPO_URL = 'https://github.com/Brian-Foerster/EAGrantsDatabase';
 const FEEDBACK_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSceNe8T97Z36LvBmepyid68MYbyairBvZucnZFlREGROSBOZA/viewform';
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 
-export default function About() {
+interface GrantmakerStats { count: number; minYear: string; maxYear: string; amount: number }
+
+interface AboutStats {
+  totalGrants: number;
+  totalAmountB: string;
+  grantmakers: Record<string, GrantmakerStats>;
+  policyCount: number;
+  policyAmountM: string;
+  orgTotal: number;
+  orgUS: number;
+  orgUK: number;
+}
+
+const fmt = (n: number) => n.toLocaleString('en-US');
+const approx = (n: number, round = 10) => '~' + fmt(Math.round(n / round) * round);
+
+export const getStaticProps: GetStaticProps<{ stats: AboutStats }> = async () => {
+  const dataDir = path.join(process.cwd(), 'public', 'data');
+  const grants: any[] = JSON.parse(fs.readFileSync(path.join(dataDir, 'grants.min.json'), 'utf-8'));
+  const orgData = JSON.parse(fs.readFileSync(path.join(dataDir, 'recipient-orgs.json'), 'utf-8'));
+
+  const grantmakers: Record<string, GrantmakerStats> = {};
+  for (const g of grants) {
+    const gm = g.grantmaker as string;
+    const year = (g.date as string).slice(0, 4);
+    if (!grantmakers[gm]) grantmakers[gm] = { count: 0, minYear: year, maxYear: year, amount: 0 };
+    grantmakers[gm].count++;
+    grantmakers[gm].amount += g.amount as number;
+    if (year < grantmakers[gm].minYear) grantmakers[gm].minYear = year;
+    if (year > grantmakers[gm].maxYear) grantmakers[gm].maxYear = year;
+  }
+
+  const policy = grants.filter((g: any) => g.category === 'Policy');
+  const totalAmount = grants.reduce((s: number, g: any) => s + (g.amount as number), 0);
+
+  const orgs: any[] = orgData.orgs;
+  const orgUS = orgs.filter((o: any) => o.source === 'propublica').length;
+  const orgUK = orgs.filter((o: any) => o.source === 'charity_commission').length;
+
+  return {
+    props: {
+      stats: {
+        totalGrants: grants.length,
+        totalAmountB: (totalAmount / 1e9).toFixed(1),
+        grantmakers,
+        policyCount: policy.length,
+        policyAmountM: (policy.reduce((s: number, g: any) => s + (g.amount as number), 0) / 1e6).toFixed(0),
+        orgTotal: orgs.length,
+        orgUS,
+        orgUK,
+      },
+    },
+  };
+};
+
+export default function About({ stats }: { stats: AboutStats }) {
   // Initialize to a constant (not window.innerWidth) so the server and the first
   // client render agree — avoids a hydration mismatch that can otherwise leave the
   // width state stuck. The effect below sets the real width immediately after mount.
@@ -83,8 +141,8 @@ export default function About() {
             <h2 style={styles.sectionTitle}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
-              the Effective Altruism community. It currently includes over 7,600 grants
-              totaling approximately $7.6 billion, spanning 2012 to 2026.
+              the Effective Altruism community. It currently includes over {fmt(Math.floor(stats.totalGrants / 100) * 100)} grants
+              totaling approximately ${stats.totalAmountB} billion, spanning 2012 to {stats.grantmakers['Coefficient Giving']?.maxYear || '2026'}.
             </p>
             <p style={styles.paragraph}>
               The site has two complementary parts: this grants database of individual grants, and a
@@ -98,6 +156,19 @@ export default function About() {
               grant is actually "EA" is a question outside the scope of this project.
             </p>
             <p style={styles.paragraph}>
+              Because the database relies entirely on public records, it is a lower bound on
+              actual EA-aligned grantmaking. Major funders that do not publicly disclose their
+              grants are not captured, most notably Longview Philanthropy, which reports privately
+              to donors. Individual donors who give directly rather than through tracked
+              intermediaries are also absent. Even for grantmakers that are tracked, publication
+              lag means recent years systematically undercount actual funding, and some grants are
+              never publicly disclosed. Grant dates reflect when a grant was announced or
+              committed, which may differ from when funds were disbursed or spent. The FTX Future Fund's roughly $160 million in 2022
+              commitments are excluded because disbursements cannot be distinguished from
+              clawed-back commitments. These gaps and others are described in detail in
+              the Limitations section below.
+            </p>
+            <p style={styles.paragraph}>
               The database is updated monthly via an automated scraping pipeline. The source
               code and full methodology documentation are available on{' '}
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={styles.link}>GitHub</a>.
@@ -107,7 +178,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Coefficient Giving (formerly Open Philanthropy)</h3>
             <p style={styles.paragraph}>
-              Approximately 3,230 grants (2012 through 2026), sourced from the official{' '}
+              Approximately {approx(stats.grantmakers['Coefficient Giving']?.count || 0)} grants ({stats.grantmakers['Coefficient Giving']?.minYear}–{stats.grantmakers['Coefficient Giving']?.maxYear}), sourced from the official{' '}
               <a href="https://coefficientgiving.org/wp-content/uploads/Coefficient-Giving-Grants-Archive.csv" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Coefficient Giving Grants Archive
               </a>.
@@ -116,21 +187,21 @@ export default function About() {
 
             <h3 style={styles.subheading}>GiveWell</h3>
             <p style={styles.paragraph}>
-              Approximately 450 grants (2014 through 2026), exported from GiveWell's public{' '}
+              Approximately {approx(stats.grantmakers['GiveWell']?.count || 0)} grants ({stats.grantmakers['GiveWell']?.minYear}–{stats.grantmakers['GiveWell']?.maxYear}), exported from GiveWell's public{' '}
               <a href="https://airtable.com/appaVhon0jdLt1rVs/shrixNMUWCSC5v1lh/tblykYPizxzYj3U1L/viwJ3DyqAUsL654Rm" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Airtable database
               </a>.
               All grants are categorized as Global Health &amp; Development.
             </p>
             <p style={styles.paragraph}>
-              Public grant listings can lag behind internal grantmaking and may be incomplete or
-              filtered for usability. As a result, public totals and counts may differ from
-              grantmaker announcements that draw on internal systems or newer approvals.
+              Public grant listings can lag behind internal grantmaking and may be incomplete.
+              As a result, public totals and counts may differ from grantmaker announcements
+              that draw on internal systems or newer approvals.
             </p>
 
             <h3 style={styles.subheading}>Effective Altruism Funds</h3>
             <p style={styles.paragraph}>
-              Approximately 1,820 grants (2017 through 2025) from the public API at{' '}
+              Approximately {approx(stats.grantmakers['EA Funds']?.count || 0)} grants ({stats.grantmakers['EA Funds']?.minYear}–{stats.grantmakers['EA Funds']?.maxYear}) from the public API at{' '}
               <a href="https://funds.effectivealtruism.org/api/grants" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 funds.effectivealtruism.org
               </a>.
@@ -140,7 +211,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Survival and Flourishing Fund</h3>
             <p style={styles.paragraph}>
-              Approximately 470 grants (2018 through 2025), parsed from the HTML table on
+              Approximately {approx(stats.grantmakers['SFF']?.count || 0)} grants ({stats.grantmakers['SFF']?.minYear}–{stats.grantmakers['SFF']?.maxYear}), parsed from the HTML table on
               the{' '}
               <a href="https://survivalandflourishing.fund/recommendations" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 recommendations page
@@ -150,13 +221,13 @@ export default function About() {
 
             <h3 style={styles.subheading}>Animal Charity Evaluators</h3>
             <p style={styles.paragraph}>
-              Approximately 320 grants (2015 through 2026) from{' '}
+              Approximately {approx(stats.grantmakers['ACE']?.count || 0)} grants ({stats.grantmakers['ACE']?.minYear}–{stats.grantmakers['ACE']?.maxYear}) from{' '}
               <a href="https://animalcharityevaluators.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>ACE</a>'s
               Movement Grants program, scraped from its{' '}
               <a href="https://animalcharityevaluators.org/movement-grants/past-movement-grants-recipients/" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 past grant recipients page
               </a>. All grants are categorized as Animal Welfare. Where itemized coverage falls
-              short of ACE's published annual giving, a residual entry tops up the difference.
+              short of ACE's published annual giving, a residual entry covers the difference.
             </p>
 
             <h3 style={styles.subheading}>Future of Life Institute</h3>
@@ -175,7 +246,7 @@ export default function About() {
               <a href="https://forum.effectivealtruism.org/topics/meta-charity-funders-mcf" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 EA Forum
               </a>{' '}
-              (approximately $3.6M across four rounds since 2023), manually curated.
+              (approximately ${((stats.grantmakers['Meta Charity Funders']?.amount || 0) / 1e6).toFixed(1)}M across four rounds since 2023), manually curated.
               Some grantees are anonymous in the source and are listed as anonymous here.
               One grant made in pounds is converted at the round's exchange rate.
             </p>
@@ -193,6 +264,23 @@ export default function About() {
               dates are approximate and coverage lags by a year.
             </p>
 
+            <h3 style={styles.subheading}>Sentinel Bio</h3>
+            <p style={styles.paragraph}>
+              Biosecurity grants (2024 onward) from{' '}
+              <a href="https://sentinelbio.org" target="_blank" rel="noopener noreferrer" style={styles.link}>Sentinel Bio</a>,
+              parsed from its individual grant pages. Each page gives the month, focus area and
+              amount; the few grant pages that publish no amount are omitted.
+            </p>
+
+            <h3 style={styles.subheading}>CLR Fund</h3>
+            <p style={styles.paragraph}>
+              Every grant listed on the Center on Long-Term Risk's{' '}
+              <a href="https://longtermrisk.org/grantmaking/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                grantmaking page
+              </a>{' '}(2018 onward), focused on reducing s-risks. Grants paid in pounds or euros
+              use the USD value CLR itself reports.
+            </p>
+
             <h3 style={styles.subheading}>BlueDot Impact and Manifund (regrants)</h3>
             <p style={styles.paragraph}>
               Rapid grants from{' '}
@@ -201,7 +289,11 @@ export default function About() {
               </a>{' '}and project funding from{' '}
               <a href="https://manifund.org" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Manifund
-              </a>, both pulled from their public data. These are regrantors whose money comes
+              </a>, both pulled from their own public APIs. BlueDot's{' '}
+              <a href="https://bluedot.org/grants/career-transition" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Career Transition Grants
+              </a>{' '}are published only as a running total, so they appear as unitemized
+              entries rather than individual grants. These are regrantors whose money comes
               largely from grantmakers already tracked here (BlueDot primarily from Coefficient
               Giving; Manifund from a mix of donors). To avoid double-counting the
               funder&nbsp;&rarr;&nbsp;regrantor&nbsp;&rarr;&nbsp;recipient chain, each regrantor's
@@ -218,9 +310,11 @@ export default function About() {
               </a>{' '}
               program, funded largely by his readers and outside donors. Later rounds
               (2024–2025) are administered through Manifund; earlier rounds (2021–2022) were
-              run directly. All are consolidated here under ACX Grants, via{' '}
+              run directly. All are consolidated here under ACX Grants, originally via{' '}
               <a href="https://trace.manifund.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Trace</a>{' '}
-              (a public-domain funding dataset from Manifund).
+              (a public-domain funding dataset from Manifund). New rounds are checked against
+              Manifund and added by hand, since ACX's share of each project's funding must be
+              confirmed separately.
             </p>
 
             <h3 style={styles.subheading}>The Audacious Project and OpenAI Foundation</h3>
@@ -232,21 +326,25 @@ export default function About() {
               nonprofits) is out of scope and not included.
             </p>
 
-            <h2 style={styles.sectionTitle}>Data sources with annual totals only</h2>
-            <p style={styles.paragraph}>
-              The following grantmaker does not publish individual grant data with dollar
-              amounts. Annual totals are used to generate residual entries that represent
-              each year's total disbursements as a single record.
-            </p>
-
             <h3 style={styles.subheading}>Founders Pledge</h3>
             <p style={styles.paragraph}>
-              Annual grant totals from IRS 990 filings (2016 through 2024), sourced via{' '}
+              Individual grants (2020 onward) from the grant tables on Founders Pledge's five{' '}
+              <a href="https://www.founderspledge.com/funds" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                fund pages
+              </a>{' '}(Climate, Global Catastrophic Risks, Catalytic Impact, Animal Welfare and
+              Patient Philanthropy), each categorized by its fund. Grants listed as{' '}
+              <em>advised</em>, which the fund's managers recommended but outside philanthropists
+              paid for, are included under a separate "(Advised)" fund value so they can be
+              filtered out.
+            </p>
+            <p style={styles.paragraph}>
+              Founders Pledge also makes grants beyond its funds. For 2016–2024, the gap between
+              the fund grants and the annual grants-paid totals in its IRS 990 filings (via{' '}
               <a href="https://projects.propublica.org/nonprofits/organizations/371795297" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 ProPublica Nonprofit Explorer
-              </a>. These figures represent grants paid, not "money
-              moved" (which is a larger figure). Grants span multiple cause areas but cannot
-              be broken out by category.
+              </a>) appears as an unitemized entry for each year. This is approximate: the fund
+              pages list grants when committed, some paid by Founders Pledge's UK entity, while
+              the 990s record cash paid by the US entity.
             </p>
 
             <h2 style={styles.sectionTitle}>Processing</h2>
@@ -268,7 +366,7 @@ export default function About() {
               GiveWell's own records — matched by recipient and program, since Coefficient files
               some GiveWell-channel grants under other fund labels. Second, cross-source fuzzy
               matching identifies grants to the same recipient in the same year with amounts
-              within 10%, merging approximately 49 additional duplicates.
+              within 10%, merging approximately 52 additional duplicates.
             </p>
             <p style={styles.paragraph}>
               These safeguards prioritize consistent totals over perfect attribution when the
@@ -305,7 +403,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>Non-core EA focus areas</h3>
             <p style={styles.paragraph}>
-              Approximately 605 grants ($337M) in the Policy Reform category are excluded
+              Approximately {approx(stats.policyCount)} grants (${stats.policyAmountM}M) in the Policy Reform category are excluded
               from the default view. These include US policy areas such as Criminal Justice
               Reform, Housing Policy Reform, Immigration Policy, Macroeconomic Stabilization
               Policy, Innovation Policy, and Abundance &amp; Growth — areas that are not
@@ -345,12 +443,12 @@ export default function About() {
             <h3 style={styles.subheading}>Other limitations</h3>
             <ul style={styles.list}>
               <li style={styles.listItem}>
-                Coefficient Giving data is sourced from their official archive CSV, which
-                is updated periodically as grants are published.
+                Coefficient Giving data comes from its official archive CSV, which is
+                updated periodically as grants are published.
               </li>
               <li style={styles.listItem}>
-                Founders Pledge entries are entirely residual — they represent annual totals,
-                not individual grants.
+                Founders Pledge's grants outside its five funds (most of its 990 totals before
+                2025) are shown only as annual unitemized entries, not individual grants.
               </li>
               <li style={styles.listItem}>
                 Metadata fields such as country, topics, and description are sparse for many
@@ -360,29 +458,11 @@ export default function About() {
                 2025 and 2026 data is partial and reflects only grants published to date.
               </li>
               <li style={styles.listItem}>
-                Both databases contain only publicly available information — publicly
-                disclosed grants and public financial filings. Grants made privately or not
-                disclosed, funders that publish no grants list, and organizations without
-                public filings are not captured, so totals are a lower bound on actual EA
-                grantmaking and organizational revenue.
-              </li>
-              <li style={styles.listItem}>
-                The database does not include donation platforms (e.g.,{' '}
+                Donation platforms (e.g.,{' '}
                 <a href="https://www.givingwhatwecan.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Giving What We Can</a>,{' '}
                 <a href="https://www.thelifeyoucansave.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>The Life You Can Save</a>)
-                because their totals largely overlap with the grantmakers already tracked.
-              </li>
-              <li style={styles.listItem}>
-                Some EA-adjacent grantmakers are not yet tracked, including{' '}
-                <a href="https://www.longview.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Longview Philanthropy</a>,
-                which sends fund reports privately to donors and publishes no grants list.
-              </li>
-              <li style={styles.listItem}>
-                The FTX Future Fund committed approximately $160M in grants during 2022
-                before the collapse of FTX. These grants are excluded because it is unclear
-                which commitments were actually disbursed and which were clawed back during
-                bankruptcy proceedings. There is no authoritative source distinguishing
-                paid grants from unfulfilled commitments.
+                are not included because their totals largely overlap with the grantmakers
+                already tracked.
               </li>
             </ul>
 
@@ -390,7 +470,7 @@ export default function About() {
             <p style={styles.paragraph}>
               A companion org financials database shows the annual finances — revenue, expenses,
               assets, and liabilities — of
-              about 100 EA-adjacent organizations that appear as grant recipients, drawn from their
+              about {stats.orgTotal} EA-adjacent organizations that appear as grant recipients, drawn from their
               public regulatory filings. It is meant to show how much money these organizations
               actually take in and spend, and what share of their revenue comes from tracked EA
               grants. Each organization card links to that organization's grants in the grants
@@ -400,7 +480,7 @@ export default function About() {
             <h3 style={styles.subheading}>US organizations (IRS Form 990)</h3>
             <p style={styles.paragraph}>
               Annual total revenue, contributions, expenses, and end-of-year assets, liabilities,
-              and net assets for approximately 87 US 501(c)(3) organizations, sourced from the{' '}
+              and net assets for {stats.orgUS} US 501(c)(3) organizations, sourced from the{' '}
               <a href="https://projects.propublica.org/nonprofits/" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 ProPublica Nonprofit Explorer
               </a>{' '}
@@ -409,7 +489,7 @@ export default function About() {
 
             <h3 style={styles.subheading}>UK organizations (Charity Commission)</h3>
             <p style={styles.paragraph}>
-              Gross income and total expenditure for approximately 12 England-and-Wales registered
+              Gross income and total expenditure for {stats.orgUK} England-and-Wales registered
               charities, taken from the{' '}
               <a href="https://register-of-charities.charitycommission.gov.uk/" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Charity Commission
@@ -421,10 +501,10 @@ export default function About() {
             <h3 style={styles.subheading}>Which organizations are included</h3>
             <p style={styles.paragraph}>
               Organizations are included when they appear as recipients in the grants database and
-              publish their own financials. Pure grantmakers and regranters — for example Open
-              Philanthropy, GiveWell, Founders Pledge, Animal Charity Evaluators, and ClimateWorks —
-              are excluded, because their reported revenue reflects pass-through donations rather
-              than programmatic income and would be misleading. Organizations whose tracked EA
+              publish their own financials. Pure grantmakers and regranters (Open
+              Philanthropy, GiveWell, Founders Pledge, Animal Charity Evaluators, ClimateWorks,
+              and others) are excluded because their reported revenue reflects pass-through
+              donations rather than programmatic income and would be misleading. Organizations whose tracked EA
               grants were both under 1% of total revenue and under $1M overall are also omitted, to
               keep the focus on organizations for which EA funding is material.
             </p>
@@ -439,8 +519,8 @@ export default function About() {
             <p style={styles.paragraph}>
               Within each revenue bar, a darker segment marks the portion attributable to grants
               recorded in the grants database for that organization and year. For years in which an
-              organization received tracked EA grants but has no filing on record — for instance
-              before its first Form 990 or after its most recent one — an inferred bar is shown
+              organization received tracked EA grants but has no filing on record (for instance
+              before its first Form 990 or after its most recent one), an inferred bar is shown
               using the known grant total as a lower bound on revenue. These are drawn with a dashed
               outline and a faded extension to signal that actual revenue was likely higher.
             </p>
@@ -450,10 +530,10 @@ export default function About() {
               Grantmakers date grants when they are awarded, and often record a multi-year grant as
               a single dated entry, so the grants logged for a given year can exceed an
               organization's filed revenue for that year. Because organizations generally recognize
-              that money as revenue over the following year or two, the excess is carried forward —
-              added to the next one or two years up to each year's revenue — rather than shown above
-              revenue or discarded; affected figures are labeled in the chart tooltips. No grant
-              money is dropped. The only amounts left above revenue are those landing in an
+              that money as revenue over the following year or two, the excess is carried forward
+              to the next one or two years (up to each year's revenue) rather than shown above
+              revenue or discarded. Affected figures are labeled in the chart tooltips. No grant
+              money is dropped; the only amounts left above revenue are those landing in an
               organization's most recent filing year, where there is not yet a later filing to
               absorb them.
             </p>

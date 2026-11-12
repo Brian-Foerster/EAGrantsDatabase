@@ -20,6 +20,10 @@ export interface Grant {
   country?: string;
   topics?: string[];
   exclude_from_total?: boolean;
+  // Counted in the database, but NOT part of the grantmaker's published/990 annual
+  // total — e.g. Founders Pledge "advised" grants, paid by outside philanthropists on
+  // FP's recommendation. Such grants must not reduce the residual for that baseline.
+  outside_baseline?: boolean;
 
   // Regrant handling: a grant made by a regrantor (e.g. BlueDot, Manifund) whose
   // money originates from grants already tracked in the database. `regrant_of` names

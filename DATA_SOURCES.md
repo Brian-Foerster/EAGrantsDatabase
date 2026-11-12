@@ -28,8 +28,11 @@ records.
 | GiveWell Airtable shared view | GiveWell | Publicly shared grants database; manual CSV export. |
 | Survival and Flourishing Fund recommendations | SFF | Public recommendations table. |
 | Animal Charity Evaluators grants page | ACE | Public Movement Grants page. |
-| Founders Pledge 990 filings | Founders Pledge | IRS 990 filings (public record) via ProPublica. |
-| **Manifund / Trace** (`trace.manifund.org`) | Manifund, BlueDot (regrants), ACX Grants, The Audacious Project, OpenAI Foundation | **CC0 / public domain** — no attribution required (credit appreciated). |
+| Founders Pledge fund pages + 990 filings | Founders Pledge | Publicly published fund grant tables; IRS 990 filings (public record) via ProPublica. |
+| BlueDot Impact public grants API | BlueDot (regrants) | Publicly listed grantees and program totals. |
+| Manifund public API | Manifund | Public project data. |
+| Sentinel Bio grant pages; CLR Fund grantmaking page | Sentinel Bio, CLR Fund | Publicly published grant listings. |
+| **Manifund / Trace** (`trace.manifund.org`) | ACX Grants, The Audacious Project, OpenAI Foundation (and BlueDot's earlier rows) | **CC0 / public domain** — no attribution required (credit appreciated). |
 | FLI grant program pages | FLI | Publicly published grant listings; manually curated into `data/raw/supplemental/`. |
 | Meta Charity Funders; Navigation Fund | Meta Charity Funders, Navigation Fund | Publicly published grant listings; manually curated. |
 
@@ -40,10 +43,9 @@ this project's methodology (below), not values reported by the grantmakers —
 attribute those to the EA Grants Database.
 
 > **Sources not yet detailed below:** FLI, Meta Charity Funders, Navigation
-> Fund, and the Trace-sourced grantmakers (Manifund, BlueDot, ACX, Audacious,
-> OpenAI Foundation) are newer additions; the numbered sections that follow
-> predate them and describe the original six pipelines. The table above is the
-> authoritative source list.
+> Fund, Manifund, and the Trace-sourced grantmakers (ACX, Audacious, OpenAI
+> Foundation) have no numbered section; "Refresh workflow & cadence" says how
+> each is maintained. The table above is the authoritative source list.
 
 ---
 
@@ -143,16 +145,42 @@ CSV columns: `Grant, Recipient, Amount, Date, Link to grant description, Topics,
 
 ---
 
-### 5. Founders Pledge (Residuals Only)
+### 5. Founders Pledge (Fund Grants + 990 Residuals)
 
 | Field | Value |
 |-------|-------|
-| **Source** | IRS 990 filings via [ProPublica Nonprofit Explorer](https://projects.propublica.org/nonprofits/organizations/371795297) |
-| **Grants** | Residual entries only (no individual grant data available) |
-| **Coverage** | 2016–2024 |
-| **Category** | Other (mixed: climate, GH, biosecurity, AI safety) |
+| **Source (itemized)** | The five fund pages, `https://www.founderspledge.com/funds/<slug>` |
+| **Source (totals)** | IRS 990 filings via [ProPublica Nonprofit Explorer](https://projects.propublica.org/nonprofits/organizations/371795297) |
+| **Scraper** | `scripts/scrapers/founders-pledge.ts` |
+| **Grants** | ~147 fund grants + ~8 advised grants + annual residuals |
+| **Coverage** | 2020–present (fund grants); 2016–2024 (990 totals) |
+| **Category** | By fund: Climate → Other, GCR → LTXR, Catalytic Impact (GHD) → GH, Animal Welfare → AW, Patient Philanthropy → LTXR |
 
-**How it works:** Founders Pledge publishes a grantees page but without dollar amounts per grant. Annual grant totals are taken from their 990 filings and stored in `scripts/mappings/annual-totals.json`. Since we have no individual grant data, all Founders Pledge entries are residual grants representing their full annual disbursements.
+**How it works:** each fund page is a Next.js page whose complete grant table ships
+inside the page's flight payload (`self.__next_f.push(...)`) as
+`content-blocks.fund-recipients` blocks — `{ id, date, name, recipientUrl, grant,
+amount, grantUrl }`, with day-precision dates and exact amounts. The visible table shows
+only the first rows behind "Load More"; the payload has them all. Names ending in `*`
+were paid in a non-USD currency; FP's "converted reference value" is used as the USD
+amount.
+
+**Advised grants** (a separate block on some fund pages) were "identified, evaluated
+and advised on by Fund Managers; resources were deployed by external philanthropists
+through their giving infrastructure, separately from the Fund." They are included
+under their own fund value — `<Fund> (Advised)` — and flagged `outside_baseline`, so
+they do **not** reduce the 990 residual (that money never passed through FP's books).
+As a result FP's yearly total can exceed its 990 total by the advised amount.
+
+**Residuals:** the US entity's 990 grants-paid totals live in
+`scripts/mappings/annual-totals.json`; a year's residual is the 990 total minus that
+year's itemized fund grants. This is approximate, in both directions:
+- Fund pages list grants when **committed**; 990s record **cash paid** (e.g. DeployUS:
+  $1.75M committed in Dec 2023, $875K paid in 2023).
+- Some fund grants are paid by **Founders Pledge Ltd (UK)**, which files no 990, so
+  they are not part of the US total they are subtracted from. Only ~55% of 2020–24 fund
+  grants appear in the US 990 grant lists.
+- The 990 totals also include member-directed and pass-through grants (e.g. to CEA USA
+  for the Long-Term Future Fund) that are not FP fund grantmaking.
 
 **990 totals used:**
 | Year | Grants Paid |
@@ -165,6 +193,59 @@ CSV columns: `Grant, Recipient, Amount, Date, Link to grant description, Topics,
 | 2022 | $28.1M |
 | 2023 | $36.8M |
 | 2024 | $30.1M |
+
+**Not yet used: the 990 grant lists.** FP Inc filed 990-PF for 2020–2023 (Part XV lists
+every grant paid, foreign included, with purpose) and a 990 for 2024 (Schedule I:
+102 US grants, $26.3M; foreign grants by region only). These itemize 70–94% of each
+year's total and could itemize the residual, but would first need reconciling against
+the fund grants (commitment vs payment) and a scope decision on member-directed gifts.
+ProPublica's XML download is bot-protected; its rendered schedule pages
+(`/nonprofits/full_text/<object_id>/IRS990PF` or `/IRS990ScheduleI`) parse cleanly.
+
+---
+
+### 5a. Sentinel Bio
+
+| Field | Value |
+|-------|-------|
+| **Source** | `https://sentinelbio.org/grant-sitemap.xml` → one page per grant |
+| **Scraper** | `scripts/scrapers/sentinel-bio.ts` |
+| **Coverage** | 2024–present, month precision |
+| **Category** | LTXR (biosecurity) |
+
+Each grant page carries the recipient (`<h1>`), "Month Year / focus area"
+(`h3.title`) and a narrative opening "We provided $X to …". Pages that publish no
+amount (a few, some with no text at all) are skipped and logged.
+
+### 5b. CLR Fund (Center on Long-Term Risk)
+
+| Field | Value |
+|-------|-------|
+| **Source** | `https://longtermrisk.org/grantmaking/` |
+| **Scraper** | `scripts/scrapers/clr-fund.ts` |
+| **Coverage** | 2018–present, day precision |
+| **Category** | LTXR (s-risks) |
+
+One page; each grant is a `<tbody class="grant" data-date data-amount data-type>`.
+`data-amount` is CLR's own USD-converted value; the original GBP/EUR figure is kept in
+the description. The page states its own grant count, which the scraper checks.
+
+### 5c. BlueDot Impact (regrants)
+
+| Field | Value |
+|-------|-------|
+| **Source** | bluedot.org tRPC API: `grants.getAllPublicRapidGrantees`, `grants.getCareerTransitionGrantStats` |
+| **Script** | `npm run refresh:bluedot -- --write` (append-only, like Manifund) |
+| **Data file** | `data/raw/bluedot-regrants.json` |
+| **Category** | LTXR |
+
+Rapid grants are matched to existing rows by first name + amount + month (multiset),
+because BlueDot's public list drops some older grantees over time and the earlier
+Trace import paraphrased project titles. Career Transition Grants publish only a
+cumulative count and total, so they are carried as `Career Transition Grants
+(Unitemized)` residual rows: the backlog as one row, then one row per refresh for
+the increase. Rapid grants that BlueDot counts but does not list publicly are not
+residualized.
 
 ---
 
@@ -247,14 +328,16 @@ cheap and stable.
 
 ```
 npm run scrape             # auto sources + source guard
-npm run refresh:manifund --write   # Manifund projects (see below)
+npm run refresh:manifund -- --write  # Manifund projects + ACX review list
+npm run refresh:bluedot -- --write   # BlueDot rapid grants + career-transition total
 npm run tag:subcats        # list NEW recipients needing sub-categories
                            #   → tag them, then: npm run tag:subcats validate
 npm run build              # rebuild public/data + the site
 ```
 
 **Automatic** (handled by `npm run scrape`): Coefficient Giving, EA Funds, SFF,
-ACE, and the Founders Pledge/ACE residual computation. The source guard aborts
+ACE, Founders Pledge (fund pages), Sentinel Bio, CLR Fund, and the residual
+computation. The source guard aborts
 the run if any source returns zero or regresses more than 10%.
 
 **Manual, per refresh:**
@@ -263,14 +346,16 @@ the run if any source returns zero or regresses more than 10%.
 |---|---|
 | **GiveWell** | No public API. Download the CSV from the Airtable shared view to `data/raw/givewell-grants.csv` (the file is gitignored), then re-scrape. This is the only step that cannot be automated. |
 | **Manifund** | `npm run refresh:manifund -- --write` — pages Manifund's own API. Do **not** import Manifund from Trace: our rows are project-level aggregates, while Trace stores the same money as per-donation rows keyed by individual donors, so a Trace import would double-count at the wrong granularity. |
-| **BlueDot, ACX, Audacious, OpenAI Foundation** | Re-pull `https://trace.manifund.org/grants.json` and diff against the existing files. Skip zero-amount/undated rows, UUID or very short recipient names, and OpenAI's People-First AI Fund (out of EA scope). |
+| **BlueDot** | `npm run refresh:bluedot -- --write` — BlueDot's own public API (Trace's copy lags by weeks). Append-only. |
+| **ACX Grants** | `refresh:manifund` prints an **ACX REVIEW** list of funded ACX-tagged Manifund projects we don't hold. Manifund's API doesn't say which transactions were ACX's, so confirm ACX's grant (results post / project page) and add rows to `data/raw/supplemental/acx-grants.json` by hand. Some listed projects are ACX Forecasting mini-grants / impact certificates, not ACX Grants. |
+| **Audacious, OpenAI Foundation** | No feed; curated in `data/raw/supplemental/trace-funders.json`. Optionally re-check `https://trace.manifund.org/grants.json`. OpenAI's People-First AI Fund is out of EA scope. |
 | **FLI, Meta Charity Funders, Navigation Fund** | Hand-curated in `data/raw/supplemental/`; check the funders' pages for new rounds. FLI publishes grant *year* only, so dates are set to mid-year. |
 
 ### IRS Form 990 timing (Founders Pledge + Org Financials)
 
-Founders Pledge is 100% residuals computed from 990 annual totals, and the Org
+Founders Pledge's residuals are computed from 990 annual totals, and the Org
 Financials dataset is built from 990 filings — so both are gated by the IRS
-filing calendar, not by our scrape schedule.
+filing calendar, not by our scrape schedule. (FP's fund-page grants are not.)
 
 For a calendar fiscal year, Form 990 is due the 15th day of the 5th month after
 year end (**May 15**), and an automatic six-month extension (Form 8868) pushes
@@ -299,7 +384,7 @@ Not all grantmakers publish individual grant data. The database has full itemiza
 | GiveWell | ~90%+ | Full for 2019+, sparse for earlier years; Airtable CSV may not include all historical grants |
 | SFF | ~100% | Full via HTML table |
 | Coefficient Giving | Partial for 2024+ | The official archive CSV is updated periodically as grants are published. Earlier years are well-covered. |
-| Founders Pledge | 0% | No public grant-level data with amounts. 100% residual. |
+| Founders Pledge | Partial | Fund grants itemized from fund pages (2020+); grants outside the funds remain 990 residuals. |
 | ACE | Partial | Movement grants are itemized; remaining funding is residual. |
 
 Residual grants fill the dollar-amount gaps but cannot provide recipient/project-level detail. ~100% dollar coverage does not mean ~100% itemization.
@@ -330,7 +415,7 @@ The Coefficient Giving archive at `coefficientgiving.org/wp-content/uploads/Coef
 
 ### Founders Pledge category assignment
 
-Founders Pledge grants span multiple cause areas (climate, global health, biosecurity, AI safety) but we don't have per-grant category data. All FP residuals are categorized as "Other" since we can't determine the breakdown.
+Itemized fund grants take their fund's category (Climate → Other, GCR → LTXR, Catalytic Impact → GH, Animal Welfare → AW). The 990 residuals span every cause area with no breakdown, so they remain "Other".
 
 ### FTX Future Fund
 

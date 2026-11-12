@@ -27,6 +27,11 @@ function normalizeRecipient(name: string): string {
     .trim();
 }
 
+/** Normalized names that stand for "recipient not disclosed". */
+function isPlaceholderRecipient(normalized: string): boolean {
+  return /^(anonymous|anon|unknown|unknown recipients?|undisclosed|various recipients|individual|individuals|private recipient)$/.test(normalized.trim());
+}
+
 /** Check if two amounts are within 10% of each other */
 function amountsMatch(a: number, b: number): boolean {
   if (a === 0 || b === 0) return false;
@@ -95,8 +100,10 @@ export function deduplicateGrants(grants: Grant[]): { grants: Grant[]; stats: De
   const dedupedGrants: Grant[] = [];
   const seen = new Set<string>();
 
-  for (const [_key, group] of byRecipient) {
-    if (group.length <= 1) {
+  for (const [key, group] of byRecipient) {
+    // Anonymous / undisclosed recipients share a placeholder name, not an identity:
+    // two funders' "Anonymous" grants are never evidence of the same grant.
+    if (group.length <= 1 || isPlaceholderRecipient(key)) {
       dedupedGrants.push(...group);
       continue;
     }

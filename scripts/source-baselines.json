@@ -2,31 +2,46 @@
   "ace": {
     "grants": 330,
     "amount": 9786432,
-    "updatedAt": "2026-11-11T15:40:44.290Z"
+    "updatedAt": "2026-11-12T02:23:50.801Z"
+  },
+  "clr-fund": {
+    "grants": 46,
+    "amount": 1642103,
+    "updatedAt": "2026-11-12T02:23:50.801Z"
   },
   "coefficient-giving": {
-    "grants": 3739,
-    "amount": 5806762489,
-    "updatedAt": "2026-11-11T15:40:44.290Z"
+    "grants": 3740,
+    "amount": 5807875037,
+    "updatedAt": "2026-11-12T02:23:50.801Z"
   },
   "ea-funds": {
     "grants": 1890,
     "amount": 132089813,
-    "updatedAt": "2026-11-11T15:40:44.290Z"
+    "updatedAt": "2026-11-12T02:23:50.801Z"
+  },
+  "founders-pledge": {
+    "grants": 155,
+    "amount": 108159744,
+    "updatedAt": "2026-11-12T02:23:50.801Z"
   },
   "givewell": {
     "grants": 570,
     "amount": 2771380731,
-    "updatedAt": "2026-11-11T15:40:44.290Z"
+    "updatedAt": "2026-11-12T02:23:50.801Z"
+  },
+  "sentinel-bio": {
+    "grants": 55,
+    "amount": 19863016,
+    "updatedAt": "2026-11-12T02:23:50.801Z"
   },
   "sff": {
     "grants": 586,
     "amount": 167622706,
-    "updatedAt": "2026-11-11T15:40:44.290Z"
+    "updatedAt": "2026-11-12T02:23:50.801Z"
   },
   "supplemental": {
     "grants": 241,
     "amount": 98407939,
-    "updatedAt": "2026-11-11T15:40:44.290Z"
+    "updatedAt": "2026-11-12T02:23:50.801Z"
   }
 }

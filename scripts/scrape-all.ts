@@ -20,6 +20,9 @@ import { scrapeSFF } from './scrapers/sff';
 import { scrapeGiveWell } from './scrapers/givewell';
 import { scrapeACE } from './scrapers/ace';
 import { scrapeSupplemental } from './scrapers/supplemental';
+import { scrapeSentinelBio } from './scrapers/sentinel-bio';
+import { scrapeCLRFund } from './scrapers/clr-fund';
+import { scrapeFoundersPledge } from './scrapers/founders-pledge';
 import { deduplicateGrants } from './dedup';
 import { computeResiduals } from './residuals';
 import { summarize, saveScrapeResult } from './scraper-utils';
@@ -57,6 +60,9 @@ async function main() {
     { name: 'GiveWell', key: 'givewell', fn: scrapeGiveWell },
     { name: 'ACE', key: 'ace', fn: scrapeACE },
     { name: 'Supplemental', key: 'supplemental', fn: scrapeSupplemental },
+    { name: 'Sentinel Bio', key: 'sentinel-bio', fn: scrapeSentinelBio },
+    { name: 'CLR Fund', key: 'clr-fund', fn: scrapeCLRFund },
+    { name: 'Founders Pledge', key: 'founders-pledge', fn: scrapeFoundersPledge },
   ];
 
   // Run scrapers sequentially to avoid rate limiting

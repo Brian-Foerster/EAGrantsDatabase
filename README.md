@@ -10,7 +10,9 @@ A web application that aggregates grants databases from multiple Effective Altru
   - Coefficient Giving (official grants archive + Algolia index)
   - Survival and Flourishing Fund (recommendations table)
   - Animal Charity Evaluators (movement grants recipients page + residuals)
-  - Founders Pledge (residuals from published totals)
+  - Founders Pledge (fund pages, plus residuals from 990 totals)
+  - BlueDot Impact (public grants API), Manifund (public API)
+  - Sentinel Bio (grant pages), CLR Fund (grantmaking page)
 
 - **Search & Filter**: 
   - Full-text search across grant titles, recipients, and descriptions
@@ -278,9 +280,10 @@ project's methodology — attribute those to the EA Grants Database.
 
 This project aggregates publicly available grants data from EA Funds, GiveWell,
 Coefficient Giving, the Survival and Flourishing Fund, Animal Charity
-Evaluators, Founders Pledge, FLI, Meta Charity Funders, the Navigation Fund, and
-Manifund/Trace (which also supplies the ACX Grants, Audacious Project, and
-OpenAI Foundation records). See [DATA_SOURCES.md](DATA_SOURCES.md) for
+Evaluators, Founders Pledge, FLI, Meta Charity Funders, the Navigation Fund,
+BlueDot Impact, Manifund, Sentinel Bio, the CLR Fund, and Manifund's Trace
+(which supplied the ACX Grants, Audacious Project, and OpenAI Foundation
+records). See [DATA_SOURCES.md](DATA_SOURCES.md) for
 per-source detail, credit, and terms.
 
 Please respect each source's terms of service and rate limits.

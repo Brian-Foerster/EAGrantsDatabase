@@ -14,7 +14,7 @@ export function computeKnownTotals(grants: Grant[]): Map<string, Map<string, num
   const knownTotals = new Map<string, Map<string, number>>();
 
   for (const g of grants) {
-    if (g.is_residual || g.exclude_from_total) continue;
+    if (g.is_residual || g.exclude_from_total || g.outside_baseline) continue;
     const year = g.date.slice(0, 4);
     if (!knownTotals.has(g.grantmaker)) knownTotals.set(g.grantmaker, new Map());
     const yearMap = knownTotals.get(g.grantmaker)!;

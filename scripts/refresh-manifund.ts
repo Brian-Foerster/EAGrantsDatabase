@@ -94,6 +94,20 @@ async function main() {
   const projects = await fetchAllProjects();
   console.log(`  total projects from API: ${projects.length}`);
 
+  // ACX Grants rounds run on Manifund, but the projects API has no donor on each txn,
+  // so it cannot tell ACX's money from other donors' (e.g. the far-UVC project shows
+  // $50,000 from ACX + $2,100 from someone else). ACX projects are therefore REPORTED
+  // here for manual review against ACX's results post, never auto-imported.
+  const acxFile = path.join(process.cwd(), 'data', 'raw', 'supplemental', 'acx-grants.json');
+  const acxRows = JSON.parse(fs.readFileSync(acxFile, 'utf8')) as { url?: string; title?: string }[];
+  // Held if either the Manifund slug or the title matches (older rows link to ACX's blog).
+  const normTitle = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  const acxHave = new Set<string>([
+    ...acxRows.map(r => (r.url || '').replace(/^.*\/projects\//, '').toLowerCase()).filter(Boolean),
+    ...acxRows.map(r => 't:' + normTitle(r.title || '')).filter(t => t.length > 2),
+  ]);
+  const acxUnheld: { title: string; slug: string; amount: number; date: string; causes: string }[] = [];
+
   let skippedUnfunded = 0, skippedAcx = 0, skippedKnown = 0;
   const additions: Record_[] = [];
   let maxId = 0;
@@ -107,7 +121,11 @@ async function main() {
     if (amount <= 0) { skippedUnfunded++; continue; }
     const causes = (p.causes || []).map(c => (c.title || '').trim()).filter(Boolean);
     // ACX-funded projects are tracked separately under the "ACX Grants" grantmaker.
-    if (/\bacx\b/i.test(causes.join(' ') + ' ' + title)) { skippedAcx++; continue; }
+    if (/\bacx\b/i.test(causes.join(' ') + ' ' + title)) {
+      skippedAcx++;
+      if (!acxHave.has(slug) && !acxHave.has('t:' + normTitle(title))) acxUnheld.push({ title, slug, amount, date: (p.created_at || '').slice(0, 10), causes: causes.join(', ') });
+      continue;
+    }
     if (haveSlug.has(slug) || haveTitle.has(title.toLowerCase())) { skippedKnown++; continue; }
 
     const joined = causes.join(', ');
@@ -138,6 +156,16 @@ async function main() {
     console.log(`  date range: ${additions[0].date} -> ${additions[additions.length - 1].date}`);
     console.log('  samples:');
     additions.slice(-5).forEach(r => console.log(`    ${r.date}  $${r.amount.toLocaleString().padStart(9)}  ${r.title.slice(0, 60)}`));
+  }
+
+  if (acxUnheld.length) {
+    acxUnheld.sort((a, b) => a.date.localeCompare(b.date));
+    console.log(`\n  ACX REVIEW: ${acxUnheld.length} funded ACX-tagged project(s) not in supplemental/acx-grants.json.`);
+    console.log('  Amounts below are ALL donors combined — confirm ACX\'s own grant (results post or the');
+    console.log('  project page) before adding a row by hand:');
+    acxUnheld.forEach(r => console.log(`    ${r.date}  $${r.amount.toLocaleString().padStart(9)}  ${r.title.slice(0, 55)}  [${r.causes}]  https://manifund.org/projects/${r.slug}`));
+  } else {
+    console.log('  ACX: every funded ACX-tagged project is already held.');
   }
 
   if (!WRITE) { console.log('\n(dry run — pass --write to append these to data/raw/manifund-regrants.json)'); return; }

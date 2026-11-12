@@ -69,9 +69,12 @@ export const TAXONOMY: Record<string, [string, string, RegExp][]> = {
 };
 
 export type Grant = {
-  category?: string; focus_area?: string; fund?: string;
+  category?: string; focus_area?: string; fund?: string; grantmaker?: string;
   title?: string; recipient?: string; amount?: number; date?: string; is_residual?: boolean;
 };
+
+/** Grantmakers whose `fund` names are portfolio labels rather than topics (see below). */
+const PORTFOLIO_FUND_GRANTMAKERS = new Set(['Founders Pledge']);
 
 export type AiOverrides = {
   curated?: Record<string, string>;   // hand-verified recipient → id (highest priority)
@@ -109,8 +112,14 @@ export function assignSubCategory(g: Grant, ai: AiOverrides = {}) {
   // 1-2: deterministic rules (structured signal first, then free text)
   const structured = `${g.focus_area || ''} | ${g.fund || ''}`;
   const freetext = `${g.title || ''} ${g.recipient || ''}`;
-  for (let i = 0; i < rules.length - 1; i++) if (rules[i][2].test(structured)) return { id: rules[i][0], label: rules[i][1], path: 'structured' as const };
-  for (let i = 0; i < rules.length - 1; i++) if (rules[i][2].test(freetext)) return { id: rules[i][0], label: rules[i][1], path: 'title' as const };
+  // For portfolio funders the fund/focus is a broad portfolio label, not a topic
+  // ("Global Catastrophic Risks Fund" spans nuclear, bio and AI), so the grant's own
+  // purpose text is tried first and the portfolio label is only the fallback.
+  const order: [string, 'structured' | 'title'][] = PORTFOLIO_FUND_GRANTMAKERS.has(g.grantmaker || '')
+    ? [[freetext, 'title'], [structured, 'structured']]
+    : [[structured, 'structured'], [freetext, 'title']];
+  for (const [text, how] of order)
+    for (let i = 0; i < rules.length - 1; i++) if (rules[i][2].test(text)) return { id: rules[i][0], label: rules[i][1], path: how };
 
   // 3: AI overrides fill what rules left "general" (content-key beats recipient), guarded by category.
   const k = contentKey(g);

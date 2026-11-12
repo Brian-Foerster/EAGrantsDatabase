@@ -288,20 +288,18 @@ const GrantRow = memo(function GrantRow({
   );
 });
 
-/** Top-level "Select All / Deselect All" for a whole filter section. */
-function SelectAllRow<T extends string | number>({ all, selected, onChange }: {
+/** Top-level "Select All / Deselect All" button (rendered inline in the header). */
+function SelectAllButton<T extends string | number>({ all, selected, onChange }: {
   all: T[]; selected: T[]; onChange: (next: T[]) => void;
 }) {
   const allOn = all.length > 0 && all.every(v => selected.includes(v));
   return (
-    <div style={styles.selectAllRow}>
-      <button
-        onClick={() => onChange(allOn ? [] : [...all])}
-        style={{ ...styles.selectAllButton, ...(allOn ? styles.selectAllButtonActive : {}) }}
-      >
-        {allOn ? 'Deselect All' : 'Select All'}
-      </button>
-    </div>
+    <button
+      onClick={(e) => { e.stopPropagation(); onChange(allOn ? [] : [...all]); }}
+      style={{ ...styles.selectAllButtonTop, ...(allOn ? styles.selectAllButtonActive : {}) }}
+    >
+      {allOn ? 'Deselect All' : 'Select All'}
+    </button>
   );
 }
 
@@ -933,7 +931,7 @@ export default function Home() {
     // ── EA Meta (cyan) ──
     'Meta Charity Funders': '#06b6d4',  // 100% Meta
     // ── Other / unspecified cause (steel blue) ──
-    'Founders Pledge': '#3a6ea5',       // 100% Other (residuals, no per-grant causes)
+    'Founders Pledge': '#3a6ea5',       // Other-dominant: 990 residuals + Climate Fund (largest itemized fund)
     // ── Long-Term & Existential Risk (warm family) ──
     // The three major LTXR funders get a dark→light amber ramp; they are mutually
     // separable under all-pairs testing (CVD ΔE 10.3, normal-vision 15.5).
@@ -945,6 +943,8 @@ export default function Home() {
     'FLI': '#a3907c',                   // 100% LTXR (76 grants)
     'The Audacious Project': '#a3907c', // 100% LTXR (2 grants)
     'OpenAI Foundation': '#a3907c',     // 100% LTXR (1 grant)
+    'Sentinel Bio': '#a3907c',          // 100% LTXR (biosecurity)
+    'CLR Fund': '#a3907c',              // 100% LTXR (s-risks)
     // ── Diversified / no dominant cause (intentional neutrals) ──
     'Coefficient Giving': '#475569',    // LTXR only 45% of $ — funds every cause
     'EA Funds': '#9ca3af',              // GH 28% of $ / LTXR 40% of grants
@@ -1764,11 +1764,11 @@ export default function Home() {
                   style={styles.filterHeader}
                 >
                   <span style={styles.filterHeaderLabel}>Grantmaker</span>
+                  {expandedFilters.grantmaker && <SelectAllButton all={metadata.grantmakers} selected={selectedGrantmakers} onChange={setSelectedGrantmakers} />}
                   <span style={styles.filterHeaderIcon}>{expandedFilters.grantmaker ? '\u2212' : '+'}</span>
                 </button>
                 {expandedFilters.grantmaker && (
                   <div style={styles.filterOptions}>
-                    <SelectAllRow all={metadata.grantmakers} selected={selectedGrantmakers} onChange={setSelectedGrantmakers} />
                     {metadata.grantmakers.map(gm => (
                       <label key={gm} style={styles.filterOption}>
                         <input
@@ -1789,15 +1789,11 @@ export default function Home() {
                   style={styles.filterHeader}
                 >
                   <span style={styles.filterHeaderLabel}>Fund</span>
+                  {expandedFilters.fund && <SelectAllButton all={fundsByGrantmaker.flatMap(g => g.funds)} selected={selectedFunds} onChange={setSelectedFunds} />}
                   <span style={styles.filterHeaderIcon}>{expandedFilters.fund ? '\u2212' : '+'}</span>
                 </button>
                 {expandedFilters.fund && (
                   <div style={styles.filterOptionsGrouped}>
-                    <SelectAllRow
-                      all={fundsByGrantmaker.flatMap(g => g.funds)}
-                      selected={selectedFunds}
-                      onChange={setSelectedFunds}
-                    />
                     {fundsByGrantmaker.map(group => {
                       // .every() is true for an empty list, which would mislabel an empty
                       // group as "Deselect All" — require at least one option.
@@ -1858,11 +1854,11 @@ export default function Home() {
                   style={styles.filterHeader}
                 >
                   <span style={styles.filterHeaderLabel}>Category</span>
+                  {expandedFilters.category && <SelectAllButton all={metadata.categories} selected={selectedCategories} onChange={setSelectedCategories} />}
                   <span style={styles.filterHeaderIcon}>{expandedFilters.category ? '\u2212' : '+'}</span>
                 </button>
                 {expandedFilters.category && (
                   <div style={styles.filterOptions}>
-                    <SelectAllRow all={metadata.categories} selected={selectedCategories} onChange={setSelectedCategories} />
                     {metadata.categories.map(cat => {
                       const isNonCoreOnly = nonCoreOnlyCategories.has(cat);
                       return (
@@ -1901,15 +1897,11 @@ export default function Home() {
                     style={styles.filterHeader}
                   >
                     <span style={styles.filterHeaderLabel}>Sub-Category</span>
+                    {expandedFilters.subcategory && <SelectAllButton all={subCategoriesByCategory.flatMap(g => g.subs.map(s => s.id))} selected={selectedSubCategories} onChange={setSelectedSubCategories} />}
                     <span style={styles.filterHeaderIcon}>{expandedFilters.subcategory ? '−' : '+'}</span>
                   </button>
                   {expandedFilters.subcategory && (
                     <div style={styles.filterOptionsGrouped}>
-                      <SelectAllRow
-                        all={subCategoriesByCategory.flatMap(g => g.subs.map(s => s.id))}
-                        selected={selectedSubCategories}
-                        onChange={setSelectedSubCategories}
-                      />
                       {subCategoriesByCategory.map(group => {
                         const ids = group.subs.map(s => s.id);
                         const allSelected = ids.length > 0 && ids.every(id => selectedSubCategories.includes(id));
@@ -1953,11 +1945,11 @@ export default function Home() {
                   style={styles.filterHeader}
                 >
                   <span style={styles.filterHeaderLabel}>Funding Year</span>
+                  {expandedFilters.year && <SelectAllButton all={availableYears} selected={selectedYears} onChange={setSelectedYears} />}
                   <span style={styles.filterHeaderIcon}>{expandedFilters.year ? '\u2212' : '+'}</span>
                 </button>
                 {expandedFilters.year && (
                   <div style={styles.filterOptions}>
-                    <SelectAllRow all={availableYears} selected={selectedYears} onChange={setSelectedYears} />
                     {availableYears.map(year => (
                       <label key={year} style={styles.filterOption}>
                         <input
@@ -2576,12 +2568,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     fontWeight: '600',
     color: '#374151',
   },
-  selectAllRow: {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'flex-end',
-    marginBottom: '6px',
-  },
   selectAllButton: {
     fontSize: '11px',
     padding: '2px 8px',
@@ -2590,6 +2576,18 @@ const styles: { [key: string]: React.CSSProperties } = {
     backgroundColor: '#f9fafb',
     color: '#6b7280',
     cursor: 'pointer',
+  },
+  selectAllButtonTop: {
+    fontSize: '11px',
+    padding: '2px 10px',
+    border: '1px solid #94a3b8',
+    borderRadius: '4px',
+    backgroundColor: '#e2e8f0',
+    color: '#334155',
+    fontWeight: '600',
+    cursor: 'pointer',
+    marginLeft: 'auto',
+    marginRight: '12px',
   },
   selectAllButtonActive: {
     backgroundColor: '#3a6ea5',
@@ -2994,6 +2992,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '4px',
     maxWidth: '100%',
     lineHeight: '1.3',
+    whiteSpace: 'nowrap',
   },
   subTag: {
     display: 'inline-block',
