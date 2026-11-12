@@ -18,20 +18,6 @@ const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
 const normalizeRegrantName = (name: string): string =>
   String(name || '').toLowerCase().replace(/[^a-z0-9]/g, '');
 
-// Funds/focus areas that are excluded by default (not generally considered core EA)
-// These grants are only shown when explicitly selected in the Fund filter
-const NON_CORE_EA_FUNDS: Record<string, string> = {
-  'Abundance & Growth': 'Policy area not generally considered part of the EA movement',
-  'Housing Policy Reform': 'US policy area outside traditional EA cause areas',
-  'Immigration Policy': 'US policy area outside traditional EA cause areas',
-  'Criminal Justice Reform': 'US policy area outside traditional EA cause areas',
-  'Land Use Reform': 'US policy area outside traditional EA cause areas',
-  'Macroeconomic Stabilization Policy': 'US policy area outside traditional EA cause areas',
-  'Innovation Policy': 'US policy area outside traditional EA cause areas',
-};
-
-const isNonCoreFund = (fund?: string) => !!fund && fund in NON_CORE_EA_FUNDS;
-
 interface MinGrant {
   id: string;
   title: string;
@@ -73,7 +59,6 @@ const SUBCATEGORY_ORDER = [
   'aw-movement', 'aw-fish', 'aw-general', 'aw-broiler', 'aw-cagefree', 'aw-altprotein', 'aw-wild',
   'gh-general', 'gh-rnd', 'gh-malaria', 'gh-nutrition', 'gh-policy', 'gh-vaccines', 'gh-lead', 'gh-deworming', 'gh-air', 'gh-cash',
   'meta-community', 'meta-giving', 'meta-forecasting', 'meta-careers', 'meta-research', 'meta-general',
-  'policy-cj', 'policy-innovation', 'policy-housing', 'policy-macro', 'policy-immigration',
   'other-general', 'other-infectious', 'other-climate',
   'science-basic', 'science-general', 'science-tools',
 ];
@@ -599,7 +584,6 @@ export default function Home() {
     // Group 1 (Source): Grantmaker + Fund — OR within
     // Group 2 (Topic): Category + Sub-category — OR within
     // Between groups: AND
-    // Non-core EA funds excluded by default unless explicitly selected
     const hasGmFilter = selectedGrantmakers.length > 0;
     const hasFundFilter = selectedFunds.length > 0;
     const hasCatFilter = selectedCategories.length > 0;
@@ -608,15 +592,7 @@ export default function Home() {
     const hasTopicFilter = hasCatFilter || hasSubCatFilter;
 
     filtered = filtered.filter(grant => {
-      // An explicit category selection opts into the otherwise-hidden non-core EA
-      // funds for grants of that category (e.g. selecting the Policy category, whose
-      // grants live entirely in non-core US-policy funds). Applies whether or not a
-      // Source filter is also active.
       const matchesSubCat = hasSubCatFilter && !!grant.sub_category && selectedSubCategories.includes(grant.sub_category);
-      const optedInViaCategory =
-        hasCatFilter && !!grant.category && selectedCategories.includes(grant.category);
-      // A sub-category selection also opts its matching grants into otherwise-hidden non-core funds.
-      const optedInViaTopic = optedInViaCategory || matchesSubCat;
 
       // --- Source group (Grantmaker / Fund) ---
       let passesSource: boolean;
@@ -635,15 +611,13 @@ export default function Home() {
           if (grantmakerHasSelectedFunds) {
             passesSource = !!grant.fund && selectedFunds.includes(grant.fund);
           } else {
-            passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaTopic;
+            passesSource = true;
           }
         } else {
           passesSource = false;
         }
       } else {
-        // No source filter — exclude non-core EA funds by default, unless opted in
-        // via an explicit category or sub-category selection.
-        passesSource = !grant.fund || !(grant.fund in NON_CORE_EA_FUNDS) || optedInViaTopic;
+        passesSource = true;
       }
 
       // --- Topic group (Category / Sub-category) — OR within ---
@@ -719,25 +693,6 @@ export default function Home() {
     return result;
   }, [grants]);
 
-  const nonCoreOnlyCategories = useMemo(() => {
-    const info: Record<string, { hasCore: boolean; hasNonCore: boolean }> = {};
-    grants.forEach(g => {
-      if (!g.category) return;
-      if (!info[g.category]) info[g.category] = { hasCore: false, hasNonCore: false };
-      if (isNonCoreFund(g.fund)) {
-        info[g.category].hasNonCore = true;
-      } else {
-        info[g.category].hasCore = true;
-      }
-    });
-    return new Set(
-      Object.entries(info)
-        .filter(([, v]) => v.hasNonCore && !v.hasCore)
-        .map(([k]) => k)
-    );
-  }, [grants]);
-
-  const nonCoreCategoryTooltip = 'Excluded by default — only appears in non-core funds.';
 
   const availableYears = useMemo(() => {
     const years = new Set(grants.map(g => new Date(g.date).getFullYear()));
@@ -767,7 +722,7 @@ export default function Home() {
       // Deselect all funds from this grantmaker
       setSelectedFunds(prev => prev.filter(f => !funds.includes(f)));
     } else {
-      // Select all funds from this grantmaker (including non-core EA)
+      // Select all funds from this grantmaker
       setSelectedFunds(prev => [...new Set([...prev, ...funds])]);
     }
   };
@@ -964,7 +919,6 @@ export default function Home() {
     'AW': 'Animal Welfare',
     'Meta': 'EA Community & Infrastructure',
     'Science': 'Scientific Research',
-    'Policy': 'Policy Reform',
     'Other': 'Other',
   };
 
@@ -986,7 +940,6 @@ export default function Home() {
     'AW': 'Animal Welfare',
     'Meta': 'EA Infra',
     'Science': 'Science',
-    'Policy': 'Policy',
     'Other': 'Other',
   };
   const shortCategory = (code?: string): string => code ? (CATEGORY_SHORT[code] || CATEGORY_DISPLAY[code] || code) : '';
@@ -1050,13 +1003,6 @@ export default function Home() {
         'Effective Giving': 'https://coefficientgiving.org/funds/effective-giving-and-careers/',
         'Effective Giving & Careers': 'https://coefficientgiving.org/funds/effective-giving-and-careers/',
         'Forecasting': 'https://coefficientgiving.org/funds/forecasting/',
-        'Criminal Justice Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-        'Immigration Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-        'Land Use Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-        'Housing Policy Reform': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-        'Macroeconomic Stabilization Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-        'Abundance & Growth': 'https://coefficientgiving.org/funds/abundance-and-growth/',
-        'Innovation Policy': 'https://coefficientgiving.org/funds/abundance-and-growth/',
         'Scientific Research': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
         'Transformative Basic Science': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
         'Scientific Innovation: Tools and Techniques': 'https://coefficientgiving.org/funds/science-and-global-health-rd/',
@@ -1814,37 +1760,21 @@ export default function Home() {
                           </button>
                         </div>
                         <div style={styles.fundGroupOptions}>
-                          {group.funds.map(fund => {
-                            const isNonCore = fund in NON_CORE_EA_FUNDS;
-                            const tooltip = isNonCore ? NON_CORE_EA_FUNDS[fund] : undefined;
-                            return (
-                              <label
-                                key={fund}
-                                style={{
-                                  ...styles.filterOption,
-                                  ...(isNonCore ? { opacity: 0.7, fontStyle: 'italic' } : {})
-                                }}
-                                onMouseEnter={tooltip ? (e) => showHoverTooltip(tooltip, e) : undefined}
-                                onMouseMove={tooltip ? moveHoverTooltip : undefined}
-                                onMouseLeave={tooltip ? hideHoverTooltip : undefined}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={selectedFunds.includes(fund)}
-                                  onChange={() => toggleFund(fund)}
-                                  style={styles.checkbox}
-                                />
-                                <span>{fund}{isNonCore && <sup style={styles.nonCoreIndicator}>*</sup>}</span>
-                              </label>
-                            );
-                          })}
+                          {group.funds.map(fund => (
+                            <label key={fund} style={styles.filterOption}>
+                              <input
+                                type="checkbox"
+                                checked={selectedFunds.includes(fund)}
+                                onChange={() => toggleFund(fund)}
+                                style={styles.checkbox}
+                              />
+                              <span>{fund}</span>
+                            </label>
+                          ))}
                         </div>
                       </div>
                       );
                     })}
-                    <p style={styles.nonCoreNote}>
-                      * Excluded by default — US policy reform areas not generally considered part of the EA movement. Hover for details.
-                    </p>
                   </div>
                 )}
               </div>
@@ -1859,34 +1789,17 @@ export default function Home() {
                 </button>
                 {expandedFilters.category && (
                   <div style={styles.filterOptions}>
-                    {metadata.categories.map(cat => {
-                      const isNonCoreOnly = nonCoreOnlyCategories.has(cat);
-                      return (
-                        <label
-                          key={cat}
-                          style={{
-                            ...styles.filterOption,
-                            ...(isNonCoreOnly ? { opacity: 0.7, fontStyle: 'italic' } : {})
-                          }}
-                          onMouseEnter={isNonCoreOnly ? (e) => showHoverTooltip(nonCoreCategoryTooltip, e) : undefined}
-                          onMouseMove={isNonCoreOnly ? moveHoverTooltip : undefined}
-                          onMouseLeave={isNonCoreOnly ? hideHoverTooltip : undefined}
-                        >
-                          <input
-                            type="checkbox"
-                            checked={selectedCategories.includes(cat)}
-                            onChange={() => toggleCategory(cat)}
-                            style={styles.checkbox}
-                          />
-                          <span>{displayCategory(cat)}{isNonCoreOnly && <sup style={styles.nonCoreIndicator}>*</sup>}</span>
-                        </label>
-                      );
-                    })}
-                    {nonCoreOnlyCategories.size > 0 && (
-                      <p style={styles.nonCoreNote}>
-                        * Excluded by default — only appears in non-core funds.
-                      </p>
-                    )}
+                    {metadata.categories.map(cat => (
+                      <label key={cat} style={styles.filterOption}>
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(cat)}
+                          onChange={() => toggleCategory(cat)}
+                          style={styles.checkbox}
+                        />
+                        <span>{displayCategory(cat)}</span>
+                      </label>
+                    ))}
                   </div>
                 )}
               </div>
@@ -2612,18 +2525,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     height: '18px',
     cursor: 'pointer',
     accentColor: '#3a6ea5',
-  },
-  nonCoreIndicator: {
-    marginLeft: '1px',
-    color: '#9ca3af',
-    fontWeight: 400,
-  },
-  nonCoreNote: {
-    width: '100%',
-    margin: '4px 0 0 0',
-    fontSize: '12px',
-    color: '#888',
-    fontStyle: 'italic',
   },
   amountFilterRow: {
     display: 'flex',

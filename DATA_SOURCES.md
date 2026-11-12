@@ -89,7 +89,9 @@ attribute those to the EA Grants Database.
 
 CSV columns: `Grant, Organization Name, Focus Area, Amount, Date, Details`. The `Focus Area` field is mapped to the sector taxonomy via `scripts/mappings/op-focus-areas.json`. Date is in "Month Year" format (e.g., "October 2024").
 
-**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~152 grants.
+**Deduplication:** Grants with focus area containing "GiveWell" are flagged `exclude_from_total = true` to avoid double-counting with GiveWell's own data. This removes ~170 grants.
+
+**Out of scope:** Coefficient's US policy focus areas (Criminal Justice Reform, Housing Policy Reform, Land Use Reform, Immigration Policy, Macroeconomic Stabilization Policy, Innovation Policy, Abundance & Growth) are dropped in `scripts/scrape-all.ts`, using the list in `scripts/scope.ts`, consistent with leaving out other grantmakers' non-EA grants. They are still passed to the residual step as known grants, so Coefficient's published annual totals (which include them) are not backfilled with an equivalent unitemized residual. The dropped count and amount are written to `lib/out-of-scope-summary.json` for the About page.
 
 **2024 annual total ($650M):** Multiple sources support this figure:
 
@@ -291,7 +293,6 @@ A residual grant is generated only if the gap exceeds $100K. Baseline total is `
 | AW | Animal Welfare | Farm animal welfare, cage-free campaigns |
 | Meta | EA Meta | EA infrastructure, effective giving, careers, capacity building |
 | Science | Scientific Research | Scientific research grants |
-| Policy | Policy Reform | Criminal justice, immigration, housing, macroeconomic policy |
 | Other | Other | Grants that don't fit other categories |
 
 Mappings from source-specific categories to this taxonomy are in:

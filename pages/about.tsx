@@ -15,8 +15,8 @@ interface AboutStats {
   totalGrants: number;
   totalAmountB: string;
   grantmakers: Record<string, GrantmakerStats>;
-  policyCount: number;
-  policyAmountM: string;
+  outOfScopeCount: number;
+  outOfScopeAmountM: string;
   orgTotal: number;
   orgUS: number;
   orgUK: number;
@@ -29,6 +29,7 @@ export const getStaticProps: GetStaticProps<{ stats: AboutStats }> = async () =>
   const dataDir = path.join(process.cwd(), 'public', 'data');
   const grants: any[] = JSON.parse(fs.readFileSync(path.join(dataDir, 'grants.min.json'), 'utf-8'));
   const orgData = JSON.parse(fs.readFileSync(path.join(dataDir, 'recipient-orgs.json'), 'utf-8'));
+  const outOfScope = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'lib', 'out-of-scope-summary.json'), 'utf-8'));
 
   const grantmakers: Record<string, GrantmakerStats> = {};
   for (const g of grants) {
@@ -41,7 +42,6 @@ export const getStaticProps: GetStaticProps<{ stats: AboutStats }> = async () =>
     if (year > grantmakers[gm].maxYear) grantmakers[gm].maxYear = year;
   }
 
-  const policy = grants.filter((g: any) => g.category === 'Policy');
   const totalAmount = grants.reduce((s: number, g: any) => s + (g.amount as number), 0);
 
   const orgs: any[] = orgData.orgs;
@@ -54,8 +54,8 @@ export const getStaticProps: GetStaticProps<{ stats: AboutStats }> = async () =>
         totalGrants: grants.length,
         totalAmountB: (totalAmount / 1e9).toFixed(1),
         grantmakers,
-        policyCount: policy.length,
-        policyAmountM: (policy.reduce((s: number, g: any) => s + (g.amount as number), 0) / 1e6).toFixed(0),
+        outOfScopeCount: outOfScope.grants,
+        outOfScopeAmountM: (outOfScope.amount / 1e6).toFixed(0),
         orgTotal: orgs.length,
         orgUS,
         orgUK,
@@ -351,11 +351,10 @@ export default function About({ stats }: { stats: AboutStats }) {
 
             <h3 style={styles.subheading}>Categories</h3>
             <p style={styles.paragraph}>
-              Grants are classified into seven categories based on the source organization's own
+              Grants are classified into six categories based on the source organization's own
               labeling: Long-Term &amp; Existential Risk, Global Health &amp; Development,
-              Animal Welfare, EA Community &amp; Infrastructure, Scientific Research,
-              Policy Reform, and Other. Mapping tables translate each source's terminology
-              to this taxonomy.
+              Animal Welfare, EA Community &amp; Infrastructure, Scientific Research, and Other.
+              Mapping tables translate each source's terminology to this taxonomy.
             </p>
 
             <h3 style={styles.subheading}>Deduplication</h3>
@@ -401,14 +400,15 @@ export default function About({ stats }: { stats: AboutStats }) {
               CPI-U annual averages.
             </p>
 
-            <h3 style={styles.subheading}>Non-core EA focus areas</h3>
+            <h3 style={styles.subheading}>Coefficient Giving's US policy programs</h3>
             <p style={styles.paragraph}>
-              Approximately {approx(stats.policyCount)} grants (${stats.policyAmountM}M) in the Policy Reform category are excluded
-              from the default view. These include US policy areas such as Criminal Justice
-              Reform, Housing Policy Reform, Immigration Policy, Macroeconomic Stabilization
-              Policy, Innovation Policy, and Abundance &amp; Growth — areas that are not
-              generally considered part of the EA movement. These grants can be viewed by
-              selecting them explicitly in the Fund filter or the Policy Reform category.
+              Coefficient Giving also funds US policy work outside EA cause areas: criminal
+              justice reform, housing and land use, immigration, macroeconomic stabilization,
+              innovation policy, and abundance &amp; growth. These {fmt(stats.outOfScopeCount)} grants
+              (about ${stats.outOfScopeAmountM}M) are not included, in line with the other
+              grantmakers, whose non-EA grants are likewise left out. They still count toward
+              Coefficient's published annual totals, so they are not added back as unitemized
+              grants.
             </p>
 
             <h2 style={styles.sectionTitle}>Limitations</h2>

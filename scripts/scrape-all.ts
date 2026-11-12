@@ -25,6 +25,7 @@ import { scrapeCLRFund } from './scrapers/clr-fund';
 import { scrapeFoundersPledge } from './scrapers/founders-pledge';
 import { deduplicateGrants } from './dedup';
 import { computeResiduals } from './residuals';
+import { isOutOfScope } from './scope';
 import { summarize, saveScrapeResult } from './scraper-utils';
 import { computeKnownTotals, findStaleBaselines, getEffectivePublishedTotal } from './annual-totals-utils';
 import {
@@ -120,12 +121,16 @@ async function main() {
   const allGrants = results.flatMap(r => r.grants);
   console.log(`Combined: ${allGrants.length} total grants from ${results.length} sources`);
 
-  const { grants: dedupedGrants, stats: dedupStats } = deduplicateGrants(allGrants);
+  const outOfScope = allGrants.filter(isOutOfScope);
+  const outOfScopeAmount = outOfScope.reduce((s, g) => s + g.amount, 0);
+  console.log(`Out of scope (non-EA focus areas): ${outOfScope.length} grants, $${(outOfScopeAmount / 1e6).toFixed(1)}M dropped`);
+
+  const { grants: dedupedGrants, stats: dedupStats } = deduplicateGrants(allGrants.filter(g => !isOutOfScope(g)));
   console.log();
 
   // ─── Phase 3: Residual Grants ───────────────────────────────
   console.log('── Phase 3: Residual Computation ──');
-  const { residuals, stats: residualStats } = computeResiduals(dedupedGrants);
+  const { residuals, stats: residualStats } = computeResiduals([...dedupedGrants, ...outOfScope]);
   console.log();
 
   // ─── Phase 4: Final output ──────────────────────────────────
@@ -144,6 +149,10 @@ async function main() {
   // Also save a lean version for the aggregator to use
   const leanPath = path.join(process.cwd(), 'lib', 'scraped-grants.json');
   fs.writeFileSync(leanPath, JSON.stringify(finalGrants));
+  fs.writeFileSync(
+    path.join(process.cwd(), 'lib', 'out-of-scope-summary.json'),
+    JSON.stringify({ grants: outOfScope.length, amount: Math.round(outOfScopeAmount) }, null, 2) + '\n'
+  );
 
   // Only a run that got past the guard and wrote output is allowed to move the bar.
   saveBaselines(updateBaselines(observations, baselines));
@@ -154,7 +163,7 @@ async function main() {
 
   // Summarize by grantmaker and year
   const byGM = new Map<string, Map<string, number>>();
-  const knownByGM = computeKnownTotals(dedupedGrants);
+  const knownByGM = computeKnownTotals([...dedupedGrants, ...outOfScope]);
   for (const g of finalGrants) {
     const year = g.date.slice(0, 4);
     if (!byGM.has(g.grantmaker)) byGM.set(g.grantmaker, new Map());

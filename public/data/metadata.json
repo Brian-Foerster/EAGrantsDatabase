@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0",
-  "totalGrants": 8911,
-  "totalAmount": 8567715275.341432,
+  "totalGrants": 8276,
+  "totalAmount": 8203461098.341432,
   "grantmakers": [
     "Coefficient Giving",
     "Founders Pledge",
@@ -26,7 +26,6 @@
     "GH",
     "AW",
     "Meta",
-    "Policy",
     "Science"
   ],
   "subCategories": [
@@ -181,36 +180,6 @@
       "category": "Meta"
     },
     {
-      "id": "policy-cj",
-      "label": "Criminal Justice",
-      "category": "Policy"
-    },
-    {
-      "id": "policy-immigration",
-      "label": "Immigration",
-      "category": "Policy"
-    },
-    {
-      "id": "policy-housing",
-      "label": "Housing & Land Use",
-      "category": "Policy"
-    },
-    {
-      "id": "policy-macro",
-      "label": "Macroeconomic Policy",
-      "category": "Policy"
-    },
-    {
-      "id": "policy-innovation",
-      "label": "Innovation & Abundance",
-      "category": "Policy"
-    },
-    {
-      "id": "policy-general",
-      "label": "Policy (Unspecified)",
-      "category": "Policy"
-    },
-    {
       "id": "science-basic",
       "label": "Basic Science",
       "category": "Science"
@@ -245,5 +214,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-11-12T03:33:13.238Z"
+  "lastUpdated": "2026-11-12T04:52:40.626Z"
 }

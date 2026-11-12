@@ -1,4 +1,4 @@
-// Two-level taxonomy: L1 = the existing 7 category codes, L2 = sub-categories.
+// Two-level taxonomy: L1 = the 6 category codes, L2 = sub-categories.
 // Assignment for a grant (first match wins):
 //   1. deterministic rule on the structured signal (focus_area + fund)
 //   2. deterministic rule on the grant title + recipient
@@ -47,14 +47,6 @@ export const TAXONOMY: Record<string, [string, string, RegExp][]> = {
     ['meta-research',    'Research & Prioritization',  /prioritiz|cause (exploration|research)|global priorities|research institute/i],
     ['meta-community',   'Community & Infrastructure', /community|infrastructure|movement building|coworking|conference|\beag\b|local group|operations/i],
     ['meta-general',     'EA Meta (Unspecified)',      /.*/],
-  ],
-  Policy: [
-    ['policy-cj',         'Criminal Justice',       /criminal justice|incarcerat|prison|policing|\bpolice\b|sentencing/i],
-    ['policy-immigration','Immigration',            /immigration|migrant|\bvisa|high.?skill/i],
-    ['policy-housing',    'Housing & Land Use',     /housing|land use|zoning|yimby|permitting/i],
-    ['policy-macro',      'Macroeconomic Policy',   /macroeconomic|monetary|\bfed\b|stabilization|inflation/i],
-    ['policy-innovation', 'Innovation & Abundance', /innovation|abundance|\bgrowth|science policy|metascience/i],
-    ['policy-general',    'Policy (Unspecified)',   /.*/],
   ],
   Science: [
     ['science-basic',   'Basic Science',                     /basic science|transformative basic|fundamental/i],
