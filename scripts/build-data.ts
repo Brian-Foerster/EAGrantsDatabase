@@ -12,6 +12,11 @@ import { Grant } from '../types/grants';
 import { aggregateAllGrants } from '../lib/aggregator';
 import { assignSubCategory, subCategoryList, type AiOverrides } from './sub-categories';
 
+// Lifetime total (USD, gross) under which a grantmaker is grouped as "smaller". $15M
+// sits in a wide gap in the data (Manifund ~$10M, the next up ~$17M), so routine
+// refreshes don't move anyone across the line.
+const SMALL_GRANTMAKER_THRESHOLD = 15_000_000;
+
 // Output directories
 const PUBLIC_DATA_DIR = path.join(process.cwd(), 'public', 'data');
 
@@ -355,11 +360,17 @@ async function buildData() {
   const metadata = {
     // Public data API contract version. Bump the minor for additive fields, the
     // major for breaking changes. Documented in API.md.
-    schemaVersion: '1.0',
+    schemaVersion: '1.1',
     totalGrants: grants.length,
     // Regrants contribute net of the tracked upstream funding that already counts them.
     totalAmount: grants.reduce((sum, g) => sum + countedAmount(g), 0),
     grantmakers: Array.from(new Set(grants.map(g => g.grantmaker))),
+    // Grantmakers whose lifetime total (gross) is under the threshold, largest first.
+    // The UI folds these into one "Smaller grantmakers" entry in the filters and chart.
+    smallGrantmakerThreshold: SMALL_GRANTMAKER_THRESHOLD,
+    smallGrantmakers: byFunder
+      .filter(f => f.total < SMALL_GRANTMAKER_THRESHOLD)
+      .map(f => f.funder),
     categories: Array.from(new Set(grants.map(g => g.category).filter(Boolean))),
     // Level-2 sub-categories: { id, label, category } — see assignSubCategory.
     subCategories: subCategoryList(),

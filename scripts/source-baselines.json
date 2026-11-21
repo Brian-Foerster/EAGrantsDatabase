@@ -2,46 +2,56 @@
   "ace": {
     "grants": 330,
     "amount": 9786432,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "clr-fund": {
     "grants": 46,
     "amount": 1642103,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "coefficient-giving": {
-    "grants": 3740,
-    "amount": 5807875037,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "grants": 3755,
+    "amount": 5878095473,
+    "updatedAt": "2026-11-19T21:14:43.992Z"
+  },
+  "cooperative-ai": {
+    "grants": 22,
+    "amount": 4663021,
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "ea-funds": {
-    "grants": 1890,
-    "amount": 132089813,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "grants": 1889,
+    "amount": 132083101,
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "founders-pledge": {
     "grants": 155,
     "amount": 108159744,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "givewell": {
     "grants": 570,
     "amount": 2771380731,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "updatedAt": "2026-11-19T21:14:43.992Z"
+  },
+  "lightcone-commons": {
+    "grants": 110,
+    "amount": 45066734,
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "sentinel-bio": {
     "grants": 55,
     "amount": 19863016,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "sff": {
     "grants": 586,
     "amount": 167622706,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   },
   "supplemental": {
-    "grants": 241,
-    "amount": 98407939,
-    "updatedAt": "2026-11-12T04:50:39.600Z"
+    "grants": 271,
+    "amount": 120079939,
+    "updatedAt": "2026-11-19T21:14:43.992Z"
   }
 }

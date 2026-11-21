@@ -1,0 +1,862 @@
+[
+ {
+  "id": "aistof-mf-01458",
+  "title": "Living support for Pip Foweraker",
+  "recipient": "Living support for Pip Foweraker",
+  "amount": 17500,
+  "currency": "USD",
+  "date": "2026-10-04",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($17,500 of the project's $20,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, EA community, Global catastrophic risks, AI safety fieldbuilding",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/living-support-for-pip-foweraker",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01458"
+ },
+ {
+  "id": "aistof-mf-01475",
+  "title": "Faithful Preference Learning : Cognitively-Aligned Post-Training",
+  "recipient": "Faithful Preference Learning : Cognitively-Aligned Post-Training",
+  "amount": 15000,
+  "currency": "USD",
+  "date": "2026-09-01",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($15,000 of the project's $50,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, grantmaking.ai",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/faithful-preference-learning--cognitively-aligned-post-training",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01475"
+ },
+ {
+  "id": "aistof-mf-01467",
+  "title": "Exploring the Benefits of Alignment Pretraining",
+  "recipient": "Exploring the Benefits of Alignment Pretraining",
+  "amount": 390000,
+  "currency": "USD",
+  "date": "2026-09-01",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($390,000 of the project's $390,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/exploring-the-benefits-of-alignment-pretraining",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01467"
+ },
+ {
+  "id": "aistof-mf-01468",
+  "title": "Compute funding for five mentored AI safety research projects",
+  "recipient": "Compute funding for five mentored AI safety research projects",
+  "amount": 83332,
+  "currency": "USD",
+  "date": "2026-09-01",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($83,332 of the project's $83,332); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/compute-funding-for-five-mentored-ai-safety-research-projects",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01468"
+ },
+ {
+  "id": "aistof-mf-00121",
+  "title": "Frontier AI Election Evaluation Framework",
+  "recipient": "Frontier AI Election Evaluation Framework",
+  "amount": 35000,
+  "currency": "USD",
+  "date": "2026-08-21",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($35,000 of the project's $35,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "AI governance, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/frontier-ai-election-evaluation-framework",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00121"
+ },
+ {
+  "id": "aistof-mf-00156",
+  "title": "Belief state geometry of language model personas",
+  "recipient": "Belief state geometry of language model personas",
+  "amount": 8022,
+  "currency": "USD",
+  "date": "2026-08-20",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($8,022 of the project's $20,022); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, grantmaking.ai",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/belief-state-geometry-of-language-model-personas-xvwqfmewtxk",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00156"
+ },
+ {
+  "id": "aistof-mf-00177",
+  "title": "Help the Argentinian AI Safety Community Grow",
+  "recipient": "Help the Argentinian AI Safety Community Grow",
+  "amount": 18000,
+  "currency": "USD",
+  "date": "2026-08-20",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($18,000 of the project's $45,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance, Global catastrophic risks, grantmaking.ai",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/help-the-argentinian-ai-safety-community-grow",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00177"
+ },
+ {
+  "id": "aistof-mf-00184",
+  "title": "Separatrix",
+  "recipient": "Separatrix",
+  "amount": 150000,
+  "currency": "USD",
+  "date": "2026-08-20",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($150,000 of the project's $205,075); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/separatrix",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00184"
+ },
+ {
+  "id": "aistof-mf-00223",
+  "title": "What Factors Influence Chain-of-Thought Faithfulness?",
+  "recipient": "What Factors Influence Chain-of-Thought Faithfulness?",
+  "amount": 33439,
+  "currency": "USD",
+  "date": "2026-08-20",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($33,439 of the project's $58,439); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, grantmaking.ai",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/what-factors-influence-chain-of-thought-faithfulness",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00223"
+ },
+ {
+  "id": "aistof-mf-00257",
+  "title": "Postdoc on verification protocols for frontier AI training",
+  "recipient": "Postdoc on verification protocols for frontier AI training",
+  "amount": 50000,
+  "currency": "USD",
+  "date": "2026-08-20",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($50,000 of the project's $100,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/postdoc-on-verification-protocols-for-frontier-ai-training",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00257"
+ },
+ {
+  "id": "aistof-mf-00092",
+  "title": "AI Safety Hong Kong (AISHK)",
+  "recipient": "AI Safety Hong Kong (AISHK)",
+  "amount": 85000,
+  "currency": "USD",
+  "date": "2026-08-13",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($85,000 of the project's $85,100); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/ai-safety-hong-kong-aishk",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00092"
+ },
+ {
+  "id": "aistof-mf-00238",
+  "title": "Shutdown evaluations for AI agents",
+  "recipient": "Shutdown evaluations for AI agents",
+  "amount": 80000,
+  "currency": "USD",
+  "date": "2026-07-17",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($80,000 of the project's $80,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/shutdown-evaluations-for-ai-agents",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00238"
+ },
+ {
+  "id": "aistof-mf-00251",
+  "title": "KernelBench: an independent benchmark for AI-automated GPU kernel engineering",
+  "recipient": "KernelBench: an independent benchmark for AI-automated GPU kernel engineering",
+  "amount": 15000,
+  "currency": "USD",
+  "date": "2026-07-15",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($15,000 of the project's $15,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/kernelbench-an-independent-benchmark-for-ai-automated-gpu-kernel-engineering",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00251"
+ },
+ {
+  "id": "aistof-mf-00278",
+  "title": "Concept control in transformers with Sparse Concept Anchoring",
+  "recipient": "Concept control in transformers with Sparse Concept Anchoring",
+  "amount": 76621,
+  "currency": "USD",
+  "date": "2026-07-13",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($76,621 of the project's $76,621); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/concept-control-in-transformers-with-sparse-concept-anchoring",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00278"
+ },
+ {
+  "id": "aistof-mf-00260",
+  "title": "2026 European Frontier AI Safety Day",
+  "recipient": "2026 European Frontier AI Safety Day",
+  "amount": 30000,
+  "currency": "USD",
+  "date": "2026-07-07",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($30,000 of the project's $30,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Manifund regrant",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/2026-european-frontier-ai-safety-day",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00260"
+ },
+ {
+  "id": "aistof-mf-00504",
+  "title": "AI Safety Workshops For 6th-8th Graders in India",
+  "recipient": "AI Safety Workshops For 6th-8th Graders in India",
+  "amount": 149599,
+  "currency": "USD",
+  "date": "2026-07-02",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($149,599 of the project's $149,824); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, AI governance, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/ai-championship-ai-safety-talent-prepipeline-for-indias-6th-8th-graders",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00504"
+ },
+ {
+  "id": "aistof-mf-00333",
+  "title": "AI Nutrition Labels For Everyday Consumers & AI Agents: Travel + POC Grant",
+  "recipient": "AI Nutrition Labels For Everyday Consumers & AI Agents: Travel + POC Grant",
+  "amount": 6663.05,
+  "currency": "USD",
+  "date": "2026-06-28",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($6,663.05 of the project's $6,663.05); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/ai-nutrition-labels-for-everyday-consumers--ai-agents-travel--poc-grant",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00333"
+ },
+ {
+  "id": "aistof-mf-00510",
+  "title": "Emergent misalignment and memetic replication in multi-agent codebases",
+  "recipient": "Emergent misalignment and memetic replication in multi-agent codebases",
+  "amount": 50000,
+  "currency": "USD",
+  "date": "2026-04-02",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($50,000 of the project's $50,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/emergent-misalignment-and-memetic-replication-in-multi-agent-codebases",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00510"
+ },
+ {
+  "id": "aistof-mf-00525",
+  "title": "Collaboration Infrastructure for Safeguarding AI",
+  "recipient": "Collaboration Infrastructure for Safeguarding AI",
+  "amount": 436861,
+  "currency": "USD",
+  "date": "2026-03-31",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($436,861 of the project's $436,861); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Manifund regrant",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/collaboration-infrastructure-for-safeguarding-ai",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00525"
+ },
+ {
+  "id": "aistof-mf-00526",
+  "title": "Human-AI Complementarity for Identifying Harm",
+  "recipient": "Human-AI Complementarity for Identifying Harm",
+  "amount": 30000,
+  "currency": "USD",
+  "date": "2026-03-19",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($30,000 of the project's $30,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/human-ai-complementarity-for-identifying-harm",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00526"
+ },
+ {
+  "id": "aistof-mf-00535",
+  "title": "DystopiaBench",
+  "recipient": "DystopiaBench",
+  "amount": 5000,
+  "currency": "USD",
+  "date": "2026-03-18",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($5,000 of the project's $5,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/dystopiabench",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00535"
+ },
+ {
+  "id": "aistof-mf-00599",
+  "title": "Safe AI Germany (SAIGE)",
+  "recipient": "Safe AI Germany (SAIGE)",
+  "amount": 80000,
+  "currency": "USD",
+  "date": "2026-03-15",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($80,000 of the project's $89,301); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety, AI governance, EA community, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/safe-ai-germany-saige",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00599"
+ },
+ {
+  "id": "aistof-mf-00543",
+  "title": "Mox: 2026 Fundraiser",
+  "recipient": "Mox: 2026 Fundraiser",
+  "amount": 350000,
+  "currency": "USD",
+  "date": "2026-03-13",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($350,000 of the project's $504,870); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "EA community, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/mox-2026-fundraiser",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00543"
+ },
+ {
+  "id": "aistof-mf-00591",
+  "title": "Towards Shared AI Compute Infrastructure",
+  "recipient": "Towards Shared AI Compute Infrastructure",
+  "amount": 23000,
+  "currency": "USD",
+  "date": "2026-02-04",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($23,000 of the project's $23,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, AI governance",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/towards-shared-ai-compute-infrastructure",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00591"
+ },
+ {
+  "id": "aistof-mf-00598",
+  "title": "Help a Bootstrapped AI Risk Literacy Founder Get To IASEAI 2026 in Paris",
+  "recipient": "Help a Bootstrapped AI Risk Literacy Founder Get To IASEAI 2026 in Paris",
+  "amount": 2891,
+  "currency": "USD",
+  "date": "2026-02-03",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($2,891 of the project's $3,036); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety, AI governance, EA community, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/help-a-bootstrapped-ai-risk-literacy-founder-get-to-paris-iaseai-2026",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00598"
+ },
+ {
+  "id": "aistof-mf-00588",
+  "title": "Seed Funding For Geodesic Research",
+  "recipient": "Seed Funding For Geodesic Research",
+  "amount": 200000,
+  "currency": "USD",
+  "date": "2026-02-02",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($200,000 of the project's $201,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/seed-funding-for-geodesic-research",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00588"
+ },
+ {
+  "id": "aistof-mf-00589",
+  "title": "AI Crisis Convening at India AI Impact Summit 2026",
+  "recipient": "AI Crisis Convening at India AI Impact Summit 2026",
+  "amount": 100000,
+  "currency": "USD",
+  "date": "2026-02-02",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($100,000 of the project's $100,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/ai-crisis-convening-at-india-ai-impact-summit-2026",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00589"
+ },
+ {
+  "id": "aistof-mf-00638",
+  "title": "Isolating CBRN Knowledge in LLMs for Safety - Phase 2 (Research)",
+  "recipient": "Isolating CBRN Knowledge in LLMs for Safety - Phase 2 (Research)",
+  "amount": 120890,
+  "currency": "USD",
+  "date": "2025-12-25",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($120,890 of the project's $150,000.16); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, Biomedical, Biosecurity",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/compartmentalizing-cbrn-ai-knowledge---phase-2-research-9cbkl56lss8",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00638"
+ },
+ {
+  "id": "aistof-mf-00647",
+  "title": "AI Security Startup Accelerator Batch #2",
+  "recipient": "AI Security Startup Accelerator Batch #2",
+  "amount": 355000,
+  "currency": "USD",
+  "date": "2025-12-03",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($355,000 of the project's $355,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/ai-security-startup-accelerator-batch-2",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00647"
+ },
+ {
+  "id": "aistof-mf-00658",
+  "title": "Visa fee support for Australian researcher to join a fellowship with Anthropic",
+  "recipient": "Visa fee support for Australian researcher to join a fellowship with Anthropic",
+  "amount": 4000,
+  "currency": "USD",
+  "date": "2025-11-25",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($4,000 of the project's $4,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/visa-fee-support-for-australian-researcher-to-join-a-fellowship-with-anthropic",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00658"
+ },
+ {
+  "id": "aistof-mf-00662",
+  "title": "Formal Certification Technologies for AI Safety",
+  "recipient": "Formal Certification Technologies for AI Safety",
+  "amount": 128000,
+  "currency": "USD",
+  "date": "2025-11-20",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($128,000 of the project's $128,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety, AI governance",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/formal-certification-technologies-for-ai-safety",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00662"
+ },
+ {
+  "id": "aistof-mf-00722",
+  "title": "Guaranteed Safe AI Seminars 2026",
+  "recipient": "Guaranteed Safe AI Seminars 2026",
+  "amount": 25700,
+  "currency": "USD",
+  "date": "2025-11-05",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($25,700 of the project's $30,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/guaranteed-safe-ai-seminars-2026-5kxriozt23",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00722"
+ },
+ {
+  "id": "aistof-mf-00677",
+  "title": "SDCPNs for AI Safety",
+  "recipient": "SDCPNs for AI Safety",
+  "amount": 39009,
+  "currency": "USD",
+  "date": "2025-11-04",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($39,009 of the project's $39,009); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/sdcpns-for-ai-safety",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00677"
+ },
+ {
+  "id": "aistof-mf-00714",
+  "title": "Operating Capital for AI Safety Evaluation Infrastructure",
+  "recipient": "Operating Capital for AI Safety Evaluation Infrastructure",
+  "amount": 400000,
+  "currency": "USD",
+  "date": "2025-10-31",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($400,000 of the project's $400,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance, Biosecurity",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/operating-capital-for-ai-safety-evaluation-infrastructure",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00714"
+ },
+ {
+  "id": "aistof-mf-01480",
+  "title": "Finish Video Game about AI Girlfriends and Social Peril",
+  "recipient": "Finish Video Game about AI Girlfriends and Social Peril",
+  "amount": 20000,
+  "currency": "USD",
+  "date": "2025-10-29",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($20,000 of the project's $20,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/finish-video-game-about-ai-girlfriends-and-social-peril",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01480"
+ },
+ {
+  "id": "aistof-mf-00786",
+  "title": "TransformerLens - Bridge Funding",
+  "recipient": "TransformerLens - Bridge Funding",
+  "amount": 10000,
+  "currency": "USD",
+  "date": "2025-08-14",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($10,000 of the project's $30,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/transformerlens---bridge-funding",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00786"
+ },
+ {
+  "id": "aistof-mf-00780",
+  "title": "Funding researcher on frontier AI governance inclusive of global majority ",
+  "recipient": "Funding researcher on frontier AI governance inclusive of global majority ",
+  "amount": 87543,
+  "currency": "USD",
+  "date": "2025-07-22",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($87,543 of the project's $87,543); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, AI governance",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/funding-researcher-on-frontier-ai-governance-inclusive-of-global-majority-",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00780"
+ },
+ {
+  "id": "aistof-mf-00873",
+  "title": "Luthien",
+  "recipient": "Luthien",
+  "amount": 150000,
+  "currency": "USD",
+  "date": "2025-05-09",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($150,000 of the project's $170,470); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety, Global catastrophic risks",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/luthien",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00873"
+ },
+ {
+  "id": "aistof-mf-00854",
+  "title": "Coordinal Research: Accelerating the research of safely deploying AI systems.",
+  "recipient": "Coordinal Research: Accelerating the research of safely deploying AI systems.",
+  "amount": 110000,
+  "currency": "USD",
+  "date": "2025-04-27",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($110,000 of the project's $125,062); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/coordinal-research-accelerating-the-research-of-safely-deploying-ai-systems",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00854"
+ },
+ {
+  "id": "aistof-mf-00905",
+  "title": "Bayesian modelling of LLM capabilities from evals",
+  "recipient": "Bayesian modelling of LLM capabilities from evals",
+  "amount": 13500,
+  "currency": "USD",
+  "date": "2025-04-07",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($13,500 of the project's $32,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Manifund regrant",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/bayesian-modelling-of-llm-capabilities-from-evals",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00905"
+ },
+ {
+  "id": "aistof-mf-00951",
+  "title": "Finishing The SB-1047 Documentary",
+  "recipient": "Finishing The SB-1047 Documentary",
+  "amount": 41162,
+  "currency": "USD",
+  "date": "2025-01-21",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($41,162 of the project's $118,987); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety, AI governance",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/finishing-the-sb-1047-documentary-in-6-weeks",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-00951"
+ },
+ {
+  "id": "aistof-mf-01150",
+  "title": "Stipend to enable a US PhD student to move to the UK for a temporary role with the UK DSIT",
+  "recipient": "Stipend to enable a US PhD student to move to the UK for a temporary role with the UK DSIT",
+  "amount": 13000,
+  "currency": "USD",
+  "date": "2024-02-29",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($13,000 of the project's $13,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Manifund regrant",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/stipend-to-enable",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01150"
+ },
+ {
+  "id": "aistof-mf-01149",
+  "title": "Visa fee support for US researcher to take on a temporary role with the UK AISI",
+  "recipient": "Visa fee support for US researcher to take on a temporary role with the UK AISI",
+  "amount": 3000,
+  "currency": "USD",
+  "date": "2024-02-28",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($3,000 of the project's $3,000); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Manifund regrant",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/visa-fee-support",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01149"
+ }
+]

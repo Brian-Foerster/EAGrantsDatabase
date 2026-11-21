@@ -210,6 +210,19 @@ export function dedupeCoefficientDuplicates(grants: Grant[]): { grants: Grant[];
   return { grants: grants.filter(g => !drop.has(g.id)), removed: drop.size };
 }
 
+/**
+ * Coefficient's CSV lists some grants, mostly to individuals, under the organisation
+ * "Unknown", but the title usually names the grantee: "Haindavi Kandarpa — Exploratory
+ * Work on ...". Take the part before the dash. Titles that name a programme rather than
+ * a grantee ("University Organizer Fellowship", "EA Funding for Individuals — Work and
+ * Study Support") pay many people, so they get "Various recipients".
+ */
+export function recipientFromTitle(title: string): string {
+  const head = title.match(/^(.+?)\s+[—–]\s+/)?.[1].trim();
+  const PROGRAMME = /\b(funding|fellowships?|scholarships?|prizes?|contests?|hackathon|grants|support for)\b/i;
+  return head && !PROGRAMME.test(head) ? head : 'Various recipients';
+}
+
 function toMonthStartFromEpoch(epochSeconds?: number): string {
   if (!epochSeconds) return '';
   const d = new Date(epochSeconds * 1000);
@@ -451,6 +464,16 @@ export async function scrapeOpenPhil(): Promise<ScrapeResult> {
   if (removed > 0) {
     console.log(`[Coefficient] Removed ${removed} intra-source duplicates (CSV/Algolia overlap)`);
   }
+
+  // Name grantees recorded as "Unknown" from their titles. Done after the de-duplication
+  // above, which matches records on the organisation name as published.
+  let named = 0;
+  for (const g of dedupedGrants) {
+    if (g.recipient.trim().toLowerCase() !== 'unknown') continue;
+    g.recipient = recipientFromTitle(g.title);
+    named += 1;
+  }
+  if (named > 0) console.log(`[Coefficient] Named ${named} "Unknown" grantees from their titles`);
 
   // Log year breakdown
   const byYear: Record<string, number> = {};

@@ -32,9 +32,12 @@ records.
 | BlueDot Impact public grants API | BlueDot (regrants) | Publicly listed grantees and program totals. |
 | Manifund public API | Manifund | Public project data. |
 | Sentinel Bio grant pages; CLR Fund grantmaking page | Sentinel Bio, CLR Fund | Publicly published grant listings. |
+| Cooperative AI Foundation grant summaries; Macroscopic Ventures grants page; Manifund project pages | Cooperative AI Foundation, Macroscopic Ventures, AISTOF | Publicly published grant listings and donation records. |
 | **Manifund / Trace** (`trace.manifund.org`) | ACX Grants, The Audacious Project, OpenAI Foundation (and BlueDot's earlier rows) | **CC0 / public domain** — no attribution required (credit appreciated). |
 | FLI grant program pages | FLI | Publicly published grant listings; manually curated into `data/raw/supplemental/`. |
 | Meta Charity Funders; Navigation Fund | Meta Charity Funders, Navigation Fund | Publicly published grant listings; manually curated. |
+| Longview Emerging Challenges Fund reports (GWWC, longview.org, public Google Drive PDFs) | Longview Philanthropy | Publicly published grant reports; manually curated. |
+| Lightcone Commons public evaluator profiles (`lightconecommons.com/profiles/<code>`) | Lightcone Commons | Publicly published funding orders and round totals. |
 
 Records ingested from **Trace are CC0**, which is what makes the ACX Grants,
 Audacious Project, and OpenAI Foundation additions clean to redistribute.
@@ -249,6 +252,121 @@ cumulative count and total, so they are carried as `Career Transition Grants
 the increase. Rapid grants that BlueDot counts but does not list publicly are not
 residualized.
 
+### 5d. Cooperative AI Foundation (regrants) and Macroscopic Ventures
+
+| Field | Value |
+|-------|-------|
+| **Source (CAIF)** | `https://www.cooperativeai.com/post/grant-summaries` |
+| **Scraper (CAIF)** | `scripts/scrapers/cooperative-ai.ts` |
+| **Source (Macroscopic)** | `https://macroscopic.org/grants` (amounts for two grants only) |
+| **Data file (Macroscopic)** | `data/raw/supplemental/macroscopic-grants.json` (curated) |
+| **Category** | LTXR |
+
+CAIF lists every grant with currency, amount and grant period ("2021-2025"). The start
+year is dated mid-year, and GBP/EUR/SEK amounts are converted at that year's annual
+average rate (table in the scraper). A grantee with no institution line (e.g. SIPRI) is
+its own recipient.
+
+Macroscopic Ventures (formerly the Center for Emerging Risk Research, then Polaris
+Ventures) lists "a selection of the organizations we have supported" and gives amounts
+for two: the $15M founding commitment to CAIF (May 2021) and $3M to Carnegie Mellon for
+FOCAL (announced February 2022). Only those are included, so Macroscopic is heavily
+understated. It publishes no grants-paid total, so there is no residual.
+
+**Double counting:** CAIF's grants are `regrant: true, regrant_of: ["Cooperative AI
+Foundation"]`, so they count net of tracked grants to CAIF, the same rule as BlueDot and
+Manifund. Macroscopic's $15M commitment exceeds CAIF's ~$4.7M of grants, so CAIF adds $0
+to the headline total and counts in full only when Macroscopic is filtered out. CAIF's
+$500K and Macroscopic's $3M to FOCAL are separate grants and both count.
+
+### 5e. AISTOF (AI Safety Tactical Opportunities Fund)
+
+| Field | Value |
+|-------|-------|
+| **Source** | Manifund project pages: donations from AISTOF's account (JueYan Zhang / AISTOF) |
+| **Script** | `npm run refresh:aistof -- --write` (run after `refresh:manifund`; rewrites the file) |
+| **Data file** | `data/raw/aistof-regrants.json` |
+| **Category** | From the Manifund project |
+
+AISTOF publishes no grants list. Manifund's projects API has no donor on each txn, but
+each project page's flight payload does, so the script reads AISTOF's donations from the
+pages of Manifund projects we hold (dated 2024+), filtered to that page's own project id.
+
+**Double counting:** those projects are already Manifund rows at their all-donor total.
+`lib/aggregator.ts` subtracts AISTOF's share from the matching Manifund row (by URL) and
+drops rows AISTOF funded entirely, so the money moves to AISTOF rather than being added.
+This follows the ACX precedent (a funder's Manifund-hosted grants are tracked under that
+funder). AISTOF rows are also regrants (`regrant_of: ["AI Safety Tactical Opportunities
+Fund", "AISTOF"]`) in case grants to AISTOF are ever tracked. AISTOF reports 150+ grants;
+those made outside Manifund are not captured, and the anonymised rows on aisafety.fund
+have no public source.
+
+### 5f. Longview Philanthropy (Emerging Challenges Fund)
+
+| Field | Value |
+|-------|-------|
+| **Source** | ECF grant reports: Dec 2022 and Aug 2023 (GWWC, as the Longtermism Fund), Dec 2023 (longview.org), 2024 and 2025 annual reports (Google Drive PDFs linked from `longview.org/emerging-challenges-fund/`) |
+| **Data file** | `data/raw/supplemental/longview-grants.json` (curated, 28 grants, $3.67M) |
+| **Category** | LTXR |
+
+Only the public ECF is included. Longview's private Frontier AI, Digital Sentience and
+Nuclear Weapons Policy funds and its donor advising (over $50M in 2025 by its own count)
+report only to donors. The Drive PDFs block downloads, so their grant lists were copied
+from the viewer by hand. The 2024 and 2025 reports give only the year, so those grants
+are dated mid-year. The 2025 report gives Horizon Institute $350,000 on its summary page
+and $150,000 on the grant page; $350,000 is used because it matches the report's $1.5M total.
+The 2024 report's "grant updates" repeat 2023 grants and are not entered again.
+
+**Double counting:** ECF money comes from Giving What We Can donors, who are not tracked,
+but Coefficient Giving and SFF have given Longview about $27.6M (mostly general support).
+ECF rows are regrants (`regrant_of: ["Longview Philanthropy"]`) under the same rule as
+BlueDot, Manifund and CAIF, so they add $0 to the headline and count in full only when
+those funders are filtered out. This is conservative, since most of that inflow paid for
+operations rather than ECF grants.
+
+### 5g. Lightcone Commons
+
+| Field | Value |
+|-------|-------|
+| **Source** | Public evaluator profiles `lightconecommons.com/profiles/<code>` (Next.js flight payload: `order.funded`, `order.names`) and the homepage round summary (`finalizedAt`, `granted`, `orgsFunded`) |
+| **Scraper** | `scripts/scrapers/lightcone-commons.ts` (automatic, in `npm run scrape`) |
+| **Archive** | `data/raw/lightcone-commons-rounds.json` (versioned; one entry per round) |
+| **Category** | LTXR, with a few Meta/Other overrides in the scraper |
+
+Lightcone Commons funders back evaluators, and money flows down each backed evaluator's
+ranked order. The grants list is behind a login, but each public profile embeds that
+evaluator's full order, including how much of each line was funded. Where several
+evaluators recommend one project, funders share its cost rather than adding to it (the
+site's FAQ: "up to $100k" plus "up to $150k" makes $150k), so a project's grant is the
+**largest** funded figure across the public orders. Summing them instead exceeds the
+round's published total. Each figure is a lower bound, since the project may also be in an
+order that isn't public.
+
+Round 1 (finalized 2026-11-02): $45,066,734 granted to 147 organisations by 23 funders
+through 17 evaluators. Ten evaluators publish orders (four of them marked "withheld" on
+the homepage, but their profile pages still carry the order), itemizing 109 grants,
+$32.60M. The scraper adds the remaining $12.47M as one unitemized residual row
+(`is_residual`), so the round total is right. Grants are dated at finalization; funders
+pay through February 2027.
+
+Recipient names are the project names Lightcone shows, which for individuals are often
+project titles. Recipient types (501(c)(3), fiscally sponsored, individual, ...) are kept
+in the round archive.
+
+**Archive:** the site shows only the current round, and the profiles will show the next
+round's orders once it finalizes. Each scrape saves the live round under its
+`finalizedAt`; a live round only replaces its archived copy when it itemizes at least as
+much. Never delete past rounds from the archive.
+
+**Double counting:** rows are regrants of "Lightcone Commons" (nothing tracked funds the
+Commons directly today, so they count in full). The Long-Term Future Fund is one of the
+round's funders: once EA Funds publishes those grants they will duplicate Commons rows.
+`scrape-all.ts` prints a warning listing LTFF grants to Commons recipients dated on or
+after their round; net those out by hand (for example by lowering the Commons row) when it
+fires. Other funders are anonymous, so overlap with SFF or Coefficient Giving grants made
+through the Commons can't be detected; the cross-source fuzzy dedup catches only exact
+repeats (same recipient, close date, amount within 10%).
+
 ---
 
 ### 6. Animal Charity Evaluators (Movement Grants + Residuals)
@@ -312,8 +430,21 @@ is always 100%. Assignment is, in priority order:
    the rules leave at the broad "— general" level, keyed by recipient. This map is
    produced by a tagging agent using the organization's identity + grant titles,
    constrained to the fixed sub-category ids.
-3. **"— general"** bucket — honest fallback for aggregate/residual rows and
+3. **Fallbacks:** a rule match on a *weak* bucket (`ltxr-ai-general`, which any mention
+   of "AI" hits, including in recipient names), then the bucket a funder-wide program
+   label points to, then the **"— general"** bucket for aggregate/residual rows and
    unidentifiable recipients (anonymous/unknown).
+
+Funder-wide program labels (`GENERIC_PROGRAM_LABELS`: Coefficient's "Navigating
+Transformative AI" and "Global Catastrophic Risks (Opportunities)", SFF's "Long-Term &
+X-Risk", the EA Infrastructure and Long-Term Future Fund names, etc.) name a whole
+portfolio, not a grant's topic, so they are only a fallback; they are also stripped from
+titles that repeat them. Before November 2026 they were decisive, which put $916M of
+Coefficient AI grants (CSET, GovAI, Epoch…) in "AI (Unspecified)" and every SFF grant in
+"GCR Capacity". Coefficient's "GCR Capacity Building" is a real fieldbuilding program and
+stays decisive. Recipients a tagging agent reviewed but found no specific topic for are
+listed under `reviewed` in the AI map: they keep their program's bucket and are not
+re-sent for labelling.
 
 **This step is part of the grant-update workflow.** After a scrape adds grants,
 run `npm run tag:subcats` to regenerate the work list of *new* residual
@@ -331,13 +462,14 @@ cheap and stable.
 npm run scrape             # auto sources + source guard
 npm run refresh:manifund -- --write  # Manifund projects + ACX review list
 npm run refresh:bluedot -- --write   # BlueDot rapid grants + career-transition total
+npm run refresh:aistof -- --write    # AISTOF's share of Manifund projects (after refresh:manifund)
 npm run tag:subcats        # list NEW recipients needing sub-categories
                            #   → tag them, then: npm run tag:subcats validate
 npm run build              # rebuild public/data + the site
 ```
 
 **Automatic** (handled by `npm run scrape`): Coefficient Giving, EA Funds, SFF,
-ACE, Founders Pledge (fund pages), Sentinel Bio, CLR Fund, and the residual
+ACE, Founders Pledge (fund pages), Sentinel Bio, CLR Fund, Cooperative AI Foundation, Lightcone Commons, and the residual
 computation. The source guard aborts
 the run if any source returns zero or regresses more than 10%.
 
@@ -348,6 +480,10 @@ the run if any source returns zero or regresses more than 10%.
 | **GiveWell** | No public API. Download the CSV from the Airtable shared view to `data/raw/givewell-grants.csv` (the file is gitignored), then re-scrape. This is the only step that cannot be automated. |
 | **Manifund** | `npm run refresh:manifund -- --write` — pages Manifund's own API. Do **not** import Manifund from Trace: our rows are project-level aggregates, while Trace stores the same money as per-donation rows keyed by individual donors, so a Trace import would double-count at the wrong granularity. |
 | **BlueDot** | `npm run refresh:bluedot -- --write` — BlueDot's own public API (Trace's copy lags by weeks). Append-only. |
+| **AISTOF** | `npm run refresh:aistof -- --write` after `refresh:manifund` — re-reads AISTOF's donations from Manifund project pages. |
+| **Longview Philanthropy** | The ECF is winding down (final round for donations received by 30 Sep 2026). Add any final report's grants to `data/raw/supplemental/longview-grants.json`. |
+| **Lightcone Commons** | Automatic, but after each round check the scrape log: the archive should gain a round, and the LTFF-overlap warning lists grants to net out by hand. New recipients need sub-category tags (`npm run tag:subcats`). |
+| **Macroscopic Ventures** | Check `macroscopic.org/grants` for newly published amounts; add to `data/raw/supplemental/macroscopic-grants.json`. |
 | **ACX Grants** | `refresh:manifund` prints an **ACX REVIEW** list of funded ACX-tagged Manifund projects we don't hold. Manifund's API doesn't say which transactions were ACX's, so confirm ACX's grant (results post / project page) and add rows to `data/raw/supplemental/acx-grants.json` by hand. Some listed projects are ACX Forecasting mini-grants / impact certificates, not ACX Grants. |
 | **Audacious, OpenAI Foundation** | No feed; curated in `data/raw/supplemental/trace-funders.json`. Optionally re-check `https://trace.manifund.org/grants.json`. OpenAI's People-First AI Fund is out of EA scope. |
 | **FLI, Meta Charity Funders, Navigation Fund** | Hand-curated in `data/raw/supplemental/`; check the funders' pages for new rounds. FLI publishes grant *year* only, so dates are set to mid-year. |

@@ -38,10 +38,33 @@ interface MinGrant {
   regrant_of?: string[];
 }
 
+// Source-group filter (Grantmaker + Fund, OR within). A selected grantmaker matches all
+// its grants unless specific funds of that grantmaker are also selected. Shared by the
+// grant list and the regrant scope, so netting follows exactly the funders in view.
+function passesSourceFilter(
+  grant: MinGrant, grants: MinGrant[], selectedGrantmakers: string[], selectedFunds: string[],
+): boolean {
+  const hasGmFilter = selectedGrantmakers.length > 0;
+  const hasFundFilter = selectedFunds.length > 0;
+  if (!hasGmFilter && !hasFundFilter) return true;
+  if (hasFundFilter && !!grant.fund && selectedFunds.includes(grant.fund)) return true;
+  if (!(hasGmFilter && selectedGrantmakers.includes(grant.grantmaker))) return false;
+  const grantmakerHasSelectedFunds = hasFundFilter && selectedFunds.some(f => {
+    const fundGrant = grants.find(g => g.fund === f);
+    return fundGrant && fundGrant.grantmaker === grant.grantmaker;
+  });
+  return grantmakerHasSelectedFunds ? !!grant.fund && selectedFunds.includes(grant.fund) : true;
+}
+
+
 interface Metadata {
   totalGrants: number;
   totalAmount: number;
   grantmakers: string[];
+  // Grantmakers under smallGrantmakerThreshold (lifetime, gross), grouped as
+  // "Smaller grantmakers" in the filters and the by-funder chart. Added in schema 1.1.
+  smallGrantmakers?: string[];
+  smallGrantmakerThreshold?: number;
   categories: string[];
   subCategories?: { id: string; label: string; category: string }[];
   dateRange: {
@@ -58,7 +81,7 @@ const SUBCATEGORY_ORDER = [
   'ltxr-ai-tech', 'ltxr-gcr', 'ltxr-ai-general', 'ltxr-bio', 'ltxr-general', 'ltxr-ai-gov', 'ltxr-nuclear',
   'aw-movement', 'aw-fish', 'aw-general', 'aw-broiler', 'aw-cagefree', 'aw-altprotein', 'aw-wild',
   'gh-general', 'gh-rnd', 'gh-malaria', 'gh-nutrition', 'gh-policy', 'gh-vaccines', 'gh-lead', 'gh-deworming', 'gh-air', 'gh-cash',
-  'meta-community', 'meta-giving', 'meta-forecasting', 'meta-careers', 'meta-research', 'meta-general',
+  'meta-community', 'meta-giving', 'meta-forecasting',
   'other-general', 'other-infectious', 'other-climate',
   'science-basic', 'science-general', 'science-tools',
 ];
@@ -273,6 +296,9 @@ const GrantRow = memo(function GrantRow({
   );
 });
 
+/** Label (and chart series name) for the grouped grantmakers under the size threshold. */
+const SMALL_GM_LABEL = 'Smaller grantmakers';
+
 /** Top-level "Select All / Deselect All" button (rendered inline in the header). */
 function SelectAllButton<T extends string | number>({ all, selected, onChange }: {
   all: T[]; selected: T[]; onChange: (next: T[]) => void;
@@ -315,6 +341,10 @@ export default function Home() {
   const [chartView, setChartView] = useState<'year' | 'month'>('year');
   const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
   const [adjustInflation, setAdjustInflation] = useState(false);
+  // "Smaller grantmakers" grouping: expanders in the two filters, and the chart's switch.
+  const [smallGmExpanded, setSmallGmExpanded] = useState(false);
+  const [smallFundsExpanded, setSmallFundsExpanded] = useState(false);
+  const [groupSmallFunders, setGroupSmallFunders] = useState(true);
   // Constant initial value so server and first client render agree (no hydration
   // mismatch); the effect sets the real width immediately after mount.
   const [windowWidth, setWindowWidth] = useState(400);
@@ -364,6 +394,13 @@ export default function Home() {
     const sort = p.get('sort');
     if (sort && ['date', 'amount', 'grantmaker', 'recipient', 'category'].includes(sort)) setSortBy(sort as typeof sortBy);
     const dir = p.get('dir'); if (dir === 'asc' || dir === 'desc') setSortOrder(dir);
+    // Chart view: by=funder|category, view=month, infl=1, group=0 (smaller grantmakers apart).
+    if (p.get('view') === 'month') setChartView('month');
+    const by = p.get('by');
+    if (by === 'funder') setTimeBreakdown('byFunder');
+    else if (by === 'category') setTimeBreakdown('byCategory');
+    if (p.get('infl') === '1') setAdjustInflation(true);
+    if (p.get('group') === '0') setGroupSmallFunders(false);
   }, []);
 
   // Reflect the current filter/sort state back into the URL (shareable / bookmarkable).
@@ -384,9 +421,14 @@ export default function Home() {
     if (amountMax) p.set('max', amountMax);
     if (sortBy !== 'date') p.set('sort', sortBy);
     if (sortOrder !== 'desc') p.set('dir', sortOrder);
+    if (chartView !== 'year') p.set('view', chartView);
+    if (timeBreakdown === 'byFunder') p.set('by', 'funder');
+    else if (timeBreakdown === 'byCategory') p.set('by', 'category');
+    if (adjustInflation) p.set('infl', '1');
+    if (!groupSmallFunders) p.set('group', '0');
     const qs = p.toString();
     window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
-  }, [orgFilter, searchTerm, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder]);
+  }, [orgFilter, searchTerm, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder, chartView, timeBreakdown, adjustInflation, groupSmallFunders]);
 
   // ...and scroll the grants list into view once it's rendered (one time).
   useEffect(() => {
@@ -584,41 +626,15 @@ export default function Home() {
     // Group 1 (Source): Grantmaker + Fund — OR within
     // Group 2 (Topic): Category + Sub-category — OR within
     // Between groups: AND
-    const hasGmFilter = selectedGrantmakers.length > 0;
-    const hasFundFilter = selectedFunds.length > 0;
     const hasCatFilter = selectedCategories.length > 0;
     const hasSubCatFilter = selectedSubCategories.length > 0;
-    const hasSourceFilter = hasGmFilter || hasFundFilter;
     const hasTopicFilter = hasCatFilter || hasSubCatFilter;
 
     filtered = filtered.filter(grant => {
       const matchesSubCat = hasSubCatFilter && !!grant.sub_category && selectedSubCategories.includes(grant.sub_category);
 
       // --- Source group (Grantmaker / Fund) ---
-      let passesSource: boolean;
-      if (hasSourceFilter) {
-        const matchesGm = hasGmFilter && selectedGrantmakers.includes(grant.grantmaker);
-        const matchesFund = hasFundFilter && !!grant.fund && selectedFunds.includes(grant.fund);
-
-        if (matchesFund) {
-          passesSource = true;
-        } else if (matchesGm) {
-          // If user also selected specific funds for this grantmaker, only show those
-          const grantmakerHasSelectedFunds = hasFundFilter && selectedFunds.some(f => {
-            const fundGrant = grants.find(g => g.fund === f);
-            return fundGrant && fundGrant.grantmaker === grant.grantmaker;
-          });
-          if (grantmakerHasSelectedFunds) {
-            passesSource = !!grant.fund && selectedFunds.includes(grant.fund);
-          } else {
-            passesSource = true;
-          }
-        } else {
-          passesSource = false;
-        }
-      } else {
-        passesSource = true;
-      }
+      const passesSource = passesSourceFilter(grant, grants, selectedGrantmakers, selectedFunds);
 
       // --- Topic group (Category / Sub-category) — OR within ---
       let passesTopic: boolean;
@@ -692,6 +708,30 @@ export default function Home() {
     }
     return result;
   }, [grants]);
+
+  const smallGrantmakers = useMemo(() => metadata?.smallGrantmakers ?? [], [metadata]);
+  const largeGrantmakers = useMemo(
+    () => (metadata?.grantmakers ?? []).filter(gm => !smallGrantmakers.includes(gm)),
+    [metadata, smallGrantmakers],
+  );
+  // Smaller grantmakers the user picked by name or by one of their funds. The chart keeps
+  // these as their own series: grouping shouldn't hide what was just asked for.
+  const pickedSmallGrantmakers = useMemo(() => {
+    const picked = new Set(selectedGrantmakers.filter(gm => smallGrantmakers.includes(gm)));
+    for (const group of fundsByGrantmaker) {
+      if (smallGrantmakers.includes(group.grantmaker) && group.funds.some(f => selectedFunds.includes(f))) {
+        picked.add(group.grantmaker);
+      }
+    }
+    return picked;
+  }, [selectedGrantmakers, selectedFunds, smallGrantmakers, fundsByGrantmaker]);
+
+  const toggleSmallGrantmakers = () => {
+    const allOn = smallGrantmakers.every(gm => selectedGrantmakers.includes(gm));
+    setSelectedGrantmakers(prev => allOn
+      ? prev.filter(gm => !smallGrantmakers.includes(gm))
+      : Array.from(new Set([...prev, ...smallGrantmakers])));
+  };
 
 
   const availableYears = useMemo(() => {
@@ -900,6 +940,11 @@ export default function Home() {
     'OpenAI Foundation': '#a3907c',     // 100% LTXR (1 grant)
     'Sentinel Bio': '#a3907c',          // 100% LTXR (biosecurity)
     'CLR Fund': '#a3907c',              // 100% LTXR (s-risks)
+    'Cooperative AI Foundation': '#a3907c', // 100% LTXR (cooperative AI)
+    'Macroscopic Ventures': '#a3907c',  // 100% LTXR (2 published commitments)
+    'AISTOF': '#a3907c',                // 100% LTXR (via Manifund)
+    'Longview Philanthropy': '#a3907c', // 100% LTXR (Emerging Challenges Fund only)
+    'Lightcone Commons': '#a3907c',     // 89% LTXR (AI safety funding round)
     // ── Diversified / no dominant cause (intentional neutrals) ──
     'Coefficient Giving': '#475569',    // LTXR only 45% of $ — funds every cause
     'EA Funds': '#9ca3af',              // GH 28% of $ / LTXR 40% of grants
@@ -928,6 +973,7 @@ export default function Home() {
     'ACE': 'Animal Charity Evaluators',
     'FLI': 'Future of Life Institute',
     'Macroscopic': 'Macroscopic Ventures',
+    'AISTOF': 'AI Safety Tactical Opportunities Fund',
   };
 
   const displayCategory = (code?: string): string => code ? (CATEGORY_DISPLAY[code] || code) : '';
@@ -1088,6 +1134,8 @@ export default function Home() {
     Object.keys(GRANTMAKER_COLORS).forEach(key => {
       map[displayGrantmaker(key)] = GRANTMAKER_COLORS[key];
     });
+    // Light warm grey: apart from EA Funds' mid grey and the minor-LTXR clay.
+    map[SMALL_GM_LABEL] = '#d6d3d1';
     return map;
     // GRANTMAKER_COLORS and displayGrantmaker are stable pure constants.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1099,7 +1147,7 @@ export default function Home() {
   //   factor = max(0, (R - U_scope) / R)
   // where R is its total regranting and U_scope is the grants TO it (matched by
   // recipient name via `regrant_of`) that fall in the current Grantmaker scope. Scope
-  // is the Grantmaker selection ALONE — never the year/category/amount slice — because
+  // is the Source selection (Grantmaker + Fund) ALONE — never the year/category/amount slice — because
   // regrantor funds roll over across years. Each regrant is then counted at its
   // regrantor's factor: BlueDot (U $32M > R $1.24M) floors to 0; Manifund
   // (U $0.16M << R $16M) keeps ~99%.
@@ -1111,9 +1159,7 @@ export default function Home() {
       total.set(g.grantmaker, (total.get(g.grantmaker) || 0) + g.amount);
       if (g.regrant_of) aliases.set(g.grantmaker, g.regrant_of);
     }
-    const inScope = selectedGrantmakers.length > 0
-      ? grants.filter(g => selectedGrantmakers.includes(g.grantmaker))
-      : grants;
+    const inScope = grants.filter(g => passesSourceFilter(g, grants, selectedGrantmakers, selectedFunds));
     const upstream = new Map<string, number>();
     for (const g of inScope) {
       const k = normalizeRegrantName(g.recipient);
@@ -1125,7 +1171,7 @@ export default function Home() {
       f.set(name, R > 0 ? Math.max(0, (R - U) / R) : 1);
     }
     return f;
-  }, [grants, selectedGrantmakers]);
+  }, [grants, selectedGrantmakers, selectedFunds]);
   const countedAmount = useCallback(
     (g: MinGrant) => (g.regrant ? g.amount * (regrantFactor.get(g.grantmaker) ?? 1) : g.amount),
     [regrantFactor]
@@ -1175,9 +1221,19 @@ export default function Home() {
       .map(([c, d]) => ({ category: c, count: d.count, total: d.total, average: d.count ? d.total / d.count : 0 }))
       .sort((a, b) => b.total - a.total);
 
+    // Smaller grantmakers in view fold into one series, unless the user picked them in
+    // a filter or switched grouping off. Grouping a single member would only rename it.
+    const smallDisplay = new Set(smallGrantmakers.map(displayGrantmaker));
+    Array.from(pickedSmallGrantmakers).forEach(gm => smallDisplay.delete(displayGrantmaker(gm)));
+    const bucketable = byFunder.filter(f => f.total > 0 && smallDisplay.has(f.funder)).map(f => f.funder);
+    const bucketOn = groupSmallFunders && bucketable.length >= 2;
+    const bucketed = new Set(bucketOn ? bucketable : []);
+    const funderKey = (display: string) => (bucketed.has(display) ? SMALL_GM_LABEL : display);
+
     // Show all orgs and categories as individual series (skip funders whose dollars
     // are fully un-counted in this view, e.g. a regrantor while its parent is present).
-    const funderGroups = byFunder.filter(f => f.total > 0).map(f => f.funder);
+    const funderGroups = byFunder.filter(f => f.total > 0 && !bucketed.has(f.funder)).map(f => f.funder);
+    if (bucketOn) funderGroups.push(SMALL_GM_LABEL);
     const categoryGroups = byCategory.map(c => c.category);
 
     // Cross-tabulations: time x group
@@ -1185,10 +1241,13 @@ export default function Home() {
     const yearCategory: { [y: string]: { [g: string]: number } } = {};
     const monthFunder: { [ym: string]: { [g: string]: number } } = {};
     const monthCategory: { [ym: string]: { [g: string]: number } } = {};
+    // Per-member amounts inside the grouped series, for its tooltip.
+    const yearSmallDetail: { [y: string]: { [g: string]: number } } = {};
+    const monthSmallDetail: { [ym: string]: { [g: string]: number } } = {};
 
     data.forEach(g => {
       const { year, yearMonth: ym } = getYearMonthFromDate(g.date);
-      const fg = displayGrantmaker(g.grantmaker);
+      const fg = funderKey(displayGrantmaker(g.grantmaker));
       const cg = displayCategory(g.category) || 'Uncategorized';
       const amt = countedAmount(g);
 
@@ -1203,6 +1262,14 @@ export default function Home() {
 
       if (!monthCategory[ym]) monthCategory[ym] = {};
       monthCategory[ym][cg] = (monthCategory[ym][cg] || 0) + amt;
+
+      if (fg === SMALL_GM_LABEL) {
+        const member = displayGrantmaker(g.grantmaker);
+        if (!yearSmallDetail[year]) yearSmallDetail[year] = {};
+        yearSmallDetail[year][member] = (yearSmallDetail[year][member] || 0) + amt;
+        if (!monthSmallDetail[ym]) monthSmallDetail[ym] = {};
+        monthSmallDetail[ym][member] = (monthSmallDetail[ym][member] || 0) + amt;
+      }
     });
 
     let byYear = Object.entries(byYearMap)
@@ -1231,8 +1298,13 @@ export default function Home() {
       byYear, byYearMonth, byFunder, byCategory,
       funderGroups, categoryGroups,
       yearFunder, yearCategory, monthFunder, monthCategory,
+      yearSmallDetail, monthSmallDetail,
+      // Whether the grouping switch has anything to act on in this view.
+      canGroupSmall: bucketable.length >= 2,
     };
-  }, [filteredAndSortedGrants, countedAmount]);
+    // displayGrantmaker is a stable pure helper.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filteredAndSortedGrants, countedAmount, smallGrantmakers, pickedSmallGrantmakers, groupSmallFunders]);
 
   const filteredTotal = useMemo(
     () => filteredAndSortedGrants.reduce((sum, grant) => sum + countedAmount(grant), 0),
@@ -1382,6 +1454,7 @@ export default function Home() {
       byYear, byYearMonth,
       funderGroups, categoryGroups,
       yearFunder, yearCategory, monthFunder, monthCategory,
+      yearSmallDetail, monthSmallDetail,
     } = chartData;
 
     // Fixed px (not %) on the right: the vertical legend has a bounded width, and a
@@ -1421,7 +1494,9 @@ export default function Home() {
     const yearMax = calcYearMax();
     const monthMax = calcMonthMax();
 
-    const breakdownTooltip = {
+    // smallDetail: per-member amounts (raw USD) behind the grouped "Smaller grantmakers"
+    // series, keyed by axis label, listed under that series' line.
+    const makeBreakdownTooltip = (smallDetail?: { [t: string]: { [g: string]: number } }) => ({
       trigger: 'axis' as const,
       axisPointer: { type: 'shadow' as const },
       confine: true,
@@ -1432,11 +1507,20 @@ export default function Home() {
           .filter((p: any) => p.value > 0)
           .map((p: any) => {
             total += p.value;
-            return `${p.marker} ${p.seriesName}: $${p.value.toFixed(2)}M`;
+            let line = `${p.marker} ${p.seriesName}: $${p.value.toFixed(2)}M`;
+            if (p.seriesName === SMALL_GM_LABEL && smallDetail?.[p.name]) {
+              const members = Object.entries(smallDetail[p.name])
+                .map(([g, v]) => [g, v * inflationMultiplier(p.name) / 1000000] as const)
+                .filter(([, v]) => v >= 0.005)
+                .sort((a, b) => b[1] - a[1]);
+              line += members.map(([g, v]) => `<br/><span style="padding-left:18px;color:#666">${g}: $${v.toFixed(2)}M</span>`).join('');
+            }
+            return line;
           });
         return `${items[0].name}<br/>${lines.join('<br/>')}<br/><b>Total: $${total.toFixed(2)}M</b>`;
       },
-    };
+    });
+    const breakdownTooltip = makeBreakdownTooltip();
 
     const titleStyle = isMobile ? { fontSize: 12 } : {};
     // Hide legend on mobile - tooltip provides enough info
@@ -1495,7 +1579,7 @@ export default function Home() {
           return {
             animation: false,
             title: isMobile ? { show: false } : { text: 'Grants by Year (by Funder)', left: 'center', top: 8 },
-            tooltip: breakdownTooltip,
+            tooltip: makeBreakdownTooltip(yearSmallDetail),
             legend: legendConfig,
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
             yAxis: yAxisConfig(yearMax),
@@ -1551,7 +1635,7 @@ export default function Home() {
           return {
             animation: false,
             title: isMobile ? { show: false } : { text: 'Grants by Month (by Funder)', left: 'center', top: 8 },
-            tooltip: breakdownTooltip,
+            tooltip: makeBreakdownTooltip(monthSmallDetail),
             legend: legendConfig,
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
             yAxis: yAxisConfig(monthMax),
@@ -1715,7 +1799,7 @@ export default function Home() {
                 </button>
                 {expandedFilters.grantmaker && (
                   <div style={styles.filterOptions}>
-                    {metadata.grantmakers.map(gm => (
+                    {largeGrantmakers.map(gm => (
                       <label key={gm} style={styles.filterOption}>
                         <input
                           type="checkbox"
@@ -1726,6 +1810,48 @@ export default function Home() {
                         {displayGrantmaker(gm)}
                       </label>
                     ))}
+                    {smallGrantmakers.length > 0 && (() => {
+                      const nOn = smallGrantmakers.filter(gm => selectedGrantmakers.includes(gm)).length;
+                      return (
+                        <div style={styles.smallGroup}>
+                          <div style={styles.smallGroupHeader}>
+                            <label style={styles.filterOption}>
+                              <input
+                                type="checkbox"
+                                checked={nOn === smallGrantmakers.length}
+                                ref={el => { if (el) el.indeterminate = nOn > 0 && nOn < smallGrantmakers.length; }}
+                                onChange={toggleSmallGrantmakers}
+                                style={styles.checkbox}
+                              />
+                              {SMALL_GM_LABEL} ({smallGrantmakers.length})
+                            </label>
+                            <button
+                              type="button"
+                              onClick={() => setSmallGmExpanded(!smallGmExpanded)}
+                              style={styles.smallGroupToggle}
+                              aria-expanded={smallGmExpanded}
+                            >
+                              {smallGmExpanded ? 'Hide' : 'Show'}
+                            </button>
+                          </div>
+                          {smallGmExpanded && (
+                            <div style={{ ...styles.filterOptions, ...styles.smallGroupOptions }}>
+                              {smallGrantmakers.map(gm => (
+                                <label key={gm} style={styles.filterOption}>
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedGrantmakers.includes(gm)}
+                                    onChange={() => toggleGrantmaker(gm)}
+                                    style={styles.checkbox}
+                                  />
+                                  {displayGrantmaker(gm)}
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
@@ -1738,9 +1864,8 @@ export default function Home() {
                   {expandedFilters.fund && <SelectAllButton all={fundsByGrantmaker.flatMap(g => g.funds)} selected={selectedFunds} onChange={setSelectedFunds} />}
                   <span style={styles.filterHeaderIcon}>{expandedFilters.fund ? '\u2212' : '+'}</span>
                 </button>
-                {expandedFilters.fund && (
-                  <div style={styles.filterOptionsGrouped}>
-                    {fundsByGrantmaker.map(group => {
+                {expandedFilters.fund && (() => {
+                  const renderFundGroup = (group: { grantmaker: string; displayName: string; funds: string[] }) => {
                       // .every() is true for an empty list, which would mislabel an empty
                       // group as "Deselect All" — require at least one option.
                       const allSelected = group.funds.length > 0 && group.funds.every(f => selectedFunds.includes(f));
@@ -1774,9 +1899,34 @@ export default function Home() {
                         </div>
                       </div>
                       );
-                    })}
+                    };
+                  const smallFundGroups = fundsByGrantmaker.filter(g => smallGrantmakers.includes(g.grantmaker));
+                  return (
+                  <div style={styles.filterOptionsGrouped}>
+                    {fundsByGrantmaker.filter(g => !smallGrantmakers.includes(g.grantmaker)).map(renderFundGroup)}
+                    {smallFundGroups.length > 0 && (
+                      <div style={styles.fundGroup}>
+                        <div style={styles.fundGroupHeaderRow}>
+                          <div style={styles.fundGroupHeader}>{SMALL_GM_LABEL} ({smallFundGroups.length})</div>
+                          <button
+                            type="button"
+                            onClick={() => setSmallFundsExpanded(!smallFundsExpanded)}
+                            style={styles.selectAllButton}
+                            aria-expanded={smallFundsExpanded}
+                          >
+                            {smallFundsExpanded ? 'Hide' : 'Show'}
+                          </button>
+                        </div>
+                        {smallFundsExpanded && (
+                          <div style={styles.filterOptionsGrouped}>
+                            {smallFundGroups.map(renderFundGroup)}
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                )}
+                  );
+                })()}
               </div>
               <div style={styles.filterSection}>
                 <button
@@ -1974,6 +2124,23 @@ export default function Home() {
               >
                 {isMobile ? 'Category' : 'By Category'}
               </button>
+              {timeBreakdown === 'byFunder' && chartData.canGroupSmall && (
+                <label
+                  style={{
+                    ...styles.inflationToggle,
+                    ...(isMobile ? { fontSize: '13px', flexBasis: '100%', marginTop: '6px' } : { marginLeft: '8px' }),
+                  }}
+                  title={`Combine grantmakers with under $${((metadata?.smallGrantmakerThreshold ?? 15e6) / 1e6).toFixed(0)}M in total grants into one series`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={groupSmallFunders}
+                    onChange={() => setGroupSmallFunders(!groupSmallFunders)}
+                    style={{ cursor: 'pointer' }}
+                  />
+                  Group smaller grantmakers
+                </label>
+              )}
               {!isMobile && <span style={styles.controlsDivider} />}
               <label style={{
                 ...styles.inflationToggle,
@@ -2036,7 +2203,7 @@ export default function Home() {
             ...(isMobile ? { flexDirection: 'column', alignItems: 'flex-start', gap: '10px' } : {})
           }}>
             <div style={styles.grantsHeaderLeft}>
-              <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px', marginBottom: 0, lineHeight: 1 }}>Grants</h2>
+              <h2 style={{ ...styles.sectionTitle, fontSize: isMobile ? '22px' : '28px', margin: 0, lineHeight: 1 }}>Grants</h2>
               <div style={styles.sortControls}>
                 <select
                   value={sortBy}
@@ -2470,6 +2637,29 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderLeft: '3px solid #e5e7eb',
     paddingLeft: '12px',
   },
+  smallGroup: {
+    flexBasis: '100%',
+  },
+  smallGroupHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
+  },
+  smallGroupToggle: {
+    fontSize: '12px',
+    padding: '2px 8px',
+    border: '1px solid #d1d5db',
+    borderRadius: '4px',
+    background: 'white',
+    color: '#374151',
+    cursor: 'pointer',
+  },
+  smallGroupOptions: {
+    borderLeft: '3px solid #e5e7eb',
+    paddingLeft: '12px',
+    paddingBottom: '0',
+    marginTop: '10px',
+  },
   fundGroupHeaderRow: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -2581,7 +2771,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
   grantsHeaderLeft: {
     display: 'flex',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: '12px',
     flexWrap: 'wrap',
   },
@@ -2893,7 +3083,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '4px',
     maxWidth: '100%',
     lineHeight: '1.3',
-    whiteSpace: 'nowrap',
+    // Wrap rather than spill into the category column (e.g. "AI Safety Tactical
+    // Opportunities Fund" is wider than the 220px funder column).
+    whiteSpace: 'normal',
+    overflowWrap: 'anywhere',
   },
   subTag: {
     display: 'inline-block',

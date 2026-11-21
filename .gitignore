@@ -51,6 +51,9 @@ index-old.tsx
 # which CI needs to rebuild public/data consistently.
 !/data/raw/bluedot-regrants.json
 !/data/raw/manifund-regrants.json
+!/data/raw/aistof-regrants.json
+# ...and the Lightcone Commons round archive (the site only shows the current round).
+!/data/raw/lightcone-commons-rounds.json
 
 # NOTE: lib/scraped-grants.json IS tracked in git so GitHub Actions can build the site
 # Run "npm run scrape" locally to update it, then commit the changes

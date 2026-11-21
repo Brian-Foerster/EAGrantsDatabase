@@ -6,7 +6,7 @@
 
 import * as cheerio from 'cheerio';
 import { Grant, ScrapeResult } from '../../types/grants';
-import { fetchWithRetry, saveRawData, parseDollarAmount } from '../scraper-utils';
+import { fetchWithRetry, saveRawData, parseDollarAmount, withTextFragment } from '../scraper-utils';
 
 const RECOMMENDATIONS_URL = 'https://survivalandflourishing.fund/recommendations';
 
@@ -106,7 +106,7 @@ export async function scrapeSFF(): Promise<ScrapeResult> {
           category: 'LTXR',
           focus_area: 'Long-Term & X-Risk',
           fund: source || 'SFF',
-          url: RECOMMENDATIONS_URL,
+          url: withTextFragment(RECOMMENDATIONS_URL, org),
           source_id: `sff-${round}-${org.replace(/\s+/g, '-').slice(0, 40)}`,
         };
 

@@ -1,9 +1,10 @@
 {
-  "schemaVersion": "1.0",
-  "totalGrants": 8276,
-  "totalAmount": 8203461098.341432,
+  "schemaVersion": "1.1",
+  "totalGrants": 8472,
+  "totalAmount": 8335144710.34145,
   "grantmakers": [
     "Coefficient Giving",
+    "Lightcone Commons",
     "Founders Pledge",
     "GiveWell",
     "Sentinel Bio",
@@ -13,19 +14,34 @@
     "EA Funds",
     "CLR Fund",
     "ACX Grants",
+    "Cooperative AI Foundation",
+    "Longview Philanthropy",
     "FLI",
     "Meta Charity Funders",
     "The Audacious Project",
     "Navigation Fund",
+    "Macroscopic Ventures",
     "BlueDot Impact",
-    "Manifund"
+    "Manifund",
+    "AISTOF"
+  ],
+  "smallGrantmakerThreshold": 15000000,
+  "smallGrantmakers": [
+    "Manifund",
+    "BlueDot Impact",
+    "ACX Grants",
+    "Cooperative AI Foundation",
+    "AISTOF",
+    "Longview Philanthropy",
+    "Meta Charity Funders",
+    "CLR Fund"
   ],
   "categories": [
     "Other",
     "LTXR",
+    "Meta",
     "GH",
     "AW",
-    "Meta",
     "Science"
   ],
   "subCategories": [
@@ -155,28 +171,13 @@
       "category": "Meta"
     },
     {
-      "id": "meta-careers",
-      "label": "Careers & Talent",
-      "category": "Meta"
-    },
-    {
       "id": "meta-forecasting",
       "label": "Forecasting & Epistemics",
       "category": "Meta"
     },
     {
-      "id": "meta-research",
-      "label": "Research & Prioritization",
-      "category": "Meta"
-    },
-    {
       "id": "meta-community",
-      "label": "Community & Infrastructure",
-      "category": "Meta"
-    },
-    {
-      "id": "meta-general",
-      "label": "EA Meta (Unspecified)",
+      "label": "Community, Careers & Research",
       "category": "Meta"
     },
     {
@@ -214,5 +215,5 @@
     "earliest": "2012-07-01",
     "latest": "2026-12-01"
   },
-  "lastUpdated": "2026-11-12T04:52:40.626Z"
+  "lastUpdated": "2026-11-20T15:51:48.666Z"
 }

@@ -142,13 +142,12 @@ export default function About({ stats }: { stats: AboutStats }) {
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
               the Effective Altruism community. It currently includes over {fmt(Math.floor(stats.totalGrants / 100) * 100)} grants
-              totaling approximately ${stats.totalAmountB} billion, spanning 2012 to {stats.grantmakers['Coefficient Giving']?.maxYear || '2026'}.
+              totaling approximately ${stats.totalAmountB} billion, spanning from 2012 to {stats.grantmakers['Coefficient Giving']?.maxYear || '2026'}.
             </p>
             <p style={styles.paragraph}>
-              The site has two complementary parts: this grants database of individual grants, and a
+              The site has two complementary parts: a grants database of individual grants, and a
               companion org financials database showing the annual revenues and expenses of the
-              organizations that receive them. The grants database is described first, followed by
-              the org financials database.
+              organizations that receive EA grants.
             </p>
             <p style={styles.paragraph}>
               Grantmakers, grants, and grantees are included in this database on the basis that
@@ -158,8 +157,9 @@ export default function About({ stats }: { stats: AboutStats }) {
             <p style={styles.paragraph}>
               Because the database relies entirely on public records, it is a lower bound on
               actual EA-aligned grantmaking. Major funders that do not publicly disclose their
-              grants are not captured, most notably Longview Philanthropy, which reports privately
-              to donors. Individual donors who give directly rather than through tracked
+              grants are not captured. The largest gap is Longview Philanthropy, which reports its
+              private funds and donor advising (over $50 million in 2025) only to its donors; just its
+              small public fund is included. Individual donors who give directly rather than through tracked
               intermediaries are also absent. Even for grantmakers that are tracked, publication
               lag means recent years systematically undercount actual funding, and some grants are
               never publicly disclosed. Grant dates reflect when a grant was announced or
@@ -281,6 +281,60 @@ export default function About({ stats }: { stats: AboutStats }) {
               use the USD value CLR itself reports.
             </p>
 
+            <h3 style={styles.subheading}>Macroscopic Ventures and the Cooperative AI Foundation</h3>
+            <p style={styles.paragraph}>
+              <a href="https://macroscopic.org/grants" target="_blank" rel="noopener noreferrer" style={styles.link}>Macroscopic Ventures</a>{' '}
+              (formerly the Center for Emerging Risk Research and Polaris Ventures) publishes only a
+              selection of its grantees, with amounts for two: its $15M founding commitment to the
+              Cooperative AI Foundation (2021) and $3M to Carnegie Mellon for the Foundations of
+              Cooperative AI Lab (2022). Only those two are included, so Macroscopic's grantmaking is
+              heavily understated. Every grant on the{' '}
+              <a href="https://www.cooperativeai.com/post/grant-summaries" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Cooperative AI Foundation's grant page
+              </a>{' '}is included, dated to the start of its grant period, with pound and krona
+              amounts converted at that year's average rate. Because CAIF is funded by Macroscopic's
+              commitment, its grants are treated as regrants (see below) and add to the total only when
+              Macroscopic is filtered out.
+            </p>
+
+            <h3 style={styles.subheading}>AI Safety Tactical Opportunities Fund (AISTOF)</h3>
+            <p style={styles.paragraph}>
+              AISTOF publishes no grants list of its own. Its public grants are donations to{' '}
+              <a href="https://manifund.org" target="_blank" rel="noopener noreferrer" style={styles.link}>Manifund</a>{' '}
+              projects, read from each project page's donor list. Those projects are also Manifund
+              entries, so AISTOF's share is moved off the Manifund entry rather than added on top: each
+              dollar is counted once. AISTOF reports more than 150 grants in total, so grants made
+              outside Manifund are not captured.
+            </p>
+
+            <h3 style={styles.subheading}>Longview Philanthropy (Emerging Challenges Fund)</h3>
+            <p style={styles.paragraph}>
+              Every grant in the public reports of Longview's{' '}
+              <a href="https://www.longview.org/emerging-challenges-fund/" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Emerging Challenges Fund
+              </a>{' '}(formerly the Longtermism Fund, run with Giving What We Can), from December
+              2022 through 2025, manually curated. Reports that give only a year are dated mid-year.
+              This fund is a small part of Longview's giving: its private Frontier AI, Digital
+              Sentience and Nuclear Weapons Policy funds and its donor advising report only to
+              donors and are not included. Coefficient Giving and SFF have given Longview more than
+              these grants total, so they are treated as regrants (see below) and add to the total
+              only when those funders are filtered out.
+            </p>
+
+            <h3 style={styles.subheading}>Lightcone Commons</h3>
+            <p style={styles.paragraph}>
+              <a href="https://www.lightconecommons.com" target="_blank" rel="noopener noreferrer" style={styles.link}>
+                Lightcone Commons
+              </a>{' '}pools funders behind evaluators, who each publish a ranked funding order. Its
+              grant list needs a login, but the public evaluator profiles show how far each order
+              was funded. Where several evaluators back the same project they share its cost, so each
+              project's grant is the largest amount any public order shows for it, a lower bound.
+              The first round (finalized November 2026) granted $45.1 million to 147 organizations;
+              10 of its 17 evaluators publish their orders, which itemize 109 grants ($32.6 million).
+              The remaining $12.5 million is one unitemized entry. The Long-Term Future Fund is one of
+              the round's funders, so its share may later appear again in EA Funds' own grants.
+            </p>
+
             <h3 style={styles.subheading}>BlueDot Impact and Manifund (regrants)</h3>
             <p style={styles.paragraph}>
               Rapid grants from{' '}
@@ -299,7 +353,9 @@ export default function About({ stats }: { stats: AboutStats }) {
               funder&nbsp;&rarr;&nbsp;regrantor&nbsp;&rarr;&nbsp;recipient chain, each regrantor's
               grants are counted <strong>net of the tracked grants that funded it</strong> — so
               they add little or nothing to the headline total, and count in full only when their
-              upstream funder is removed from the current view.
+              upstream funder is removed from the current view. The Cooperative AI Foundation
+              (funded by Macroscopic), AISTOF and Longview's Emerging Challenges Fund are treated
+              the same way.
             </p>
 
             <h3 style={styles.subheading}>ACX Grants</h3>

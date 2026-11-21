@@ -14,6 +14,7 @@
     "start": "next start",
     "lint": "next lint",
     "refresh:manifund": "tsx scripts/refresh-manifund.ts",
+    "refresh:aistof": "tsx scripts/refresh-aistof.ts",
     "refresh:bluedot": "tsx scripts/refresh-bluedot.ts"
   },
   "keywords": [],

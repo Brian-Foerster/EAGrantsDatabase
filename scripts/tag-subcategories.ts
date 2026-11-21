@@ -16,13 +16,17 @@ const AI_MAP = path.join(ROOT, 'scripts/mappings/sub-categories-ai.json');
 const WORKLIST = path.join(ROOT, 'data/raw/subcat-worklist.json');
 const TAXFILE = path.join(ROOT, 'data/raw/subcat-taxonomy.json');
 // Recipients that can't be identified — leave them "— general" honestly, don't send to AI.
-const ANON = /^\(?(anonymous|unknown|withheld|n\/a|confidential|various|multiple)\)?$/i;
+const ANON = /^\(?(anonymous|unknown|withheld|n\/a|confidential|various|multiple)( recipients)?\)?$/i;
 
 const CURATED = path.join(ROOT, 'scripts/mappings/sub-categories-curated.json');
 const grants = JSON.parse(readFileSync(path.join(ROOT, 'public/data/grants.min.json'), 'utf8'));
 const ai: AiOverrides = existsSync(AI_MAP) ? JSON.parse(readFileSync(AI_MAP, 'utf8')) : {};
 ai.byRecipient = ai.byRecipient || {};
 if (existsSync(CURATED)) ai.curated = JSON.parse(readFileSync(CURATED, 'utf8')).curated;
+// Recipients already reviewed and found to have no specific topic (e.g. individuals
+// titled only "Name - EA Infrastructure Fund"). They keep their program's bucket and
+// are not re-sent for labelling.
+const REVIEWED = new Set<string>(((ai as any).reviewed || []) as string[]);
 
 const VALID = new Set(subCategoryList().map(s => s.id));
 const CAT_OF: Record<string, string> = {};
@@ -36,9 +40,9 @@ if (process.argv[2] === 'validate') {
   }
   let newRecip = 0, multiCat = 0;
   for (const g of grants as any[]) {
-    if (assignSubCategory(g, ai).path !== 'fallback') continue;
+    { const p = assignSubCategory(g, ai).path; if (p !== 'fallback' && p !== 'program' && p !== 'weak') continue; }
     const r = (g.recipient || '').toLowerCase().trim();
-    if (!r || ANON.test((g.recipient || '').trim())) continue; // anonymous → legitimately general
+    if (!r || ANON.test((g.recipient || '').trim()) || REVIEWED.has(r)) continue; // anonymous / reviewed → legitimately general
     if (ai.byRecipient[r]) multiCat++;   // recipient IS labeled, but for another L1 category
     else newRecip++;                     // genuinely un-tagged recipient
   }
@@ -59,9 +63,9 @@ const byRecip = new Map<string, Row>();
 
 for (const g of grants) {
   const a = assignSubCategory(g, ai);
-  if (a.path !== 'fallback') continue; // only rules-couldn't-place, non-residual grants
+  if (a.path !== 'fallback' && a.path !== 'program' && a.path !== 'weak') continue; // rules couldn't place it (or only a generic program label did)
   const key = (g.recipient || '').toLowerCase().trim();
-  if (!key || ai.byRecipient[key]) continue; // skip already-labeled
+  if (!key || ai.byRecipient[key] || REVIEWED.has(key)) continue; // skip already-labeled or reviewed
   if (ANON.test((g.recipient || '').trim())) continue; // unidentifiable → stays general
   let row = byRecip.get(key);
   if (!row) { row = { recipient: g.recipient, category: g.category, count: 0, amount: 0, focus_fund: new Set(), titles: new Set() }; byRecip.set(key, row); }

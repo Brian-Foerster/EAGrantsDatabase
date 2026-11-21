@@ -7,7 +7,7 @@
 import { parse } from 'csv-parse/sync';
 import * as cheerio from 'cheerio';
 import { Grant, ScrapeResult } from '../../types/grants';
-import { fetchWithRetry, normalizeDate, saveRawData, parseDollarAmount, makeGrantId } from '../scraper-utils';
+import { fetchWithRetry, normalizeDate, saveRawData, parseDollarAmount, makeGrantId, withTextFragment } from '../scraper-utils';
 import fundMapping from '../mappings/eaf-funds.json';
 
 const API_URL = 'https://funds.effectivealtruism.org/api/grants';
@@ -247,7 +247,7 @@ async function scrapePayoutReports(existingKeys: Set<string>): Promise<Grant[]> 
           description: parsed.description || undefined,
           category: mapFundToCategory(fundName),
           fund: fundName,
-          url,
+          url: withTextFragment(url, parsed.recipient),
           source_id: `payout:${url.split('/').pop()}`,
         });
       }
@@ -321,7 +321,11 @@ export async function scrapeEAFunds(): Promise<ScrapeResult> {
       description: descText,
       category: mapFundToCategory(fundName),
       fund: fundName,
-      url: fundUrl(fundName),
+      // The grants database (funds.effectivealtruism.org/grants) reads ?search= from the
+      // URL, so named grantees open pre-searched; anonymous ones keep the fund page.
+      url: r.grantee && !/^\(?anonymous\)?$/i.test(r.grantee.trim())
+        ? `https://funds.effectivealtruism.org/grants?search=${encodeURIComponent(r.grantee.trim())}`
+        : fundUrl(fundName),
       source_id: r.id,
     };
 

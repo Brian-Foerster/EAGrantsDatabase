@@ -1,0 +1,30 @@
+[
+ {
+  "id": "macro-2021-001",
+  "title": "Founding commitment to the Cooperative AI Foundation",
+  "recipient": "Cooperative AI Foundation",
+  "amount": 15000000,
+  "currency": "USD",
+  "date": "2021-05-04",
+  "grantmaker": "Macroscopic Ventures",
+  "category": "LTXR",
+  "focus_area": "Cooperative AI",
+  "fund": "Grants",
+  "url": "https://macroscopic.org/grants",
+  "description": "$15M commitment that seeded the Cooperative AI Foundation, made in May 2021 as the Center for Emerging Risk Research (later Polaris Ventures, now Macroscopic Ventures). A multi-year commitment recorded as one grant. CAIF's own grants are netted against it."
+ },
+ {
+  "id": "macro-2022-001",
+  "title": "Foundations of Cooperative AI Lab (FOCAL)",
+  "recipient": "Carnegie Mellon University",
+  "amount": 3000000,
+  "currency": "USD",
+  "date": "2022-02-01",
+  "grantmaker": "Macroscopic Ventures",
+  "category": "LTXR",
+  "focus_area": "Cooperative AI",
+  "fund": "Grants",
+  "url": "https://www.cmu.edu/news/stories/archives/2022/february/expert-in-ethics-and-ai-joins-cmu-faculty-this-fall",
+  "description": "$3M commitment to Carnegie Mellon University to establish the Foundations of Cooperative AI Lab headed by Vincent Conitzer, announced February 2022 (given as the Center for Emerging Risk Research). Listed on macroscopic.org/grants."
+ }
+]

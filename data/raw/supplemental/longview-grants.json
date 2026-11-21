@@ -1,0 +1,506 @@
+[
+ {
+  "id": "longview-2022-001",
+  "title": "AI alignment research and researcher training",
+  "recipient": "Center for Human-Compatible AI",
+  "amount": 70000,
+  "currency": "USD",
+  "date": "2022-12-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longermism-fund-december-2022-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund December 2022 grants report (paid January 2023).",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2022-002",
+  "title": "Reducing extreme biological risks",
+  "recipient": "SecureBio",
+  "amount": 60000,
+  "currency": "USD",
+  "date": "2022-12-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Biosecurity",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longermism-fund-december-2022-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund December 2022 grants report (paid January 2023).",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2022-003",
+  "title": "General Longtermism Team's existential risk research and development",
+  "recipient": "Rethink Priorities",
+  "amount": 30000,
+  "currency": "USD",
+  "date": "2022-12-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Global catastrophic risks",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longermism-fund-december-2022-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund December 2022 grants report (paid January 2023).",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2022-004",
+  "title": "Nuclear weapons policy work",
+  "recipient": "Council on Strategic Risks",
+  "amount": 15000,
+  "currency": "USD",
+  "date": "2022-12-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Nuclear security",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longermism-fund-december-2022-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund December 2022 grants report (paid January 2023).",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023a-001",
+  "title": "AI governance work by the evaluations project at the Alignment Research Center (ARC Evals, now METR)",
+  "recipient": "METR",
+  "amount": 220000,
+  "currency": "USD",
+  "date": "2023-08-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longtermism-fund-august-2023-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund August 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023a-002",
+  "title": "Martin Wattenberg and Fernanda Viégas's AI interpretability work",
+  "recipient": "Harvard University",
+  "amount": 110000,
+  "currency": "USD",
+  "date": "2023-08-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longtermism-fund-august-2023-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund August 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023a-003",
+  "title": "NTI | Bio project to strengthen the norm against bioweapons",
+  "recipient": "Nuclear Threat Initiative",
+  "amount": 100000,
+  "currency": "USD",
+  "date": "2023-08-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Biosecurity",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longtermism-fund-august-2023-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund August 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023a-004",
+  "title": "Director of Research and Administration position",
+  "recipient": "Center for Communicable Disease Dynamics",
+  "amount": 80000,
+  "currency": "USD",
+  "date": "2023-08-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Biosecurity",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longtermism-fund-august-2023-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund August 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023a-005",
+  "title": "Project on escalation pathways to nuclear war",
+  "recipient": "Carnegie Endowment for International Peace",
+  "amount": 52000,
+  "currency": "USD",
+  "date": "2023-08-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Nuclear security",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.givingwhatwecan.org/en-GB/charities/longtermism-fund/longtermism-fund-august-2023-grants-report",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Longtermism Fund August 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023b-001",
+  "title": "Research directions focused on safely building advanced AI systems",
+  "recipient": "FAR AI",
+  "amount": 100000,
+  "currency": "USD",
+  "date": "2023-12-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.longview.org/fund/emerging-challenges-fund-december-2023-grants-report/",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund December 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023b-002",
+  "title": "Research on the efficacy and safety of far-UVC light",
+  "recipient": "Blueprint Biosecurity",
+  "amount": 50000,
+  "currency": "USD",
+  "date": "2023-12-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Biosecurity",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.longview.org/fund/emerging-challenges-fund-december-2023-grants-report/",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund December 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2023b-003",
+  "title": "Work on nuclear decision-making",
+  "recipient": "Decision Research",
+  "amount": 20000,
+  "currency": "USD",
+  "date": "2023-12-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Nuclear security",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://www.longview.org/fund/emerging-challenges-fund-december-2023-grants-report/",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund December 2023 grants report.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-001",
+  "title": "EU AI Act emergency support: Code of Practice participation",
+  "recipient": "SaferAI",
+  "amount": 262000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-002",
+  "title": "EU AI Act emergency support: Code of Practice participation",
+  "recipient": "Apollo Research",
+  "amount": 219000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-003",
+  "title": "EU AI Act emergency support: Code of Practice participation",
+  "recipient": "Pour Demain",
+  "amount": 126000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-004",
+  "title": "EU AI Act emergency support: Code of Practice participation",
+  "recipient": "CeSIA",
+  "amount": 56000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-005",
+  "title": "EU AI Act emergency support: Code of Practice participation",
+  "recipient": "Observatorio de Riesgos Catastróficos Globales",
+  "amount": 51000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-006",
+  "title": "EU AI Act emergency support: Code of Practice participation",
+  "recipient": "AI Objectives Institute",
+  "amount": 19000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-007",
+  "title": "Promoting non-nuclear deterrence",
+  "recipient": "Council on Strategic Risks",
+  "amount": 210000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Nuclear security",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-008",
+  "title": "Placing technical expertise in government",
+  "recipient": "Horizon Institute for Public Service",
+  "amount": 150000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-009",
+  "title": "Advising on biosecurity and AI policy",
+  "recipient": "Centre for Long-Term Resilience",
+  "amount": 150000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2024-010",
+  "title": "Convening US/China Track II dialogues",
+  "recipient": "Pacific Forum",
+  "amount": 50000,
+  "currency": "USD",
+  "date": "2024-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Nuclear security",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1HIds8PdJsjdMSyW2yQtozqEG87jIOzv9/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2024 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2025-001",
+  "title": "Evaluating risks from frontier AI models",
+  "recipient": "METR",
+  "amount": 450000,
+  "currency": "USD",
+  "date": "2025-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1KQWTkWdR6NJ0owpAWeVYwDyKlIPLIuvf/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2025 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2025-002",
+  "title": "Placing technical experts in government",
+  "recipient": "Horizon Institute for Public Service",
+  "amount": 350000,
+  "currency": "USD",
+  "date": "2025-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1KQWTkWdR6NJ0owpAWeVYwDyKlIPLIuvf/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2025 annual report. The report summary gives $350,000; its grant page says $150,000. The summary figure matches the report's $1.5M total. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2025-003",
+  "title": "Researching risks from superintelligence",
+  "recipient": "Forethought Research",
+  "amount": 346000,
+  "currency": "USD",
+  "date": "2025-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI safety",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1KQWTkWdR6NJ0owpAWeVYwDyKlIPLIuvf/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2025 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2025-004",
+  "title": "Establishing AI risk management standards",
+  "recipient": "SaferAI",
+  "amount": 115000,
+  "currency": "USD",
+  "date": "2025-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "AI governance",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1KQWTkWdR6NJ0owpAWeVYwDyKlIPLIuvf/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2025 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2025-005",
+  "title": "Perry World House: drafting AI-nuclear arms control agreements",
+  "recipient": "University of Pennsylvania",
+  "amount": 114000,
+  "currency": "USD",
+  "date": "2025-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Nuclear security",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1KQWTkWdR6NJ0owpAWeVYwDyKlIPLIuvf/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2025 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ },
+ {
+  "id": "longview-2025-006",
+  "title": "Evaluating AI-enabled biorisks",
+  "recipient": "Panoplia Laboratories",
+  "amount": 97000,
+  "currency": "USD",
+  "date": "2025-07-01",
+  "grantmaker": "Longview Philanthropy",
+  "category": "LTXR",
+  "focus_area": "Biosecurity",
+  "fund": "Emerging Challenges Fund",
+  "url": "https://drive.google.com/file/d/1KQWTkWdR6NJ0owpAWeVYwDyKlIPLIuvf/view",
+  "description": "Emerging Challenges Fund grant (formerly the Longtermism Fund, run with Giving What We Can). Source: Emerging Challenges Fund 2025 annual report. Dated mid-year because the report gives only the year.",
+  "regrant": true,
+  "regrant_of": [
+   "Longview Philanthropy"
+  ]
+ }
+]

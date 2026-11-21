@@ -9,7 +9,7 @@ live site on every deploy.
 
 ## Versioning
 
-`metadata.json` carries a `schemaVersion` (currently **`1.0`**). The contract:
+`metadata.json` carries a `schemaVersion` (currently **`1.1`**). The contract:
 
 - **Minor bump** (`1.0` → `1.1`): additive, backward-compatible (new optional
   fields, new endpoints). Existing fields keep their meaning.
@@ -37,14 +37,16 @@ The index. Read this first.
 
 ```json
 {
-  "schemaVersion": "1.0",
-  "totalGrants": 7707,
-  "totalAmount": 7608756199.97,
+  "schemaVersion": "1.1",
+  "totalGrants": 8472,
+  "totalAmount": 8335144710.34,
   "grantmakers": ["Coefficient Giving", "GiveWell", "..."],
+  "smallGrantmakerThreshold": 15000000,
+  "smallGrantmakers": ["Manifund", "BlueDot Impact", "..."],
   "categories": ["LTXR", "GH", "AW", "Meta", "Policy", "Science", "Other"],
   "subCategories": [{ "id": "gh-malaria", "label": "Malaria", "category": "GH" }],
   "dateRange": { "earliest": "2012-07-01", "latest": "2026-12-01" },
-  "lastUpdated": "2026-09-03T02:05:09.361Z"
+  "lastUpdated": "2026-11-20T15:29:29.529Z"
 }
 ```
 
@@ -52,9 +54,14 @@ The index. Read this first.
 already includes them (see the regrant note below), so it is not simply the sum
 of every grant's `amount`.
 
+`smallGrantmakers` (added in `1.1`) lists the grantmakers whose lifetime total
+(gross) is under `smallGrantmakerThreshold` USD, largest first. The site groups
+them as "Smaller grantmakers" in its filters and charts; it is a display aid,
+and every grant still carries its own `grantmaker`.
+
 ### `grants.min.json`
 
-The full grant list — one array, ~3.3 MB, ~7,700 objects. This is the primary
+The full grant list — one array, ~4.8 MB, ~8,500 objects. This is the primary
 dataset.
 
 ```json

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-06-14T21:21:03.817928",
+  "generated_at": "2026-11-19T21:31:19.420005",
   "org_count": 99,
-  "filing_count": 866,
+  "filing_count": 901,
   "orgs": [
     {
       "name": "1Day Sooner",
@@ -64,9 +64,29 @@
           "grants_carryforward": false
         },
         {
+          "year": 2024,
+          "income": 100000,
+          "contributions": 100000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
           "year": 2025,
           "income": 3000000,
           "contributions": 3000000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 70000,
+          "contributions": 70000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -99,7 +119,7 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 56320304,
+          "grants": 56328831,
           "grants_carryforward": false
         },
         {
@@ -110,7 +130,7 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 53392630,
+          "grants": 53473471,
           "grants_carryforward": false
         },
         {
@@ -158,8 +178,8 @@
         },
         {
           "year": 2016,
-          "income": 20345634,
-          "contributions": 20345634,
+          "income": 3485473,
+          "contributions": 3485473,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -208,8 +228,18 @@
         },
         {
           "year": 2026,
-          "income": 33651728,
-          "contributions": 33651728,
+          "income": 239208078,
+          "contributions": 239208078,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2027,
+          "income": 13468351,
+          "contributions": 13468351,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -439,8 +469,18 @@
         },
         {
           "year": 2025,
-          "income": 6611130,
-          "contributions": 6611130,
+          "income": 7545763,
+          "contributions": 7545763,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 4729564,
+          "contributions": 4729564,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -506,7 +546,7 @@
           "assets": 56500257,
           "liabilities": 13775603,
           "net_assets": 42724654,
-          "grants": 1184720,
+          "grants": null,
           "grants_carryforward": false
         },
         {
@@ -539,7 +579,7 @@
           "assets": 58957213,
           "liabilities": 12020483,
           "net_assets": 46936730,
-          "grants": 1800000,
+          "grants": null,
           "grants_carryforward": false
         },
         {
@@ -561,7 +601,7 @@
           "assets": 65162640,
           "liabilities": 11820271,
           "net_assets": 53342369,
-          "grants": 4158438,
+          "grants": 3448550,
           "grants_carryforward": false
         },
         {
@@ -572,7 +612,7 @@
           "assets": 73335379,
           "liabilities": 11607008,
           "net_assets": 61728371,
-          "grants": 1850000,
+          "grants": 850000,
           "grants_carryforward": false
         },
         {
@@ -621,8 +661,8 @@
         },
         {
           "year": 2025,
-          "income": 5300000,
-          "contributions": 5300000,
+          "income": 5880050,
+          "contributions": 5880050,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -631,8 +671,8 @@
         },
         {
           "year": 2026,
-          "income": 1550000,
-          "contributions": 1550000,
+          "income": 2549269,
+          "contributions": 2549269,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -824,8 +864,8 @@
         },
         {
           "year": 2026,
-          "income": 16909747,
-          "contributions": 16909747,
+          "income": 33623852,
+          "contributions": 33623852,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -882,16 +922,6 @@
           "net_assets": 96100000,
           "grants": null,
           "grants_carryforward": false
-        },
-        {
-          "year": 2025,
-          "income": 1100000,
-          "contributions": 1100000,
-          "expenses": null,
-          "assets": null,
-          "liabilities": null,
-          "net_assets": null,
-          "inferred": true
         },
         {
           "year": 2026,
@@ -1074,6 +1104,16 @@
           "net_assets": 83175727,
           "grants": 4472199,
           "grants_carryforward": true
+        },
+        {
+          "year": 2025,
+          "income": 2400000,
+          "contributions": 2400000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -1307,7 +1347,7 @@
           "assets": 21268905,
           "liabilities": 3931673,
           "net_assets": 17337232,
-          "grants": 13289851,
+          "grants": 2499851,
           "grants_carryforward": false
         },
         {
@@ -1384,7 +1424,7 @@
           "assets": 200145111,
           "liabilities": 3287299,
           "net_assets": 196857812,
-          "grants": 53935681,
+          "grants": 53985681,
           "grants_carryforward": false
         },
         {
@@ -1395,13 +1435,13 @@
           "assets": 201038038,
           "liabilities": 11740094,
           "net_assets": 189297944,
-          "grants": 5948710,
+          "grants": 5882596,
           "grants_carryforward": false
         },
         {
           "year": 2025,
-          "income": 24096562,
-          "contributions": 24096562,
+          "income": 23882753,
+          "contributions": 23882753,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -1603,8 +1643,8 @@
         },
         {
           "year": 2026,
-          "income": 330000,
-          "contributions": 330000,
+          "income": 3936502,
+          "contributions": 3936502,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -1784,8 +1824,18 @@
         },
         {
           "year": 2025,
-          "income": 6086364,
-          "contributions": 6086364,
+          "income": 6868386,
+          "contributions": 6868386,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 4857396,
+          "contributions": 4857396,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -1972,13 +2022,13 @@
           "assets": 166255533,
           "liabilities": 42496521,
           "net_assets": 123759012,
-          "grants": 32401118,
+          "grants": 23261805,
           "grants_carryforward": false
         },
         {
           "year": 2026,
-          "income": 10244932,
-          "contributions": 10244932,
+          "income": 55584245,
+          "contributions": 55584245,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -2160,8 +2210,8 @@
         },
         {
           "year": 2025,
-          "income": 1015607,
-          "contributions": 1015607,
+          "income": 1329442,
+          "contributions": 1329442,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -2170,8 +2220,8 @@
         },
         {
           "year": 2026,
-          "income": 1461786,
-          "contributions": 1461786,
+          "income": 4341824,
+          "contributions": 4341824,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -2352,8 +2402,8 @@
         },
         {
           "year": 2025,
-          "income": 2167100,
-          "contributions": 2167100,
+          "income": 2215440,
+          "contributions": 2215440,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -2362,8 +2412,8 @@
         },
         {
           "year": 2026,
-          "income": 1873804,
-          "contributions": 1873804,
+          "income": 4239489,
+          "contributions": 4239489,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -2924,6 +2974,16 @@
           "liabilities": null,
           "net_assets": null,
           "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 3150000,
+          "contributions": 3150000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -2967,8 +3027,8 @@
         },
         {
           "year": 2026,
-          "income": 14954484,
-          "contributions": 14954484,
+          "income": 16577759,
+          "contributions": 16577759,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -3002,8 +3062,8 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 47325362,
-          "grants_carryforward": false
+          "grants": 68064000,
+          "grants_carryforward": true
         },
         {
           "year": 2022,
@@ -3024,7 +3084,7 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 100705000,
+          "grants": 94837867,
           "grants_carryforward": true
         },
         {
@@ -3035,8 +3095,8 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 86106631,
-          "grants_carryforward": true
+          "grants": 72654961,
+          "grants_carryforward": false
         },
         {
           "year": 2025,
@@ -3047,6 +3107,17 @@
           "liabilities": null,
           "net_assets": null,
           "grants": 19593965,
+          "grants_carryforward": false
+        },
+        {
+          "year": 2026,
+          "income": 99444000,
+          "contributions": null,
+          "expenses": 98965000,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": 67734906,
           "grants_carryforward": false
         },
         {
@@ -3080,9 +3151,9 @@
           "inferred": true
         },
         {
-          "year": 2026,
-          "income": 67734906,
-          "contributions": 67734906,
+          "year": 2027,
+          "income": 1686425,
+          "contributions": 1686425,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -3271,6 +3342,16 @@
           "net_assets": 8195124,
           "grants": null,
           "grants_carryforward": false
+        },
+        {
+          "year": 2026,
+          "income": 225000,
+          "contributions": 225000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -3343,6 +3424,17 @@
           "liabilities": null,
           "net_assets": null,
           "grants": 234192,
+          "grants_carryforward": false
+        },
+        {
+          "year": 2025,
+          "income": 3423637,
+          "contributions": null,
+          "expenses": 3495059,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": null,
           "grants_carryforward": false
         }
       ]
@@ -3812,8 +3904,8 @@
           "assets": 17944969,
           "liabilities": 79279,
           "net_assets": 17865690,
-          "grants": 19186944,
-          "grants_carryforward": true
+          "grants": 18683148,
+          "grants_carryforward": false
         },
         {
           "year": 2021,
@@ -3823,8 +3915,8 @@
           "assets": 29292382,
           "liabilities": 135317,
           "net_assets": 29157065,
-          "grants": 12794109,
-          "grants_carryforward": true
+          "grants": 11400000,
+          "grants_carryforward": false
         },
         {
           "year": 2022,
@@ -3845,7 +3937,7 @@
           "assets": 103532902,
           "liabilities": 606412,
           "net_assets": 102926490,
-          "grants": 20426927,
+          "grants": 20456927,
           "grants_carryforward": false
         },
         {
@@ -3863,6 +3955,16 @@
           "year": 2025,
           "income": 20127586,
           "contributions": 20127586,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 15309979,
+          "contributions": 15309979,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -4199,7 +4301,7 @@
           "assets": 346497870,
           "liabilities": 292900954,
           "net_assets": 53596916,
-          "grants": 3433374,
+          "grants": 4167446,
           "grants_carryforward": false
         },
         {
@@ -4215,8 +4317,8 @@
         },
         {
           "year": 2025,
-          "income": 2489219,
-          "contributions": 2489219,
+          "income": 2489119,
+          "contributions": 2489119,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -4225,8 +4327,8 @@
         },
         {
           "year": 2026,
-          "income": 18592716,
-          "contributions": 18592716,
+          "income": 22100129,
+          "contributions": 22100129,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -4407,8 +4509,8 @@
         },
         {
           "year": 2025,
-          "income": 1760566,
-          "contributions": 1760566,
+          "income": 1959534,
+          "contributions": 1959534,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -4585,7 +4687,7 @@
           "assets": 15738894,
           "liabilities": 931515,
           "net_assets": 14807379,
-          "grants": null,
+          "grants": 125000,
           "grants_carryforward": false
         },
         {
@@ -4879,7 +4981,7 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 95392,
+          "grants": 135812,
           "grants_carryforward": false
         },
         {
@@ -4890,7 +4992,7 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 13639894,
+          "grants": 13680087,
           "grants_carryforward": false
         },
         {
@@ -4902,6 +5004,17 @@
           "liabilities": null,
           "net_assets": null,
           "grants": 1484066,
+          "grants_carryforward": false
+        },
+        {
+          "year": 2025,
+          "income": 283836000,
+          "contributions": null,
+          "expenses": 288392000,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": null,
           "grants_carryforward": false
         },
         {
@@ -5157,8 +5270,8 @@
         },
         {
           "year": 2025,
-          "income": 508677,
-          "contributions": 508677,
+          "income": 588489,
+          "contributions": 588489,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -5232,6 +5345,17 @@
           "income": 6803599,
           "contributions": null,
           "expenses": 8816800,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": null,
+          "grants_carryforward": false
+        },
+        {
+          "year": 2026,
+          "income": 5851254,
+          "contributions": null,
+          "expenses": 8878400,
           "assets": null,
           "liabilities": null,
           "net_assets": null,
@@ -5452,8 +5576,8 @@
         },
         {
           "year": 2026,
-          "income": 182000,
-          "contributions": 182000,
+          "income": 1104085,
+          "contributions": 1104085,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -5493,6 +5617,16 @@
           "year": 2025,
           "income": 1535000,
           "contributions": 1535000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 3305000,
+          "contributions": 3305000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -5547,7 +5681,7 @@
           "assets": 7411763,
           "liabilities": 277151,
           "net_assets": 7134612,
-          "grants": null,
+          "grants": 1401000,
           "grants_carryforward": false
         },
         {
@@ -5591,8 +5725,18 @@
         },
         {
           "year": 2024,
-          "income": 2429700,
-          "contributions": 2429700,
+          "income": 2648700,
+          "contributions": 2648700,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 705000,
+          "contributions": 705000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -5691,7 +5835,7 @@
           "assets": 6992306,
           "liabilities": 875684,
           "net_assets": 6116622,
-          "grants": 3305310,
+          "grants": 3786310,
           "grants_carryforward": false
         },
         {
@@ -5707,8 +5851,18 @@
         },
         {
           "year": 2025,
-          "income": 764482,
-          "contributions": 764482,
+          "income": 796234,
+          "contributions": 796234,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 2630000,
+          "contributions": 2630000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -5799,7 +5953,7 @@
           "assets": 2036040,
           "liabilities": 18456,
           "net_assets": 2017584,
-          "grants": 50000,
+          "grants": 100000,
           "grants_carryforward": false
         },
         {
@@ -5810,7 +5964,7 @@
           "assets": 819848,
           "liabilities": 68649,
           "net_assets": 751199,
-          "grants": 978000,
+          "grants": 1003000,
           "grants_carryforward": false
         },
         {
@@ -5825,8 +5979,8 @@
         },
         {
           "year": 2026,
-          "income": 11000000,
-          "contributions": 11000000,
+          "income": 56400000,
+          "contributions": 56400000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -5875,8 +6029,8 @@
         },
         {
           "year": 2025,
-          "income": 3876645,
-          "contributions": 3876645,
+          "income": 3994276,
+          "contributions": 3994276,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -5885,8 +6039,8 @@
         },
         {
           "year": 2026,
-          "income": 2272866,
-          "contributions": 2272866,
+          "income": 2422866,
+          "contributions": 2422866,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -6002,7 +6156,7 @@
           "assets": 6392219,
           "liabilities": 801929,
           "net_assets": 5590290,
-          "grants": 2898350,
+          "grants": 2913350,
           "grants_carryforward": false
         },
         {
@@ -6035,8 +6189,18 @@
           "assets": 6812912,
           "liabilities": 435072,
           "net_assets": 6377840,
-          "grants": 1164747,
+          "grants": 1682005,
           "grants_carryforward": true
+        },
+        {
+          "year": 2026,
+          "income": 400000,
+          "contributions": 400000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -6076,7 +6240,7 @@
           "assets": 7724375,
           "liabilities": 955277,
           "net_assets": 6769098,
-          "grants": 4097500,
+          "grants": 6055500,
           "grants_carryforward": false
         },
         {
@@ -6087,13 +6251,13 @@
           "assets": 23022514,
           "liabilities": 562647,
           "net_assets": 22459867,
-          "grants": 21768750,
+          "grants": 20044930,
           "grants_carryforward": false
         },
         {
-          "year": 2021,
-          "income": 425800,
-          "contributions": 425800,
+          "year": 2025,
+          "income": 37945253,
+          "contributions": 37945253,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -6101,9 +6265,9 @@
           "inferred": true
         },
         {
-          "year": 2025,
-          "income": 37945253,
-          "contributions": 37945253,
+          "year": 2026,
+          "income": 7000,
+          "contributions": 7000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -6313,8 +6477,18 @@
         },
         {
           "year": 2025,
-          "income": 10676530,
-          "contributions": 10676530,
+          "income": 5338265,
+          "contributions": 5338265,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 6394789,
+          "contributions": 6394789,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -6402,7 +6576,7 @@
           "assets": 2666100,
           "liabilities": 409262,
           "net_assets": 2256838,
-          "grants": null,
+          "grants": 299310,
           "grants_carryforward": false
         },
         {
@@ -6535,8 +6709,18 @@
         },
         {
           "year": 2025,
-          "income": 84376000,
-          "contributions": 84376000,
+          "income": 72452000,
+          "contributions": 72452000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 300000,
+          "contributions": 300000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -6574,8 +6758,8 @@
         },
         {
           "year": 2025,
-          "income": 4200000,
-          "contributions": 4200000,
+          "income": 7200000,
+          "contributions": 7200000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -6740,7 +6924,7 @@
           "assets": 91461881,
           "liabilities": 10140692,
           "net_assets": 81321189,
-          "grants": 7831500,
+          "grants": 7931500,
           "grants_carryforward": false
         },
         {
@@ -6753,6 +6937,16 @@
           "net_assets": 76393438,
           "grants": null,
           "grants_carryforward": false
+        },
+        {
+          "year": 2026,
+          "income": 450000,
+          "contributions": 450000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -6968,6 +7162,16 @@
           "liabilities": null,
           "net_assets": null,
           "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 5126214,
+          "contributions": 5126214,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -7034,8 +7238,8 @@
         },
         {
           "year": 2025,
-          "income": 37666000,
-          "contributions": 37666000,
+          "income": 73994603,
+          "contributions": 73994603,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -7068,7 +7272,7 @@
           "assets": 3261854,
           "liabilities": 12000,
           "net_assets": 3249854,
-          "grants": 1420937,
+          "grants": 1480937,
           "grants_carryforward": false
         },
         {
@@ -7090,13 +7294,13 @@
           "assets": 8470365,
           "liabilities": 682712,
           "net_assets": 7787653,
-          "grants": 4254000,
+          "grants": 4264000,
           "grants_carryforward": false
         },
         {
           "year": 2025,
-          "income": 11138366,
-          "contributions": 11138366,
+          "income": 11738366,
+          "contributions": 11738366,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -7105,8 +7309,8 @@
         },
         {
           "year": 2026,
-          "income": 3590654,
-          "contributions": 3590654,
+          "income": 26336654,
+          "contributions": 26336654,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -7184,6 +7388,16 @@
           "liabilities": null,
           "net_assets": null,
           "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 1884282,
+          "contributions": 1884282,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -7223,6 +7437,16 @@
           "liabilities": null,
           "net_assets": null,
           "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 250000,
+          "contributions": 250000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -7246,6 +7470,16 @@
           "year": 2025,
           "income": 5216000,
           "contributions": 5216000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 10932000,
+          "contributions": 10932000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -7329,6 +7563,16 @@
           "year": 2025,
           "income": 200000,
           "contributions": 200000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 6000,
+          "contributions": 6000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -7512,6 +7756,16 @@
           "net_assets": 2953919,
           "grants": null,
           "grants_carryforward": false
+        },
+        {
+          "year": 2026,
+          "income": 2225000,
+          "contributions": 2225000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -7740,6 +7994,17 @@
           "grants_carryforward": false
         },
         {
+          "year": 2026,
+          "income": 14033834,
+          "contributions": null,
+          "expenses": 16547782,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": 1506409,
+          "grants_carryforward": false
+        },
+        {
           "year": 2017,
           "income": 796162,
           "contributions": 796162,
@@ -7780,9 +8045,9 @@
           "inferred": true
         },
         {
-          "year": 2026,
-          "income": 515940,
-          "contributions": 515940,
+          "year": 2027,
+          "income": 795059,
+          "contributions": 795059,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -7848,7 +8113,7 @@
           "assets": 165351,
           "liabilities": 901,
           "net_assets": 164450,
-          "grants": 51146,
+          "grants": 101146,
           "grants_carryforward": true
         },
         {
@@ -8243,7 +8508,7 @@
           "assets": 1331354,
           "liabilities": 0,
           "net_assets": 1331354,
-          "grants": 1170000,
+          "grants": 1255000,
           "grants_carryforward": false
         },
         {
@@ -8270,8 +8535,8 @@
         },
         {
           "year": 2025,
-          "income": 2000000,
-          "contributions": 2000000,
+          "income": 2300000,
+          "contributions": 2300000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -8303,6 +8568,7 @@
       "notes": null,
       "fy_end_month": 12,
       "grant_names": [
+        "good food institute",
         "the good food institute"
       ],
       "filings": [
@@ -8369,7 +8635,7 @@
           "assets": 59697609,
           "liabilities": 5198111,
           "net_assets": 54499498,
-          "grants": 10000000,
+          "grants": 10171270,
           "grants_carryforward": false
         },
         {
@@ -8781,8 +9047,8 @@
         },
         {
           "year": 2025,
-          "income": 1404000,
-          "contributions": 1404000,
+          "income": 467999,
+          "contributions": 467999,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -8815,7 +9081,7 @@
           "assets": 301339,
           "liabilities": 0,
           "net_assets": 301339,
-          "grants": 76000,
+          "grants": 148000,
           "grants_carryforward": false
         },
         {
@@ -9022,6 +9288,16 @@
           "net_assets": 29003279,
           "grants": 12380000,
           "grants_carryforward": false
+        },
+        {
+          "year": 2026,
+          "income": 12650000,
+          "contributions": 12650000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -9142,8 +9418,8 @@
         },
         {
           "year": 2026,
-          "income": 1750000,
-          "contributions": 1750000,
+          "income": 3264505,
+          "contributions": 3264505,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -9287,8 +9563,8 @@
         },
         {
           "year": 2025,
-          "income": 11681000,
-          "contributions": 11681000,
+          "income": 3893667,
+          "contributions": 3893667,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -9431,7 +9707,7 @@
           "assets": 25306701,
           "liabilities": 346720,
           "net_assets": 24959981,
-          "grants": 7000000,
+          "grants": 7244672,
           "grants_carryforward": false
         },
         {
@@ -9561,6 +9837,17 @@
           "grants_carryforward": false
         },
         {
+          "year": 2026,
+          "income": 1797383,
+          "contributions": null,
+          "expenses": 1741571,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": null,
+          "grants_carryforward": false
+        },
+        {
           "year": 2019,
           "income": 78309,
           "contributions": 78309,
@@ -9635,7 +9922,7 @@
           "assets": 432378,
           "liabilities": 12150,
           "net_assets": 420228,
-          "grants": 110000,
+          "grants": 149200,
           "grants_carryforward": false
         },
         {
@@ -9679,7 +9966,7 @@
           "assets": 8682275,
           "liabilities": 1150437,
           "net_assets": 7531838,
-          "grants": 2716667,
+          "grants": 2766667,
           "grants_carryforward": false
         },
         {
@@ -9695,8 +9982,8 @@
         },
         {
           "year": 2025,
-          "income": 300000,
-          "contributions": 300000,
+          "income": 650000,
+          "contributions": 650000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -9887,12 +10174,23 @@
       "source": "charity_commission",
       "ein": null,
       "cc_number": "1212431",
-      "notes": "Career advice for social impact; newly registered, no financial history yet",
+      "notes": "Career advice for social impact; UK entity registered March 2025",
       "fy_end_month": 12,
       "grant_names": [
         "80,000 hours"
       ],
       "filings": [
+        {
+          "year": 2025,
+          "income": 1236788,
+          "contributions": null,
+          "expenses": 53959,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": 8087092,
+          "grants_carryforward": false
+        },
         {
           "year": 2017,
           "income": 872770,
@@ -9955,8 +10253,8 @@
         },
         {
           "year": 2024,
-          "income": 5308353,
-          "contributions": 5308353,
+          "income": 5312190,
+          "contributions": 5312190,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -9964,9 +10262,9 @@
           "inferred": true
         },
         {
-          "year": 2025,
-          "income": 8087092,
-          "contributions": 8087092,
+          "year": 2026,
+          "income": 787402,
+          "contributions": 787402,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -10083,7 +10381,7 @@
           "assets": 121177,
           "liabilities": 0,
           "net_assets": 121177,
-          "grants": null,
+          "grants": 111757,
           "grants_carryforward": false
         },
         {
@@ -10277,6 +10575,16 @@
           "liabilities": null,
           "net_assets": null,
           "inferred": true
+        },
+        {
+          "year": 2027,
+          "income": 1362793,
+          "contributions": 1362793,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -10380,7 +10688,7 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 39392866,
+          "grants": 35614731,
           "grants_carryforward": false
         },
         {
@@ -10659,7 +10967,18 @@
           "assets": null,
           "liabilities": null,
           "net_assets": null,
-          "grants": 2395308,
+          "grants": 2397785,
+          "grants_carryforward": false
+        },
+        {
+          "year": 2025,
+          "income": 12572196,
+          "contributions": null,
+          "expenses": 14387435,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "grants": null,
           "grants_carryforward": false
         },
         {
@@ -10676,6 +10995,16 @@
           "year": 2023,
           "income": 2059409,
           "contributions": 2059409,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 4990607,
+          "contributions": 4990607,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -10792,13 +11121,23 @@
           "assets": 181098,
           "liabilities": 10999,
           "net_assets": 170099,
-          "grants": 105000,
+          "grants": 55000,
           "grants_carryforward": false
         },
         {
           "year": 2025,
           "income": 300000,
           "contributions": 300000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 1000000,
+          "contributions": 1000000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -10831,7 +11170,7 @@
           "assets": 792451,
           "liabilities": 33084,
           "net_assets": 759367,
-          "grants": 2170000,
+          "grants": 2408465,
           "grants_carryforward": false
         },
         {
@@ -10868,6 +11207,16 @@
           "year": 2025,
           "income": 661000,
           "contributions": 661000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 178000,
+          "contributions": 178000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -11005,6 +11354,16 @@
           "liabilities": null,
           "net_assets": null,
           "inferred": true
+        },
+        {
+          "year": 2026,
+          "income": 6000000,
+          "contributions": 6000000,
+          "expenses": null,
+          "assets": null,
+          "liabilities": null,
+          "net_assets": null,
+          "inferred": true
         }
       ]
     },
@@ -11113,7 +11472,7 @@
           "assets": 11526295,
           "liabilities": 1150165,
           "net_assets": 10376130,
-          "grants": 4703761,
+          "grants": 4733761,
           "grants_carryforward": false
         },
         {
@@ -11140,8 +11499,8 @@
         },
         {
           "year": 2018,
-          "income": 160000,
-          "contributions": 160000,
+          "income": 186000,
+          "contributions": 186000,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -11160,8 +11519,8 @@
         },
         {
           "year": 2025,
-          "income": 10393130,
-          "contributions": 10393130,
+          "income": 9246306,
+          "contributions": 9246306,
           "expenses": null,
           "assets": null,
           "liabilities": null,
@@ -11170,8 +11529,8 @@
         },
         {
           "year": 2026,
-          "income": 35624,
-          "contributions": 35624,
+          "income": 3708481,
+          "contributions": 3708481,
           "expenses": null,
           "assets": null,
           "liabilities": null,

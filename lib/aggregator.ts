@@ -8,7 +8,30 @@ const SCRAPED_DATA_PATH = path.join(process.cwd(), 'lib', 'scraped-grants.json')
 const REGRANT_PROTOTYPE_PATHS = [
   path.join(process.cwd(), 'data', 'raw', 'bluedot-regrants.json'),
   path.join(process.cwd(), 'data', 'raw', 'manifund-regrants.json'),
+  path.join(process.cwd(), 'data', 'raw', 'aistof-regrants.json'),
 ];
+
+/**
+ * AISTOF's grants are its donations to Manifund projects, which the Manifund rows
+ * already count at their all-donor total. Move AISTOF's share off each matching
+ * Manifund row (by project URL) so the money counts once, under AISTOF.
+ */
+function splitAistofFromManifund(grants: Grant[]): Grant[] {
+  const share = new Map<string, number>();
+  for (const g of grants) if (g.grantmaker === 'AISTOF' && g.url) share.set(g.url, (share.get(g.url) || 0) + g.amount);
+  if (share.size === 0) return grants;
+  const out: Grant[] = [];
+  let moved = 0;
+  for (const g of grants) {
+    const s = g.grantmaker === 'Manifund' && g.url ? share.get(g.url) : undefined;
+    if (!s) { out.push(g); continue; }
+    const rest = Math.max(0, g.amount - s);
+    moved += g.amount - rest;
+    if (rest > 0) out.push({ ...g, amount: rest, description: `${g.description || ''} (Excludes $${s.toLocaleString('en-US')} from AISTOF, listed under AISTOF.)`.trim() });
+  }
+  console.log(`[prototype] Moved $${(moved / 1e6).toFixed(2)}M of AISTOF donations off ${share.size} Manifund rows`);
+  return out;
+}
 
 function loadRegrantPrototypes(): Grant[] {
   const extra: Grant[] = [];
@@ -24,7 +47,7 @@ function loadRegrantPrototypes(): Grant[] {
       console.error(`[prototype] Failed to read ${p}:`, err);
     }
   }
-  return extra;
+  return splitAistofFromManifund(extra);
 }
 
 /**

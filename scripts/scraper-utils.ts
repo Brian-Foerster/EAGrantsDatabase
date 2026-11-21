@@ -124,6 +124,18 @@ export function normalizeDate(raw: string): string {
   return raw;
 }
 
+/**
+ * Link to `text` on a page via a URL text fragment (#:~:text=...), which scrolls to and
+ * highlights the first match in Chromium, Safari and Firefox. Where the text isn't found
+ * the page simply opens at the top, so it is safe for single-page grant lists that have
+ * no per-grant anchors. "-", "," and "&" are fragment syntax and must be escaped.
+ */
+export function withTextFragment(url: string, text?: string): string {
+  const t = (text || '').replace(/\s+/g, ' ').trim();
+  if (!t || url.includes('#')) return url;
+  return `${url}#:~:text=${encodeURIComponent(t).replace(/-/g, '%2D')}`;
+}
+
 /** Generate a stable ID for a grant */
 export function makeGrantId(source: string, index: number, extra?: string): string {
   const suffix = extra ? `-${extra.replace(/[^a-z0-9]/gi, '').slice(0, 30)}` : '';

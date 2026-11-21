@@ -1,0 +1,1099 @@
+{
+ "rounds": {
+  "2026-11-02T22:30:26.534Z": {
+   "finalizedAt": "2026-11-02T22:30:26.534Z",
+   "granted": 45066734,
+   "orgsFunded": 147,
+   "evaluators": 17,
+   "publicOrders": [
+    "EVN2",
+    "EY",
+    "LL",
+    "NS",
+    "OH2",
+    "RM",
+    "RN",
+    "SB",
+    "SS",
+    "ZM"
+   ],
+   "scrapedAt": "2026-11-19T21:14:43.902Z",
+   "targets": [
+    {
+     "id": "a6d6aef0-cb19-4b62-80c4-d7db4917d175",
+     "name": "Palisade Research",
+     "type": "current_501c3",
+     "amount": 4644214,
+     "evaluators": {
+      "EVN2": 4644214,
+      "EY": 4078390,
+      "LL": 2000000,
+      "OH2": 2273575,
+      "RM": 2000000
+     }
+    },
+    {
+     "id": "43a17e6c-ca2e-46b5-a160-936be75d7212",
+     "name": "Anima Labs",
+     "type": "current_501c3",
+     "amount": 2142857,
+     "evaluators": {
+      "LL": 200000,
+      "RN": 350000,
+      "SS": 1587203,
+      "ZM": 2142857
+     }
+    },
+    {
+     "id": "127450f6-78e7-4f00-b169-6e77baea0a41",
+     "name": "Encode AI",
+     "type": "current_501c4",
+     "amount": 2000000,
+     "evaluators": {
+      "EY": 2000000,
+      "NS": 1256609,
+      "OH2": 827070,
+      "SS": 1514356,
+      "ZM": 500000
+     }
+    },
+    {
+     "id": "ebcf2560-52d9-48e6-ab3a-e2c54b35421b",
+     "name": "AI Futures Project",
+     "type": "current_501c3",
+     "amount": 2000000,
+     "evaluators": {
+      "LL": 2000000,
+      "NS": 837739,
+      "OH2": 2000000
+     }
+    },
+    {
+     "id": "7c5b160e-214b-4ddb-a897-657341fee8d8",
+     "name": "Nightingale",
+     "type": "current_501c4",
+     "amount": 1963400,
+     "evaluators": {
+      "LL": 500000,
+      "NS": 1963400,
+      "RM": 400000,
+      "SS": 1800000
+     }
+    },
+    {
+     "id": "4473b17a-ce99-45c1-b09b-da13ff1df61d",
+     "name": "80,000 Hours",
+     "type": "foreign_charity_501c3_equivalence",
+     "amount": 1000000,
+     "evaluators": {
+      "LL": 100000,
+      "RM": 1000000
+     }
+    },
+    {
+     "id": "63cbc238-0e2e-402b-80f2-2c354dccda4c",
+     "name": "AI Impacts",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 963685,
+     "evaluators": {
+      "LL": 450000,
+      "NS": 113526,
+      "OH2": 963685,
+      "RM": 100000,
+      "ZM": 150000
+     }
+    },
+    {
+     "id": "e61f07c5-962e-454b-93c8-fb7068d11ab0",
+     "name": "Secure AI Project",
+     "type": "current_501c4",
+     "amount": 858064,
+     "evaluators": {
+      "SS": 858064,
+      "ZM": 416667
+     }
+    },
+    {
+     "id": "a2411070-8fea-4670-acf4-099280cc9ce2",
+     "name": "Mox",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 813000,
+     "evaluators": {
+      "ZM": 813000
+     }
+    },
+    {
+     "id": "d760b26f-a38f-4943-a927-40ec93e8b81b",
+     "name": "Bicameral Labs",
+     "type": "current_501c3",
+     "amount": 800000,
+     "evaluators": {
+      "SB": 800000
+     }
+    },
+    {
+     "id": "855afc7f-902a-405b-814e-7dbe7eac473b",
+     "name": "CeSIA",
+     "type": "foreign_charity_501c3_equivalence",
+     "amount": 765000,
+     "evaluators": {
+      "LL": 200000,
+      "OH2": 765000
+     }
+    },
+    {
+     "id": "21406996-c7f1-40b2-9f5d-a36f67c79589",
+     "name": "Rationality Meetups",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 700000,
+     "evaluators": {
+      "EVN2": 255000,
+      "OH2": 455000,
+      "RM": 255000,
+      "ZM": 700000
+     }
+    },
+    {
+     "id": "dc54dcf2-638c-47ae-af51-4c8e7f5c70ab",
+     "name": "American Shield",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 629965,
+     "evaluators": {
+      "NS": 629965
+     }
+    },
+    {
+     "id": "c71b9661-969a-4781-ac01-3272215af391",
+     "name": "ACS Research",
+     "type": "current_501c3",
+     "amount": 600000,
+     "evaluators": {
+      "RN": 600000
+     }
+    },
+    {
+     "id": "aeb219c2-9977-42e0-b11b-284901fb21e7",
+     "name": "Institute for Responsible Superintelligence",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 571429,
+     "evaluators": {
+      "ZM": 571429
+     }
+    },
+    {
+     "id": "1c146764-3524-4aab-854c-a405cfd9ac6f",
+     "name": "Humanitarian OpenStreetMap Team",
+     "type": "current_501c3",
+     "amount": 533130,
+     "evaluators": {
+      "EVN2": 533130
+     }
+    },
+    {
+     "id": "80c6ffce-80af-4542-b356-4ad454e67ce0",
+     "name": "Berkeley Genomics Project",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 500000,
+     "evaluators": {
+      "EY": 300000,
+      "OH2": 500000,
+      "RM": 300000,
+      "ZM": 400000
+     }
+    },
+    {
+     "id": "75689872-c88e-4ec4-8742-9ed45eff3c0f",
+     "name": "Ovelle Bio Corp. (Nonprofit Operations)",
+     "type": "for_profit",
+     "amount": 500000,
+     "evaluators": {
+      "OH2": 431000,
+      "ZM": 500000
+     }
+    },
+    {
+     "id": "fcd584ac-8649-4ee8-9fac-29adc3cf5900",
+     "name": "SciencePetr",
+     "type": "individual",
+     "amount": 487100,
+     "evaluators": {
+      "LL": 150000,
+      "OH2": 487100,
+      "RM": 200000
+     }
+    },
+    {
+     "id": "d70c1e58-b8c2-4444-8106-bfe88fa3b240",
+     "name": "Who Decides",
+     "type": "current_501c4",
+     "amount": 439866,
+     "evaluators": {
+      "ZM": 439866
+     }
+    },
+    {
+     "id": "437e294d-10eb-411f-9f51-1ddbc24b7b64",
+     "name": "Multi-agent Rationality Research",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 400000,
+     "evaluators": {
+      "EY": 358354,
+      "OH2": 400000
+     }
+    },
+    {
+     "id": "6da17a88-77dd-47e0-b9da-176daf6dd1ce",
+     "name": "Stop The AI Race",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 400000,
+     "evaluators": {
+      "OH2": 400000,
+      "RM": 200000
+     }
+    },
+    {
+     "id": "18a047de-fb44-48e4-88d7-faf3df3429d6",
+     "name": "Sparrow Infrastructure",
+     "type": "current_501c3",
+     "amount": 400000,
+     "evaluators": {
+      "SS": 302871,
+      "ZM": 400000
+     }
+    },
+    {
+     "id": "4ba38696-195b-474a-88aa-a5ec0de08229",
+     "name": "Rob Miles AI Safety",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 350000,
+     "evaluators": {
+      "EY": 350000,
+      "LL": 50000,
+      "NS": 167548,
+      "OH2": 200000,
+      "RM": 120000,
+      "SS": 50000,
+      "ZM": 200000
+     }
+    },
+    {
+     "id": "84ea162a-fa82-4dc0-8d16-b86cf72f17f2",
+     "name": "AI Strategy Team",
+     "type": "current_501c3",
+     "amount": 325000,
+     "evaluators": {
+      "SS": 325000
+     }
+    },
+    {
+     "id": "7b2335f9-caec-42ca-8c5d-66656ee7b61e",
+     "name": "Technology Strategy Roleplay",
+     "type": "foreign_charity_501c3_equivalence",
+     "amount": 311565,
+     "evaluators": {
+      "LL": 50000,
+      "OH2": 311565
+     }
+    },
+    {
+     "id": "3f2409f0-00e5-44bd-9898-40911a2df649",
+     "name": "Principles of Intelligence",
+     "type": "current_501c3",
+     "amount": 300000,
+     "evaluators": {
+      "RN": 300000
+     }
+    },
+    {
+     "id": "31c70a0f-8fdb-4767-a600-6faeafe7129f",
+     "name": "Vibecamp",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 300000,
+     "evaluators": {
+      "ZM": 300000
+     }
+    },
+    {
+     "id": "8eaf1a60-5548-4d0b-b5eb-15d1de0398a5",
+     "name": "Cognitive Amplification Research Institute",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 280000,
+     "evaluators": {
+      "EY": 280000,
+      "OH2": 200000,
+      "RM": 200000,
+      "ZM": 200000
+     }
+    },
+    {
+     "id": "1c3c7872-fbb8-45e2-959b-01404eff9970",
+     "name": "Manifold Markets",
+     "type": "for_profit",
+     "amount": 275000,
+     "evaluators": {
+      "RM": 275000
+     }
+    },
+    {
+     "id": "4a7b8c75-ac33-4e18-835f-ddd72640aa32",
+     "name": "ERA – Frontier AI Security & Verification Testbed",
+     "type": "foreign_charity_501c3_equivalence",
+     "amount": 238500,
+     "evaluators": {
+      "EY": 238500,
+      "LL": 230000,
+      "SS": 238500
+     }
+    },
+    {
+     "id": "0c06ca31-7132-425f-8c88-ffcd174a4f67",
+     "name": "Gretta Duleba – Independent Research",
+     "type": "individual",
+     "amount": 225785,
+     "evaluators": {
+      "EVN2": 225785,
+      "OH2": 170000,
+      "ZM": 150000
+     }
+    },
+    {
+     "id": "4e5683ab-7c38-4c3d-b007-e5387c485908",
+     "name": "ClusterFree",
+     "type": "foreign_charity_no_equivalence",
+     "amount": 214000,
+     "evaluators": {
+      "SS": 214000
+     }
+    },
+    {
+     "id": "4e5766e1-73c9-4c04-b60d-d5371d6e10c6",
+     "name": "Lens Academy",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 200000,
+     "evaluators": {
+      "EY": 200000
+     }
+    },
+    {
+     "id": "1470ad88-6aa5-468a-a2dc-02253547951d",
+     "name": "MachineGod Productions, LLC",
+     "type": "for_profit",
+     "amount": 200000,
+     "evaluators": {
+      "OH2": 200000,
+      "ZM": 50000
+     }
+    },
+    {
+     "id": "703a2fea-1629-4fd2-92b0-69cd78b40218",
+     "name": "Antimemetic AI Institute",
+     "type": "planned_501c3",
+     "amount": 200000,
+     "evaluators": {
+      "RN": 200000
+     }
+    },
+    {
+     "id": "253bb42b-df52-440d-be4b-b295f36db772",
+     "name": "Common Mechanics",
+     "type": "for_profit",
+     "amount": 189830,
+     "evaluators": {
+      "OH2": 189830
+     }
+    },
+    {
+     "id": "a85a77bf-27bf-4ae2-934b-9410782ea63f",
+     "name": "Beacon Institute for Global Catastrophic Risk",
+     "type": "current_501c3",
+     "amount": 185000,
+     "evaluators": {
+      "EY": 185000,
+      "SS": 140078
+     }
+    },
+    {
+     "id": "89681ca0-e94d-4d35-9d3f-4a0ba2a900e1",
+     "name": "Making unlearning robust",
+     "type": "individual",
+     "amount": 180000,
+     "evaluators": {
+      "ZM": 180000
+     }
+    },
+    {
+     "id": "65429c98-ab6b-41e9-a1d1-16720993e664",
+     "name": "ERA – AIxComms",
+     "type": "foreign_charity_501c3_equivalence",
+     "amount": 163715,
+     "evaluators": {
+      "EVN2": 163715,
+      "LL": 50000,
+      "RM": 163715
+     }
+    },
+    {
+     "id": "faf4394d-7ee4-48ed-af38-9c351f402d75",
+     "name": "Helping Rob Miles (and others in the AI Safety space)",
+     "type": "individual",
+     "amount": 156250,
+     "evaluators": {
+      "LL": 80000,
+      "OH2": 80000,
+      "RM": 80000,
+      "ZM": 156250
+     }
+    },
+    {
+     "id": "60df44e2-23a3-44b2-80a4-456206d61483",
+     "name": "Cascade: AI Safety Influencer Comms Agency",
+     "type": "planned_501c3",
+     "amount": 156000,
+     "evaluators": {
+      "NS": 156000,
+      "OH2": 140000
+     }
+    },
+    {
+     "id": "f9873847-2c61-402b-8f81-cf16a83f569e",
+     "name": "YouTube channel explaining AI capabilities and risks",
+     "type": "individual",
+     "amount": 150000,
+     "evaluators": {
+      "EVN2": 103245,
+      "OH2": 150000,
+      "RM": 45000,
+      "ZM": 80000
+     }
+    },
+    {
+     "id": "d49ce9c9-8c55-4935-8d10-4a7571dcb2fe",
+     "name": "Berkeley House Rental",
+     "type": "noncharitable_individual",
+     "amount": 150000,
+     "evaluators": {
+      "OH2": 150000
+     }
+    },
+    {
+     "id": "38ae7efb-a568-4df7-bfcf-4279317e29ae",
+     "name": "Working Load",
+     "type": "individual",
+     "amount": 150000,
+     "evaluators": {
+      "OH2": 80000,
+      "RN": 150000
+     }
+    },
+    {
+     "id": "a40c9a22-80d3-4243-b5e7-38cd29917528",
+     "name": "Effective Theories of Agency",
+     "type": "individual",
+     "amount": 150000,
+     "evaluators": {
+      "RN": 150000
+     }
+    },
+    {
+     "id": "82538f62-a58c-4576-b24c-40620365e84a",
+     "name": "Groundless Alignment",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 150000,
+     "evaluators": {
+      "RN": 150000
+     }
+    },
+    {
+     "id": "4532ba90-4672-4d43-81d5-f2007ae5aa4b",
+     "name": "Ben Hoffman",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 150000,
+     "evaluators": {
+      "RN": 150000
+     }
+    },
+    {
+     "id": "cd9b6f7c-a1ef-4c85-8b7d-809b827ff89a",
+     "name": "More End Kidney Deaths campaigning",
+     "type": "current_501c3",
+     "amount": 150000,
+     "evaluators": {
+      "SB": 150000
+     }
+    },
+    {
+     "id": "f2955186-9ac9-4414-a70a-b83e6b0e1825",
+     "name": "Gwern.net (and other websites and projects)",
+     "type": "individual",
+     "amount": 150000,
+     "evaluators": {
+      "ZM": 150000
+     }
+    },
+    {
+     "id": "d2fbc7f8-23a9-4399-bcfd-7456b5fb7125",
+     "name": "the mathematical structure of world models",
+     "type": "individual",
+     "amount": 136000,
+     "evaluators": {
+      "EY": 136000,
+      "OH2": 94637,
+      "RN": 40000
+     }
+    },
+    {
+     "id": "79fb1caa-8ef4-4f3a-ad99-b33fc668c6d4",
+     "name": "The Unjournal",
+     "type": "current_501c3",
+     "amount": 130000,
+     "evaluators": {
+      "SB": 130000
+     }
+    },
+    {
+     "id": "8496c316-f3a6-48c3-ac5a-2a2d9869d606",
+     "name": "Education Progress",
+     "type": "current_501c3",
+     "amount": 100000,
+     "evaluators": {
+      "EVN2": 25000,
+      "SB": 100000
+     }
+    },
+    {
+     "id": "3e0533cb-bb01-48cf-84ea-128a4dd223e4",
+     "name": "Natural Abstraction + More Generally AGI-Not-Kill-Us-Research",
+     "type": "individual",
+     "amount": 100000,
+     "evaluators": {
+      "EY": 100000,
+      "RN": 100000
+     }
+    },
+    {
+     "id": "6f85d7a7-ee1e-4967-abf4-376b0772871c",
+     "name": "Ozy Brennan",
+     "type": "individual",
+     "amount": 100000,
+     "evaluators": {
+      "OH2": 100000
+     }
+    },
+    {
+     "id": "4901eda0-677a-425c-bb5e-ffc2af3d5558",
+     "name": "Cooperative Training",
+     "type": "individual",
+     "amount": 100000,
+     "evaluators": {
+      "RN": 100000
+     }
+    },
+    {
+     "id": "8ab926ba-ce21-4dc5-ab1e-b8abe46b1a42",
+     "name": "Hazard Spence",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 100000,
+     "evaluators": {
+      "RN": 100000
+     }
+    },
+    {
+     "id": "b5bc6def-0a44-43d1-bea7-a9bd3699ca63",
+     "name": "SARI",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 100000,
+     "evaluators": {
+      "RN": 100000
+     }
+    },
+    {
+     "id": "9f7099f6-4d3b-4327-a6a6-bf9b130e7b2c",
+     "name": "MIT: AI Research RCT",
+     "type": "current_501c3",
+     "amount": 100000,
+     "evaluators": {
+      "SB": 100000
+     }
+    },
+    {
+     "id": "93e790a6-f9ef-4f45-971f-d440d882fece",
+     "name": "Market Shaping Accelerator",
+     "type": "current_501c3",
+     "amount": 100000,
+     "evaluators": {
+      "SB": 100000
+     }
+    },
+    {
+     "id": "d38c60fa-3cb0-45f3-970e-bb04e3024cb6",
+     "name": "The Consciousness Foundation",
+     "type": "current_501c3",
+     "amount": 100000,
+     "evaluators": {
+      "SB": 100000
+     }
+    },
+    {
+     "id": "d1af03a5-1e01-499a-a4c9-9f506551690c",
+     "name": "The Conversation",
+     "type": "current_501c3",
+     "amount": 100000,
+     "evaluators": {
+      "SS": 100000
+     }
+    },
+    {
+     "id": "6a9bf610-a292-4ccf-b0cc-d0a8c9412f99",
+     "name": "Education Through Absurdism",
+     "type": "individual",
+     "amount": 80000,
+     "evaluators": {
+      "NS": 70274,
+      "OH2": 40000,
+      "RM": 20000,
+      "ZM": 80000
+     }
+    },
+    {
+     "id": "5b866f26-308b-4ab4-9227-3fcf1e75f66c",
+     "name": "Blacklight",
+     "type": "for_profit",
+     "amount": 71601,
+     "evaluators": {
+      "EVN2": 71601
+     }
+    },
+    {
+     "id": "c6c52c30-fb9e-46ed-8640-886093f43973",
+     "name": "Research on Generalized Instrumental Convergence",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 64906,
+     "evaluators": {
+      "RN": 64906
+     }
+    },
+    {
+     "id": "903e4d40-52bc-4381-940e-e1fbbe3b215c",
+     "name": "YouTube channel: Chez Anatole",
+     "type": "individual",
+     "amount": 60000,
+     "evaluators": {
+      "OH2": 60000
+     }
+    },
+    {
+     "id": "e0024934-3728-4229-b9e2-d2e092958be5",
+     "name": "Mathematical Foundations for Collective Intelligence",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 60000,
+     "evaluators": {
+      "RN": 60000
+     }
+    },
+    {
+     "id": "0975b704-f7dc-46c3-b62b-71b3873ba507",
+     "name": "From economic theories of agency to physics",
+     "type": "individual",
+     "amount": 60000,
+     "evaluators": {
+      "RN": 60000
+     }
+    },
+    {
+     "id": "9657d638-2e89-40f5-bd41-24f6a804a205",
+     "name": "John Wentworth's Research",
+     "type": "individual",
+     "amount": 60000,
+     "evaluators": {
+      "RN": 60000
+     }
+    },
+    {
+     "id": "dd8ae429-36a5-4005-b13a-122cb740688e",
+     "name": "Finnish Center for Safe AI",
+     "type": "foreign_charity_501c3_equivalence",
+     "amount": 50500,
+     "evaluators": {
+      "LL": 50500
+     }
+    },
+    {
+     "id": "fa674b0f-f775-49a1-954e-3cd3b311fbd9",
+     "name": "Alterman: Satirical AI Campaign",
+     "type": "individual",
+     "amount": 50000,
+     "evaluators": {
+      "LL": 50000,
+      "NS": 10000
+     }
+    },
+    {
+     "id": "14a0ca90-8efc-4697-ac68-1392dc7dc2c7",
+     "name": "Cambridge AI Foresight: Quarterly Forecasts",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 50000,
+     "evaluators": {
+      "LL": 50000
+     }
+    },
+    {
+     "id": "2039b8ac-5745-4f40-a87a-d246f47e3a9c",
+     "name": "MAPLE Documentation, Accountability, and Recovery Effort",
+     "type": "individual",
+     "amount": 50000,
+     "evaluators": {
+      "OH2": 50000
+     }
+    },
+    {
+     "id": "81cd2806-1324-41b7-8f75-8e7dc6d55326",
+     "name": "Missing Measures",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 50000,
+     "evaluators": {
+      "OH2": 50000
+     }
+    },
+    {
+     "id": "5f46c8ab-e871-4efe-a78f-2d370f1a4851",
+     "name": "Core funding for PauseAI UK",
+     "type": "foreign_charity_no_equivalence",
+     "amount": 50000,
+     "evaluators": {
+      "RM": 50000,
+      "SS": 10000
+     }
+    },
+    {
+     "id": "c5af93ad-99b8-4cee-8cfe-dce37125ecc0",
+     "name": "Community Archive",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 50000,
+     "evaluators": {
+      "RN": 50000
+     }
+    },
+    {
+     "id": "317e4372-cfe3-4fc1-8100-9029cb718d0b",
+     "name": "Haru Kim",
+     "type": "individual",
+     "amount": 45000,
+     "evaluators": {
+      "RN": 45000
+     }
+    },
+    {
+     "id": "3f105e61-94db-46a6-841a-5021cc3b54f8",
+     "name": "Handcrafting Neural Networks",
+     "type": "individual",
+     "amount": 45000,
+     "evaluators": {
+      "RN": 45000
+     }
+    },
+    {
+     "id": "17ce5056-3c06-4349-9b2a-3a45322a9481",
+     "name": "Abbasi: AI Incident Reporting",
+     "type": "individual",
+     "amount": 42000,
+     "evaluators": {
+      "LL": 42000
+     }
+    },
+    {
+     "id": "3648442d-6756-4062-b878-c6a5b0bcf4b0",
+     "name": "artificial.isabel",
+     "type": "individual",
+     "amount": 40000,
+     "evaluators": {
+      "EY": 40000,
+      "LL": 40000,
+      "NS": 40000,
+      "OH2": 40000,
+      "RM": 40000,
+      "ZM": 40000
+     }
+    },
+    {
+     "id": "f54cfb05-0d36-490b-b564-58eb58188c4d",
+     "name": "Chris Lakin",
+     "type": "individual",
+     "amount": 40000,
+     "evaluators": {
+      "RN": 40000
+     }
+    },
+    {
+     "id": "54b83e74-3687-4472-bdb5-37916c0b44a1",
+     "name": "Testing Corrigibility as a Singular Target",
+     "type": "individual",
+     "amount": 40000,
+     "evaluators": {
+      "ZM": 40000
+     }
+    },
+    {
+     "id": "a1be2294-1daf-4afc-923e-768701355844",
+     "name": "Whylome",
+     "type": "current_501c3",
+     "amount": 40000,
+     "evaluators": {
+      "ZM": 40000
+     }
+    },
+    {
+     "id": "00c66ef6-1bdf-42d1-b157-7926fe387d7d",
+     "name": "Hale: Mechanistic Interpretability Research",
+     "type": "individual",
+     "amount": 36000,
+     "evaluators": {
+      "RN": 36000
+     }
+    },
+    {
+     "id": "fd187479-8593-4c28-8beb-0aec8a6e3710",
+     "name": "Robi Rahman",
+     "type": "individual",
+     "amount": 30000,
+     "evaluators": {
+      "EY": 10000,
+      "LL": 15000,
+      "RM": 10000,
+      "SS": 30000,
+      "ZM": 15000
+     }
+    },
+    {
+     "id": "eddd8ea6-0337-445f-8464-2653a478dc05",
+     "name": "Victor Warlop",
+     "type": "individual",
+     "amount": 30000,
+     "evaluators": {
+      "EY": 20000,
+      "RN": 30000
+     }
+    },
+    {
+     "id": "7e3aeb22-7987-4267-931e-fb0814a1a4de",
+     "name": "University of Wisconsin-Eau Claire",
+     "type": "current_501c3",
+     "amount": 25000,
+     "evaluators": {
+      "EY": 23000,
+      "ZM": 25000
+     }
+    },
+    {
+     "id": "42f81823-7e91-4527-a917-5c00293875f5",
+     "name": "Ram Potham",
+     "type": "individual",
+     "amount": 25000,
+     "evaluators": {
+      "EY": 25000,
+      "SS": 25000
+     }
+    },
+    {
+     "id": "1a27f31b-49cc-4970-8358-50b686b6cab8",
+     "name": "AI Wow",
+     "type": "individual",
+     "amount": 25000,
+     "evaluators": {
+      "OH2": 25000
+     }
+    },
+    {
+     "id": "8f27e743-9fe4-49a6-86cc-d22ba5c2b9a8",
+     "name": "Scaling and sustaining adoption of synthesis screening outside the US and EU",
+     "type": "foreign_charity_501c3_equivalence",
+     "amount": 25000,
+     "evaluators": {
+      "ZM": 25000
+     }
+    },
+    {
+     "id": "639fba26-b311-4b53-9880-4ea56ae2f8a8",
+     "name": "safely.bio",
+     "type": "for_profit",
+     "amount": 24000,
+     "evaluators": {
+      "ZM": 24000
+     }
+    },
+    {
+     "id": "7d338ea1-c13a-4335-a463-fc283e0ab444",
+     "name": "Reading China's AI Registry: A Public Monitor",
+     "type": "individual",
+     "amount": 22000,
+     "evaluators": {
+      "LL": 22000,
+      "SS": 8000
+     }
+    },
+    {
+     "id": "336337c1-e8bc-4d56-8acd-1a54eeebc137",
+     "name": "AI safety & X-risk communications",
+     "type": "individual",
+     "amount": 20000,
+     "evaluators": {
+      "LL": 5000,
+      "NS": 18640,
+      "OH2": 13640,
+      "RM": 13640,
+      "SS": 13640,
+      "ZM": 20000
+     }
+    },
+    {
+     "id": "305696ba-3bd2-4f7e-9efd-629dd06ae1d5",
+     "name": "DC Mini-Conference",
+     "type": "fiscally_sponsored_501c3",
+     "amount": 20000,
+     "evaluators": {
+      "LL": 20000
+     }
+    },
+    {
+     "id": "186f0628-047e-4b98-815c-973995410cd2",
+     "name": "Rachel Farley starts an ambitious comms / special projects operation",
+     "type": "individual",
+     "amount": 20000,
+     "evaluators": {
+      "NS": 20000,
+      "OH2": 20000,
+      "RM": 20000
+     }
+    },
+    {
+     "id": "54b2067a-55cd-48d1-b3e8-bb482af4a26e",
+     "name": "Offline Research Retreat",
+     "type": "noncharitable_individual",
+     "amount": 20000,
+     "evaluators": {
+      "OH2": 20000
+     }
+    },
+    {
+     "id": "561adfb8-c358-4915-80a9-c444e3c2ea56",
+     "name": "Sar: AI Welfare Seminar",
+     "type": "individual",
+     "amount": 19500,
+     "evaluators": {
+      "LL": 19500
+     }
+    },
+    {
+     "id": "953a8829-40c7-4e23-aad8-8df5bd5a090b",
+     "name": "The Server Room (working title)",
+     "type": "individual",
+     "amount": 15000,
+     "evaluators": {
+      "OH2": 15000
+     }
+    },
+    {
+     "id": "4427833e-f7e9-4dbd-a0d2-68d208cec58e",
+     "name": "Grant to establish an AI safety lab and fellowship from India",
+     "type": "foreign_charity_no_equivalence",
+     "amount": 14000,
+     "evaluators": {
+      "SS": 14000
+     }
+    },
+    {
+     "id": "75980a5e-5bcd-4990-99fc-5212bd7b3e08",
+     "name": "The Treacherous Team",
+     "type": "individual",
+     "amount": 12000,
+     "evaluators": {
+      "EY": 12000,
+      "ZM": 11600
+     }
+    },
+    {
+     "id": "20443302-26ac-429f-8dcb-0ee9117c9ee2",
+     "name": "PauseAI Germany",
+     "type": "foreign_charity_no_equivalence",
+     "amount": 12000,
+     "evaluators": {
+      "OH2": 12000
+     }
+    },
+    {
+     "id": "7eaa1e80-f525-450c-9ee0-b517a5d3fe14",
+     "name": "Signal Technology Foundation",
+     "type": "current_501c3",
+     "amount": 10000,
+     "evaluators": {
+      "EVN2": 10000
+     }
+    },
+    {
+     "id": "ebbf902e-a4b9-46ef-b501-0e70e3519fa4",
+     "name": "Caitlin Yardley",
+     "type": "individual",
+     "amount": 10000,
+     "evaluators": {
+      "NS": 10000
+     }
+    },
+    {
+     "id": "59af6432-599d-4d47-9692-b42d2d342f4d",
+     "name": "Mateusz Bagiński",
+     "type": "individual",
+     "amount": 10000,
+     "evaluators": {
+      "OH2": 10000
+     }
+    },
+    {
+     "id": "f8ded55c-f707-4992-8a66-794874c0fe00",
+     "name": "Belief state geometry of language model personas",
+     "type": "individual",
+     "amount": 10000,
+     "evaluators": {
+      "RN": 10000
+     }
+    },
+    {
+     "id": "9e0af4a2-ee18-4ba9-b36a-b468c7a28245",
+     "name": "A Superhuman Language Model for the game of Go",
+     "type": "individual",
+     "amount": 10000,
+     "evaluators": {
+      "RN": 10000
+     }
+    },
+    {
+     "id": "5d72de11-4181-43ca-a929-15990a20eb67",
+     "name": "Tom Barber",
+     "type": "individual",
+     "amount": 10000,
+     "evaluators": {
+      "SS": 10000
+     }
+    },
+    {
+     "id": "233966d4-0345-47bd-b212-b94296418c0e",
+     "name": "Pause IA: Advocacy Lead",
+     "type": "foreign_charity_no_equivalence",
+     "amount": 9126,
+     "evaluators": {
+      "OH2": 9126
+     }
+    },
+    {
+     "id": "c9754a86-b451-401c-9d37-382d504aa770",
+     "name": "Sixsmith: Short-Form AI Risk Videos",
+     "type": "individual",
+     "amount": 7425,
+     "evaluators": {
+      "LL": 7425,
+      "OH2": 7425
+     }
+    }
+   ]
+  }
+ },
+ "_comment": "Lightcone Commons rounds, archived per scrape (see scripts/scrapers/lightcone-commons.ts). The site only shows the current round, so do not delete past rounds."
+}

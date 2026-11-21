@@ -23,6 +23,8 @@ import { scrapeSupplemental } from './scrapers/supplemental';
 import { scrapeSentinelBio } from './scrapers/sentinel-bio';
 import { scrapeCLRFund } from './scrapers/clr-fund';
 import { scrapeFoundersPledge } from './scrapers/founders-pledge';
+import { scrapeCooperativeAI } from './scrapers/cooperative-ai';
+import { scrapeLightconeCommons } from './scrapers/lightcone-commons';
 import { deduplicateGrants } from './dedup';
 import { computeResiduals } from './residuals';
 import { isOutOfScope } from './scope';
@@ -64,6 +66,8 @@ async function main() {
     { name: 'Sentinel Bio', key: 'sentinel-bio', fn: scrapeSentinelBio },
     { name: 'CLR Fund', key: 'clr-fund', fn: scrapeCLRFund },
     { name: 'Founders Pledge', key: 'founders-pledge', fn: scrapeFoundersPledge },
+    { name: 'Cooperative AI Foundation', key: 'cooperative-ai', fn: scrapeCooperativeAI },
+    { name: 'Lightcone Commons', key: 'lightcone-commons', fn: scrapeLightconeCommons },
   ];
 
   // Run scrapers sequentially to avoid rate limiting
@@ -132,6 +136,23 @@ async function main() {
   console.log('── Phase 3: Residual Computation ──');
   const { residuals, stats: residualStats } = computeResiduals([...dedupedGrants, ...outOfScope]);
   console.log();
+
+  // LTFF funds part of each Lightcone Commons round. Once EA Funds publishes those
+  // grants they duplicate Commons rows; flag them so the refresher can net them out.
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const commonsRounds = new Map<string, string>(); // recipient -> earliest round date
+  for (const g of dedupedGrants) {
+    if (g.grantmaker !== 'Lightcone Commons' || g.is_residual) continue;
+    const prev = commonsRounds.get(norm(g.recipient));
+    if (!prev || g.date < prev) commonsRounds.set(norm(g.recipient), g.date);
+  }
+  const commonsOverlap = dedupedGrants.filter(g =>
+    g.grantmaker !== 'Lightcone Commons' && /long-term future|ltff/i.test(`${g.fund} ${g.grantmaker}`) &&
+    commonsRounds.has(norm(g.recipient)) && g.date >= commonsRounds.get(norm(g.recipient))!.slice(0, 7));
+  if (commonsOverlap.length) {
+    console.warn(`  WARNING: ${commonsOverlap.length} LTFF grant(s) to Lightcone Commons recipients dated on/after their round — possible double count:`);
+    for (const g of commonsOverlap) console.warn(`    ${g.date} ${g.recipient} $${g.amount.toLocaleString()}`);
+  }
 
   // ─── Phase 4: Final output ──────────────────────────────────
   const finalGrants = [...dedupedGrants, ...residuals];

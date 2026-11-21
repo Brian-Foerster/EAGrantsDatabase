@@ -5,7 +5,7 @@
 
 import * as cheerio from 'cheerio';
 import { Grant, ScrapeResult } from '../../types/grants';
-import { fetchWithRetry, parseDollarAmount, makeGrantId } from '../scraper-utils';
+import { fetchWithRetry, parseDollarAmount, makeGrantId, withTextFragment } from '../scraper-utils';
 
 const PAST_GRANTS_URL = 'https://animalcharityevaluators.org/movement-grants/past-movement-grants-recipients/';
 
@@ -118,7 +118,7 @@ export async function scrapeACE(): Promise<ScrapeResult> {
         description: description || undefined,
         category: 'AW',
         fund: 'Movement Grants',
-        url: PAST_GRANTS_URL,
+        url: withTextFragment(PAST_GRANTS_URL, recipient),
       });
       continue;
     }
