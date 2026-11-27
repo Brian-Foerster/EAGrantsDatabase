@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
+import { HeroGlow, plainHeader } from '@/lib/hero';
+import { replaceUrl } from '@/lib/history';
 import { GetStaticProps } from 'next';
 import fs from 'fs';
 import path from 'path';
@@ -15,12 +17,20 @@ interface AboutStats {
   totalGrants: number;
   totalAmountB: string;
   grantmakers: Record<string, GrantmakerStats>;
-  outOfScopeCount: number;
-  outOfScopeAmountM: string;
   orgTotal: number;
   orgUS: number;
   orgUK: number;
 }
+
+const SECTIONS: [string, string][] = [
+  ['what-this-is', 'What this is'],
+  ['data-sources', 'Data sources with individual grants'],
+  ['processing', 'Processing'],
+  ['limitations', 'Limitations'],
+  ['org-financials', 'The org financials database'],
+  ['source-code', 'Source code'],
+  ['feedback', 'Feedback'],
+];
 
 const fmt = (n: number) => n.toLocaleString('en-US');
 const approx = (n: number, round = 10) => '~' + fmt(Math.round(n / round) * round);
@@ -29,7 +39,6 @@ export const getStaticProps: GetStaticProps<{ stats: AboutStats }> = async () =>
   const dataDir = path.join(process.cwd(), 'public', 'data');
   const grants: any[] = JSON.parse(fs.readFileSync(path.join(dataDir, 'grants.min.json'), 'utf-8'));
   const orgData = JSON.parse(fs.readFileSync(path.join(dataDir, 'recipient-orgs.json'), 'utf-8'));
-  const outOfScope = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'lib', 'out-of-scope-summary.json'), 'utf-8'));
 
   const grantmakers: Record<string, GrantmakerStats> = {};
   for (const g of grants) {
@@ -54,8 +63,6 @@ export const getStaticProps: GetStaticProps<{ stats: AboutStats }> = async () =>
         totalGrants: grants.length,
         totalAmountB: (totalAmount / 1e9).toFixed(1),
         grantmakers,
-        outOfScopeCount: outOfScope.grants,
-        outOfScopeAmountM: (outOfScope.amount / 1e6).toFixed(0),
         orgTotal: orgs.length,
         orgUS,
         orgUK,
@@ -84,13 +91,13 @@ export default function About({ stats }: { stats: AboutStats }) {
     if (url.searchParams.has('v')) {
       url.searchParams.delete('v');
       const next = url.pathname + url.search + url.hash;
-      window.history.replaceState({}, '', next);
+      replaceUrl(next);
     }
   }, []);
 
   const isPhonePortrait = windowWidth < 480;
-  const isTablet = windowWidth >= 768 && windowWidth < 1024;
-  const isMobile = windowWidth < 768;
+  const isTablet = windowWidth >= 800 && windowWidth < 1024;
+  const isMobile = windowWidth < 800;
 
   return (
     <>
@@ -100,6 +107,7 @@ export default function About({ stats }: { stats: AboutStats }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="canonical" href="https://brian-foerster.github.io/EAGrantsDatabase/about" />
       </Head>
+      <HeroGlow rgb="233, 213, 255" x="90%" />
       <main style={{
         ...styles.main,
         padding: isPhonePortrait ? '12px 12px' : isMobile ? '16px 16px' : isTablet ? '20px 40px' : '20px 80px'
@@ -107,7 +115,7 @@ export default function About({ stats }: { stats: AboutStats }) {
         <header style={{
           ...styles.header,
           minHeight: isMobile ? '196px' : '244px',
-          padding: isMobile ? '18px 16px' : '32px 36px',
+          padding: isMobile ? '18px 0' : '32px 0',
           marginBottom: isMobile ? '20px' : '40px'
         }}>
           <nav style={styles.nav}>
@@ -138,7 +146,18 @@ export default function About({ stats }: { stats: AboutStats }) {
             ...styles.content,
             padding: isMobile ? '20px' : '40px'
           }}>
-            <h2 style={styles.sectionTitle}>What this is</h2>
+            <nav aria-label="Contents" style={styles.toc}>
+              <div style={styles.tocTitle}>Contents</div>
+              <ol style={styles.tocList}>
+                {SECTIONS.map(([id, title]) => (
+                  <li key={id} style={styles.tocItem}>
+                    <a href={`#${id}`} style={styles.link}>{title}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+
+            <h2 id="what-this-is" style={{ ...styles.sectionTitle, marginTop: 0 }}>What this is</h2>
             <p style={styles.paragraph}>
               This site aggregates publicly available grant data from grantmakers associated with
               the Effective Altruism community. It currently includes over {fmt(Math.floor(stats.totalGrants / 100) * 100)} grants
@@ -174,7 +193,7 @@ export default function About({ stats }: { stats: AboutStats }) {
               <a href={REPO_URL} target="_blank" rel="noopener noreferrer" style={styles.link}>GitHub</a>.
             </p>
 
-            <h2 style={styles.sectionTitle}>Data sources with individual grants</h2>
+            <h2 id="data-sources" style={styles.sectionTitle}>Data sources with individual grants</h2>
 
             <h3 style={styles.subheading}>Coefficient Giving (formerly Open Philanthropy)</h3>
             <p style={styles.paragraph}>
@@ -254,12 +273,7 @@ export default function About({ stats }: { stats: AboutStats }) {
             <h3 style={styles.subheading}>The Navigation Fund</h3>
             <p style={styles.paragraph}>
               Grants in EA-relevant program areas from the Navigation Charitable Fund's
-              complete IRS Form 990 Schedule I, manually classified. Both filed years were
-              reviewed (FY2023 and FY2024); the included grants are farm-animal-welfare
-              support (via Food System Innovations / Humane America Animal Foundation) and a
-              digital-sentience grant. Excluded from every year are large transfers to a
-              donor-advised fund (Vanguard Charitable), open-science and criminal-justice
-              grants, and operational/PR vendor payments. The fund publishes no grants list
+              complete IRS Form 990 Schedule I, manually classified. The fund publishes no grants list
               of its own and its filings carry no award dates beyond the fiscal year-end, so
               dates are approximate and coverage lags by a year.
             </p>
@@ -325,9 +339,8 @@ export default function About({ stats }: { stats: AboutStats }) {
             <p style={styles.paragraph}>
               <a href="https://www.lightconecommons.com" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 Lightcone Commons
-              </a>{' '}pools funders behind evaluators, who each publish a ranked funding order. Its
-              grant list needs a login, but the public evaluator profiles show how far each order
-              was funded. Where several evaluators back the same project they share its cost, so each
+              </a>{' '}pools funders behind evaluators, who each publish a ranked funding order.
+              Where several evaluators back the same project they share its cost, so each
               project's grant is the largest amount any public order shows for it, a lower bound.
               The first round (finalized November 2026) granted $45.1 million to 147 organizations;
               10 of its 17 evaluators publish their orders, which itemize 109 grants ($32.6 million).
@@ -366,9 +379,7 @@ export default function About({ stats }: { stats: AboutStats }) {
               </a>{' '}
               program, funded largely by his readers and outside donors. Later rounds
               (2024–2025) are administered through Manifund; earlier rounds (2021–2022) were
-              run directly. All are consolidated here under ACX Grants, originally via{' '}
-              <a href="https://trace.manifund.org/" target="_blank" rel="noopener noreferrer" style={styles.link}>Trace</a>{' '}
-              (a public-domain funding dataset from Manifund). New rounds are checked against
+              run directly. All are consolidated here under ACX Grants. New rounds are checked against
               Manifund and added by hand, since ACX's share of each project's funding must be
               confirmed separately.
             </p>
@@ -398,12 +409,10 @@ export default function About({ stats }: { stats: AboutStats }) {
               the fund grants and the annual grants-paid totals in its IRS 990 filings (via{' '}
               <a href="https://projects.propublica.org/nonprofits/organizations/371795297" target="_blank" rel="noopener noreferrer" style={styles.link}>
                 ProPublica Nonprofit Explorer
-              </a>) appears as an unitemized entry for each year. This is approximate: the fund
-              pages list grants when committed, some paid by Founders Pledge's UK entity, while
-              the 990s record cash paid by the US entity.
+              </a>) appears as an unitemized entry for each year.
             </p>
 
-            <h2 style={styles.sectionTitle}>Processing</h2>
+            <h2 id="processing" style={styles.sectionTitle}>Processing</h2>
 
             <h3 style={styles.subheading}>Categories</h3>
             <p style={styles.paragraph}>
@@ -429,13 +438,11 @@ export default function About({ stats }: { stats: AboutStats }) {
               different grantmaker than the original announcement.
             </p>
             <p style={styles.paragraph}>
-              A direct consequence is that <strong>Coefficient Giving's (Open Philanthropy's)
-              total understates its actual grantmaking</strong>. The roughly $1.25 billion it has
-              granted to GiveWell-recommended charities is attributed to GiveWell — the proximate
-              grantmaker — rather than counted again under Coefficient. Per-grantmaker totals are
-              therefore de-duplicated, not additive: this avoids double-counting the GiveWell
-              funding channel, at the cost of making Open Philanthropy look smaller than its
-              headline figures, which typically include money it moves through GiveWell.
+              This means <strong>Coefficient Giving's total here is lower than its actual
+              grantmaking</strong>. About $1.25 billion that it granted to GiveWell-recommended
+              charities is attributed to GiveWell, since GiveWell is the one that made those grants
+              to the charities. Coefficient's own published figures count that money, but in the
+              database it appears only under GiveWell to avoid counting it twice.
             </p>
 
             <h3 style={styles.subheading}>Residual grants</h3>
@@ -456,18 +463,7 @@ export default function About({ stats }: { stats: AboutStats }) {
               CPI-U annual averages.
             </p>
 
-            <h3 style={styles.subheading}>Coefficient Giving's US policy programs</h3>
-            <p style={styles.paragraph}>
-              Coefficient Giving also funds US policy work outside EA cause areas: criminal
-              justice reform, housing and land use, immigration, macroeconomic stabilization,
-              innovation policy, and abundance &amp; growth. These {fmt(stats.outOfScopeCount)} grants
-              (about ${stats.outOfScopeAmountM}M) are not included, in line with the other
-              grantmakers, whose non-EA grants are likewise left out. They still count toward
-              Coefficient's published annual totals, so they are not added back as unitemized
-              grants.
-            </p>
-
-            <h2 style={styles.sectionTitle}>Limitations</h2>
+            <h2 id="limitations" style={styles.sectionTitle}>Limitations</h2>
 
             <h3 style={styles.subheading}>Publication timing</h3>
             <p style={styles.paragraph}>
@@ -522,7 +518,7 @@ export default function About({ stats }: { stats: AboutStats }) {
               </li>
             </ul>
 
-            <h2 style={styles.sectionTitle}>The org financials database</h2>
+            <h2 id="org-financials" style={styles.sectionTitle}>The org financials database</h2>
             <p style={styles.paragraph}>
               A companion org financials database shows the annual finances — revenue, expenses,
               assets, and liabilities — of
@@ -568,7 +564,7 @@ export default function About({ stats }: { stats: AboutStats }) {
               Some clearly EA-funded organizations cannot be included: those that are fiscally
               sponsored by another entity and therefore have no separate filing (their finances are
               folded into the host's return), and organizations based outside the US and UK, for
-              which no comparable open financial register is currently used.
+              which no comparable open financial register is available.
             </p>
 
             <h3 style={styles.subheading}>Tracked EA grants and inferred years</h3>
@@ -631,7 +627,7 @@ export default function About({ stats }: { stats: AboutStats }) {
               </li>
             </ul>
 
-            <h2 style={styles.sectionTitle}>Source code</h2>
+            <h2 id="source-code" style={styles.sectionTitle}>Source code</h2>
             <p style={styles.paragraph}>
               The full source code, scraping pipeline, and detailed methodology documentation
               are available at{' '}
@@ -645,7 +641,7 @@ export default function About({ stats }: { stats: AboutStats }) {
               for the complete data sourcing notes. Contributions via pull request are welcome.
             </p>
 
-            <h2 style={styles.sectionTitle}>Feedback</h2>
+            <h2 id="feedback" style={styles.sectionTitle}>Feedback</h2>
             <p style={styles.paragraph}>
               To report errors, suggest additional data sources, or provide other feedback,
               use the{' '}
@@ -679,14 +675,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     maxWidth: '1400px',
     margin: '0 auto',
     padding: '20px 80px',
+    position: 'relative', // above the HeroGlow layer
+    zIndex: 1,
   },
-  header: {
-    textAlign: 'left',
-    marginBottom: '40px',
-    borderRadius: '16px',
-    border: '1px solid #e5e7eb',
-    background: 'radial-gradient(82% 150% at 90% 82%, #e9d5ff 0%, #f8fafc 88%)',
-  },
+  header: plainHeader,
   nav: {
     display: 'flex',
     justifyContent: 'flex-start',
@@ -728,7 +720,34 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '4px',
     border: '1px solid #e5e7eb',
   },
+  toc: {
+    marginBottom: '32px',
+    paddingBottom: '24px',
+    borderBottom: '1px solid #e5e7eb',
+  },
+  tocTitle: {
+    fontSize: '13px',
+    fontWeight: 600,
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    color: '#64748b',
+    marginBottom: '10px',
+  },
+  tocList: {
+    margin: 0,
+    paddingLeft: '20px',
+    columns: '2 360px',
+    columnGap: '40px',
+  },
+  tocItem: {
+    fontSize: '15px',
+    lineHeight: '1.6',
+    marginBottom: '4px',
+    color: '#94a3b8',
+    breakInside: 'avoid',
+  },
   sectionTitle: {
+    scrollMarginTop: '16px',
     fontSize: '24px',
     fontWeight: 'bold',
     marginTop: '36px',

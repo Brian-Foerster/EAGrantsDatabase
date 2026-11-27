@@ -10,7 +10,6 @@ body {
   overflow-x: hidden;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto',
     'Helvetica Neue', 'Arial', sans-serif;
-  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -18,6 +17,11 @@ body {
 body {
   color: #333;
   background: #f5f7fa;
+}
+
+/* Form controls default to the browser's UI font; use the site font instead. */
+button, input, select, textarea {
+  font-family: inherit;
 }
 
 a {

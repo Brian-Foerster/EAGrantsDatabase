@@ -4,14 +4,40 @@ import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
 import MiniSearch from 'minisearch';
 import ReactECharts from 'echarts-for-react';
+import type { ECharts } from 'echarts';
+import { FONT_FAMILY } from '@/lib/fonts';
+import { HeroGlow, plainHeader } from '@/lib/hero';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { writeupKey } from '../lib/writeup-key';
+import { replaceUrl } from '@/lib/history';
+import { yAxisRange, formatMillions } from '@/lib/chart-axis';
+import {
+  LEGEND_COLUMN_PX, LEGEND_TEXT_PX, legendRightOffset, closeTooltipOnSecondTap, useDividerHiddenOnWrap,
+} from '@/lib/chart-shared';
 
 // Build timestamp for cache busting (set at build time)
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 
 // Base path for deployment (set via NEXT_PUBLIC_BASE_PATH when needed)
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
+const escapeHtml = (text: string) =>
+  text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Darkens a colour until it reads as text on white (contrast ≥ 4.5).
+const inkCache = new Map<string, string>();
+function readableInk(hex: string): string {
+  const hit = inkCache.get(hex); if (hit) return hit;
+  let rgb = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16));
+  const lum = (c: number[]) => {
+    const [r, g, b] = c.map(v => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  while (1.05 / (lum(rgb) + 0.05) < 4.5) rgb = rgb.map(v => Math.floor(v * 0.92));
+  const ink = '#' + rgb.map(v => v.toString(16).padStart(2, '0')).join('');
+  inkCache.set(hex, ink);
+  return ink;
+}
 
 // Normalize an org name for matching a regrant's upstream grants (`regrant_of`)
 // against recipients present in the current view.
@@ -175,7 +201,7 @@ const GrantRow = memo(function GrantRow({
           <span style={{
             ...styles.tagTiny,
             borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+            color: readableInk(GRANTMAKER_COLORS[grant.grantmaker] || '#666666'),
           }}>{grant.grantmaker}</span>
           {grant.category && (
             <span style={{
@@ -215,13 +241,13 @@ const GrantRow = memo(function GrantRow({
             )}
             {financialsOrg && (
               <div style={styles.expandedRow}>
-                <a
-                  href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`}
+                <Link
+                  href={`/recipients?org=${encodeURIComponent(financialsOrg)}`}
                   style={styles.expandedLink}
                   onClick={e => e.stopPropagation()}
                 >
                   View org financials →
-                </a>
+                </Link>
               </div>
             )}
           </div>
@@ -251,22 +277,22 @@ const GrantRow = memo(function GrantRow({
             </div>
           )}
           {financialsOrg && !expanded && (
-            <a href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.crossLink} onClick={e => e.stopPropagation()}>
+            <Link href={`/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.crossLink} onClick={e => e.stopPropagation()}>
               View org financials →
-            </a>
+            </Link>
           )}
         </div>
         <div style={styles.grantFunderCol}>
           <span style={{
             ...styles.tagColored,
             borderColor: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
-            color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+            color: readableInk(GRANTMAKER_COLORS[grant.grantmaker] || '#666666'),
           }}>{displayGrantmaker(grant.grantmaker)}</span>
           {grant.fund && (
             <span style={{
               ...styles.subTag,
               borderColor: (GRANTMAKER_COLORS[grant.grantmaker] || '#666') + 'aa',
-              color: GRANTMAKER_COLORS[grant.grantmaker] || '#666',
+              color: readableInk(GRANTMAKER_COLORS[grant.grantmaker] || '#666666'),
             }}>{grant.fund === 'EA Infrastructure Fund' ? 'Infrastructure Fund' : grant.fund}</span>
           )}
         </div>
@@ -286,9 +312,9 @@ const GrantRow = memo(function GrantRow({
       {expanded && financialsOrg && (
         <div style={styles.grantDesktopExpanded}>
           <div style={styles.grantExpandedLinks}>
-            <a href={`${BASE_PATH}/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.expandedLink} onClick={e => e.stopPropagation()}>
+            <Link href={`/recipients?org=${encodeURIComponent(financialsOrg)}`} style={styles.expandedLink} onClick={e => e.stopPropagation()}>
               View org financials →
-            </a>
+            </Link>
           </div>
         </div>
       )}
@@ -300,6 +326,20 @@ const GrantRow = memo(function GrantRow({
 const SMALL_GM_LABEL = 'Smaller grantmakers';
 
 /** Top-level "Select All / Deselect All" button (rendered inline in the header). */
+// Show/Hide label that keeps one width: both labels share a grid cell and only the
+// current one is visible, so the button doesn't resize when it's clicked.
+function ShowHideLabel({ open }: { open: boolean }) {
+  return (
+    <span style={{ display: 'inline-grid' }}>
+      {([['Show', '▼', false], ['Hide', '▲', true]] as const).map(([label, arrow, forOpen]) => (
+        <span key={label} style={{ gridArea: '1 / 1', visibility: forOpen === open ? 'visible' : 'hidden' }}>
+          {label}<span style={{ ...styles.grantExpandArrow, marginLeft: '5px' }}>{arrow}</span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 function SelectAllButton<T extends string | number>({ all, selected, onChange }: {
   all: T[]; selected: T[]; onChange: (next: T[]) => void;
 }) {
@@ -314,13 +354,19 @@ function SelectAllButton<T extends string | number>({ all, selected, onChange }:
   );
 }
 
+type OrgIndexEntry = { name: string; grant_names: string[] };
+
+// Loaded data outlives the page component, so coming back from another page
+// (client-side navigation) skips the download, parse and search-index build.
+let loadedData: { grants: MinGrant[]; metadata: Metadata; orgIndex: OrgIndexEntry[]; miniSearch: MiniSearch } | null = null;
+
 export default function Home() {
   // Data loading state
-  const [grants, setGrants] = useState<MinGrant[]>([]);
-  const [metadata, setMetadata] = useState<Metadata | null>(null);
-  const [orgIndex, setOrgIndex] = useState<{ name: string; grant_names: string[] }[]>([]);
+  const [grants, setGrants] = useState<MinGrant[]>(() => loadedData?.grants ?? []);
+  const [metadata, setMetadata] = useState<Metadata | null>(() => loadedData?.metadata ?? null);
+  const [orgIndex, setOrgIndex] = useState<OrgIndexEntry[]>(() => loadedData?.orgIndex ?? []);
   const [orgFilter, setOrgFilter] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => !loadedData);
   const [loadingProgress, setLoadingProgress] = useState('Loading...');
   const [loadError, setLoadError] = useState(false);
   const fetchAttempted = useRef(false);
@@ -336,7 +382,7 @@ export default function Home() {
   const [expandedFilters, setExpandedFilters] = useState<{ [key: string]: boolean }>({});
   const [sortBy, setSortBy] = useState<'date' | 'amount' | 'grantmaker' | 'recipient' | 'category'>('date');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
-  const [miniSearch, setMiniSearch] = useState<MiniSearch | null>(null);
+  const [miniSearch, setMiniSearch] = useState<MiniSearch | null>(() => loadedData?.miniSearch ?? null);
   const [searchResults, setSearchResults] = useState<string[]>([]);
   const [chartView, setChartView] = useState<'year' | 'month'>('year');
   const [timeBreakdown, setTimeBreakdown] = useState<'total' | 'byFunder' | 'byCategory'>('total');
@@ -344,7 +390,6 @@ export default function Home() {
   // "Smaller grantmakers" grouping: expanders in the two filters, and the chart's switch.
   const [smallGmExpanded, setSmallGmExpanded] = useState(false);
   const [smallFundsExpanded, setSmallFundsExpanded] = useState(false);
-  const [groupSmallFunders, setGroupSmallFunders] = useState(true);
   // Constant initial value so server and first client render agree (no hydration
   // mismatch); the effect sets the real width immediately after mount.
   const [windowWidth, setWindowWidth] = useState(400);
@@ -372,7 +417,7 @@ export default function Home() {
     if (url.searchParams.has('v')) {
       url.searchParams.delete('v');
       const next = url.pathname + url.search + url.hash;
-      window.history.replaceState({}, '', next);
+      replaceUrl(next);
     }
   }, []);
 
@@ -400,7 +445,6 @@ export default function Home() {
     if (by === 'funder') setTimeBreakdown('byFunder');
     else if (by === 'category') setTimeBreakdown('byCategory');
     if (p.get('infl') === '1') setAdjustInflation(true);
-    if (p.get('group') === '0') setGroupSmallFunders(false);
   }, []);
 
   // Reflect the current filter/sort state back into the URL (shareable / bookmarkable).
@@ -425,10 +469,9 @@ export default function Home() {
     if (timeBreakdown === 'byFunder') p.set('by', 'funder');
     else if (timeBreakdown === 'byCategory') p.set('by', 'category');
     if (adjustInflation) p.set('infl', '1');
-    if (!groupSmallFunders) p.set('group', '0');
     const qs = p.toString();
-    window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
-  }, [orgFilter, searchTerm, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder, chartView, timeBreakdown, adjustInflation, groupSmallFunders]);
+    replaceUrl(window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+  }, [orgFilter, searchTerm, selectedGrantmakers, selectedFunds, selectedCategories, selectedSubCategories, selectedYears, amountMin, amountMax, sortBy, sortOrder, chartView, timeBreakdown, adjustInflation]);
 
   // ...and scroll the grants list into view once it's rendered (one time).
   useEffect(() => {
@@ -441,9 +484,9 @@ export default function Home() {
 
   // Responsive breakpoints
   const isPhonePortrait = windowWidth < 480;
-  const isPhoneLandscape = windowWidth >= 480 && windowWidth < 768;
-  const isTablet = windowWidth >= 768 && windowWidth < 1024;
-  const isMobile = windowWidth < 768;
+  const isPhoneLandscape = windowWidth >= 480 && windowWidth < 800;
+  const isTablet = windowWidth >= 800 && windowWidth < 1024;
+  const isMobile = windowWidth < 800;
 
   // Uniform sizing for all chart-control tabs, shrinking together on smaller
   // screens so they stay on one row as long as reasonable.
@@ -453,7 +496,6 @@ export default function Home() {
     ? { padding: '9px 15px', fontSize: '14px' }
     : { padding: '10px 17px', fontSize: '15px' };
   const isCompact = windowWidth < 1024;
-  const canOverlayChartTotal = !isMobile && windowWidth >= 1200;
   const shouldAlignExpandedLabels = isMobile && windowWidth >= 360;
   const expandedLabelWidth = shouldAlignExpandedLabels
     ? Math.min(90, Math.max(60, Math.round(windowWidth * 0.22)))
@@ -470,7 +512,7 @@ export default function Home() {
   // Fetch data client-side only
   useEffect(() => {
     // Prevent double fetch in React strict mode or re-renders
-    if (fetchAttempted.current) return;
+    if (fetchAttempted.current || loadedData) return;
     fetchAttempted.current = true;
 
     const fetchData = async () => {
@@ -514,16 +556,16 @@ export default function Home() {
 
         // Org financials index — used to cross-link grants to org cards.
         // Optional enhancement: a failure here must not break the grants page.
+        let orgs: OrgIndexEntry[] = [];
         try {
           const orgsRes = await fetch(`${BASE_PATH}/data/recipient-orgs.json?v=${BUILD_VERSION}`);
           if (orgsRes.ok) {
             const orgsData = await orgsRes.json();
-            setOrgIndex(
-              (orgsData.orgs || []).map((o: { name: string; grant_names?: string[] }) => ({
-                name: o.name,
-                grant_names: o.grant_names || [],
-              }))
-            );
+            orgs = (orgsData.orgs || []).map((o: { name: string; grant_names?: string[] }) => ({
+              name: o.name,
+              grant_names: o.grant_names || [],
+            }));
+            setOrgIndex(orgs);
           }
         } catch {
           /* cross-linking disabled if org data unavailable */
@@ -543,6 +585,7 @@ export default function Home() {
         ms.addAll(grantsData);
         setMiniSearch(ms);
 
+        loadedData = { grants: grantsData, metadata: metaData, orgIndex: orgs, miniSearch: ms };
         setIsLoading(false);
       } catch (err) {
         console.error('Failed to load data:', err);
@@ -723,7 +766,7 @@ export default function Home() {
         picked.add(group.grantmaker);
       }
     }
-    return picked;
+    return picked.size === smallGrantmakers.length ? new Set<string>() : picked;
   }, [selectedGrantmakers, selectedFunds, smallGrantmakers, fundsByGrantmaker]);
 
   const toggleSmallGrantmakers = () => {
@@ -732,6 +775,104 @@ export default function Home() {
       ? prev.filter(gm => !smallGrantmakers.includes(gm))
       : Array.from(new Set([...prev, ...smallGrantmakers])));
   };
+
+  // The chart legend mirrors the Grantmaker and Category filters: an entry is "on" when
+  // it passes the filter, and clicking it adds it to or removes it from the filter.
+  const sourceFiltered = selectedGrantmakers.length > 0 || selectedFunds.length > 0;
+  const topicFiltered = selectedCategories.length > 0 || selectedSubCategories.length > 0;
+  const fundsOf = (gm: string) => fundsByGrantmaker.find(g => g.grantmaker === gm)?.funds ?? [];
+  const subCategoryParent = useMemo(
+    () => new Map((metadata?.subCategories ?? []).map(sc => [sc.id, sc.category])),
+    [metadata],
+  );
+  const allCategoryCodes = useMemo(
+    () => Array.from(new Set(grants.map(g => g.category).filter((c): c is string => !!c))),
+    [grants],
+  );
+  const grantmakerInFilter = (gm: string) =>
+    !sourceFiltered || selectedGrantmakers.includes(gm) || fundsOf(gm).some(f => selectedFunds.includes(f));
+  const categoryInFilter = (code: string) =>
+    !topicFiltered || selectedCategories.includes(code)
+    || selectedSubCategories.some(sc => subCategoryParent.get(sc) === code);
+
+  // Filtered-out entries stay in the legend, greyed out, so they can be clicked back on.
+  const excludedFunderEntries = (): string[] => {
+    if (!sourceFiltered) return [];
+    const out = largeGrantmakers.filter(gm => !grantmakerInFilter(gm)).map(displayGrantmaker);
+    if (smallGrantmakers.length && !smallGrantmakers.some(grantmakerInFilter)) out.push(SMALL_GM_LABEL);
+    return out;
+  };
+  const excludedCategoryEntries = (): string[] =>
+    topicFiltered ? allCategoryCodes.filter(c => !categoryInFilter(c)).map(c => chartCategory(c)) : [];
+
+  const toggleGrantmakersFromLegend = (name: string) => {
+    const all = metadata?.grantmakers ?? [];
+    const targets = name === SMALL_GM_LABEL
+      ? smallGrantmakers.filter(gm => !pickedSmallGrantmakers.has(gm))
+      : all.filter(gm => displayGrantmaker(gm) === name);
+    if (!targets.length) { setSelectedGrantmakers(prev => [...prev]); return; }
+    let nextGms: string[];
+    let nextFunds = selectedFunds;
+    if (targets.some(grantmakerInFilter)) {
+      if (!sourceFiltered) {
+        nextGms = all.filter(gm => !targets.includes(gm));
+      } else {
+        nextGms = selectedGrantmakers.filter(gm => !targets.includes(gm));
+        const targetFunds = new Set(targets.flatMap(fundsOf));
+        nextFunds = selectedFunds.filter(f => !targetFunds.has(f));
+      }
+      // Turning off the last entry would read as "no filter" and bring everything back.
+      if (!nextGms.length && !nextFunds.length) { setSelectedGrantmakers(prev => [...prev]); return; }
+    } else {
+      nextGms = Array.from(new Set([...selectedGrantmakers, ...targets]));
+      if (!nextFunds.length && all.every(gm => nextGms.includes(gm))) nextGms = [];
+    }
+    setSelectedGrantmakers(nextGms);
+    setSelectedFunds(nextFunds);
+  };
+
+  const toggleCategoryFromLegend = (name: string) => {
+    const code = allCategoryCodes.find(c => chartCategory(c) === name);
+    if (!code) { setSelectedCategories(prev => [...prev]); return; }
+    let nextCats: string[];
+    let nextSubs = selectedSubCategories;
+    if (categoryInFilter(code)) {
+      if (!topicFiltered) {
+        nextCats = allCategoryCodes.filter(c => c !== code);
+      } else {
+        nextCats = selectedCategories.filter(c => c !== code);
+        nextSubs = selectedSubCategories.filter(sc => subCategoryParent.get(sc) !== code);
+      }
+      if (!nextCats.length && !nextSubs.length) { setSelectedCategories(prev => [...prev]); return; }
+    } else {
+      nextCats = Array.from(new Set([...selectedCategories, code]));
+      if (!nextSubs.length && allCategoryCodes.every(c => nextCats.includes(c))) nextCats = [];
+    }
+    setSelectedCategories(nextCats);
+    setSelectedSubCategories(nextSubs);
+  };
+
+  // Stable handler for the chart (a new object each render would rebind every time);
+  // the ref always points at this render's toggle so it sees current filter state.
+  const legendClickRef = useRef<(name: string) => void>(() => {});
+  legendClickRef.current = (name: string) =>
+    (timeBreakdown === 'byCategory' ? toggleCategoryFromLegend : toggleGrantmakersFromLegend)(name);
+  const chartEvents = useMemo(
+    () => ({
+      // Apply on the next tick: ECharts' own handling of the click schedules a tooltip
+      // redisplay, and rebuilding the chart before it runs leaves it a removed tooltip.
+      legendselectchanged: (e: { name: string }) => { setTimeout(() => legendClickRef.current(e.name)); },
+    }),
+    [],
+  );
+
+  // On phones a tap shows a column's tooltip; tapping the same column again closes it.
+  const isMobileRef = useRef(isMobile);
+  isMobileRef.current = isMobile;
+  const handleChartReady = useCallback(
+    (chart: ECharts) => closeTooltipOnSecondTap(chart, () => isMobileRef.current),
+    [],
+  );
 
 
   const availableYears = useMemo(() => {
@@ -904,51 +1045,33 @@ export default function Home() {
     '#9ca3af',
   ];
 
-  // Grantmaker colors. Funders that work in a single cause area echo that cause's
-  // color (see CATEGORY_COLORS); diversified funders and the crowded LTXR space
-  // use distinct brand-ish colors that deliberately avoid the cause palette.
-  // Funder colour encodes the cause area that funder concentrates on: each sits in the
-  // hue family of its dominant category, stepped within the family so the pairs that sit
-  // next to each other in the stacked chart stay separable. Funders with no dominant
-  // cause take deliberately desaturated neutrals — "funds across the board".
-  //
-  // Validated (dataviz six-checks, light surface, adjacent pairlist): worst adjacent
-  // CVD ΔE 10.8, normal-vision ΔE 16.5, all inside the L 0.43–0.77 band. The neutrals and
-  // the shared muted clay sit below the chroma floor on purpose — low chroma is itself the
-  // signal ("no single cause" / "minor funder") — and the grantmaker name is written in
-  // every tag, so colour reinforces identity rather than carrying it alone.
+  // Grantmaker colours come from each grantmaker's own branding (site theme colours,
+  // CSS palette or logo), picking whichever palette colour keeps the funders that appear
+  // separately in the by-funder chart distinguishable (CIEDE2000 ΔE ≥ 14 between every
+  // pair, ≥ 16 for all but Founders Pledge / Macroscopic, which never stack adjacently).
   const GRANTMAKER_COLORS: { [key: string]: string } = {
-    // ── Global Health (emerald) ──
-    'GiveWell': '#10b981',              // 100% GH
-    // ── Animal Welfare (violet) ──
-    'ACE': '#8b5cf6',                   // 100% AW
-    'Navigation Fund': '#6d28d9',       // 77% AW
-    // ── EA Meta (cyan) ──
-    'Meta Charity Funders': '#06b6d4',  // 100% Meta
-    // ── Other / unspecified cause (steel blue) ──
-    'Founders Pledge': '#3a6ea5',       // Other-dominant: 990 residuals + Climate Fund (largest itemized fund)
-    // ── Long-Term & Existential Risk (warm family) ──
-    // The three major LTXR funders get a dark→light amber ramp; they are mutually
-    // separable under all-pairs testing (CVD ΔE 10.3, normal-vision 15.5).
-    'BlueDot Impact': '#9a3412',        // 100% LTXR
-    'SFF': '#ea580c',                   // 100% LTXR
-    'Manifund': '#f59e0b',              // 93% LTXR
-    // The minor LTXR funders share one muted clay: still warm (so the cause reads),
-    // but desaturated to say "small share" rather than competing for amber space.
-    'FLI': '#a3907c',                   // 100% LTXR (76 grants)
-    'The Audacious Project': '#a3907c', // 100% LTXR (2 grants)
-    'OpenAI Foundation': '#a3907c',     // 100% LTXR (1 grant)
-    'Sentinel Bio': '#a3907c',          // 100% LTXR (biosecurity)
-    'CLR Fund': '#a3907c',              // 100% LTXR (s-risks)
-    'Cooperative AI Foundation': '#a3907c', // 100% LTXR (cooperative AI)
-    'Macroscopic Ventures': '#a3907c',  // 100% LTXR (2 published commitments)
-    'AISTOF': '#a3907c',                // 100% LTXR (via Manifund)
-    'Longview Philanthropy': '#a3907c', // 100% LTXR (Emerging Challenges Fund only)
-    'Lightcone Commons': '#a3907c',     // 89% LTXR (AI safety funding round)
-    // ── Diversified / no dominant cause (intentional neutrals) ──
-    'Coefficient Giving': '#475569',    // LTXR only 45% of $ — funds every cause
-    'EA Funds': '#9ca3af',              // GH 28% of $ / LTXR 40% of grants
-    'ACX Grants': '#6b7280',            // 63% "Other" — mixed small grants
+    'Coefficient Giving': '#064d49',    // brand green
+    'GiveWell': '#669bb5',              // logo blue
+    'Founders Pledge': '#2e2250',       // brand dark purple
+    'SFF': '#348469',                   // site green
+    'EA Funds': '#f59469',              // accent salmon (its teal is too close to GiveWell)
+    'ACE': '#00a6a1',                   // logo teal
+    'Lightcone Commons': '#6e1322',     // accent burgundy
+    'FLI': '#f09e25',                   // site orange
+    'Navigation Fund': '#3171d1',       // primary blue
+    'Sentinel Bio': '#56e39f',          // accent mint
+    'Macroscopic Ventures': '#113d6e',  // site navy
+    'OpenAI Foundation': '#111111',     // black
+    'The Audacious Project': '#7801ff', // brand violet
+    // Smaller grantmakers: shown individually in tags and when picked in the filters.
+    'Manifund': '#f97316',              // brand orange
+    'BlueDot Impact': '#1144cc',        // brand blue
+    'ACX Grants': '#67bdfc',            // blog accent blue
+    'Cooperative AI Foundation': '#ff005a', // accent pink
+    'Longview Philanthropy': '#3b878c', // brand teal
+    'Meta Charity Funders': '#d51635',  // brand red
+    'CLR Fund': '#2b5e8a',              // accent blue
+    'AISTOF': '#78716c',                // no published branding
   };
 
   // Fixed per-cause palette, matching the org-financials database so a funder's
@@ -989,6 +1112,11 @@ export default function Home() {
     'Other': 'Other',
   };
   const shortCategory = (code?: string): string => code ? (CATEGORY_SHORT[code] || CATEGORY_DISPLAY[code] || code) : '';
+  // Chart series / legend names: the shorter labels the org financials page uses.
+  const CHART_CATEGORY_LABEL: Record<string, string> = {
+    GH: 'Global Health', LTXR: 'Long-Term / X-Risk', AW: 'Animal Welfare', Meta: 'EA Meta', Other: 'Other',
+  };
+  const chartCategory = (code?: string): string => code ? (CHART_CATEGORY_LABEL[code] || displayCategory(code)) : '';
 
   // Shorten long fund names for mobile
   const shortFund = (fund: string): string => {
@@ -1120,7 +1248,7 @@ export default function Home() {
   const categoryDisplayColors = useMemo(() => {
     const map: { [displayName: string]: string } = { Uncategorized: '#9ca3af' };
     Object.keys(categoryColorMap).forEach(code => {
-      map[displayCategory(code) || code] = categoryColorMap[code];
+      map[chartCategory(code) || code] = categoryColorMap[code];
     });
     return map;
     // displayCategory is a stable pure helper; categoryColorMap is the real input
@@ -1194,7 +1322,7 @@ export default function Home() {
     data.forEach(g => {
       const { year, yearMonth: ym } = getYearMonthFromDate(g.date);
       const funder = displayGrantmaker(g.grantmaker);
-      const cat = displayCategory(g.category) || 'Uncategorized';
+      const cat = chartCategory(g.category) || 'Uncategorized';
       const amt = countedAmount(g);
 
       if (!byYearMap[year]) byYearMap[year] = { count: 0, total: 0 };
@@ -1226,7 +1354,7 @@ export default function Home() {
     const smallDisplay = new Set(smallGrantmakers.map(displayGrantmaker));
     Array.from(pickedSmallGrantmakers).forEach(gm => smallDisplay.delete(displayGrantmaker(gm)));
     const bucketable = byFunder.filter(f => f.total > 0 && smallDisplay.has(f.funder)).map(f => f.funder);
-    const bucketOn = groupSmallFunders && bucketable.length >= 2;
+    const bucketOn = bucketable.length >= 2;
     const bucketed = new Set(bucketOn ? bucketable : []);
     const funderKey = (display: string) => (bucketed.has(display) ? SMALL_GM_LABEL : display);
 
@@ -1248,7 +1376,7 @@ export default function Home() {
     data.forEach(g => {
       const { year, yearMonth: ym } = getYearMonthFromDate(g.date);
       const fg = funderKey(displayGrantmaker(g.grantmaker));
-      const cg = displayCategory(g.category) || 'Uncategorized';
+      const cg = chartCategory(g.category) || 'Uncategorized';
       const amt = countedAmount(g);
 
       if (!yearFunder[year]) yearFunder[year] = {};
@@ -1299,12 +1427,10 @@ export default function Home() {
       funderGroups, categoryGroups,
       yearFunder, yearCategory, monthFunder, monthCategory,
       yearSmallDetail, monthSmallDetail,
-      // Whether the grouping switch has anything to act on in this view.
-      canGroupSmall: bucketable.length >= 2,
     };
     // displayGrantmaker is a stable pure helper.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filteredAndSortedGrants, countedAmount, smallGrantmakers, pickedSmallGrantmakers, groupSmallFunders]);
+  }, [filteredAndSortedGrants, countedAmount, smallGrantmakers, pickedSmallGrantmakers]);
 
   const filteredTotal = useMemo(
     () => filteredAndSortedGrants.reduce((sum, grant) => sum + countedAmount(grant), 0),
@@ -1439,6 +1565,7 @@ export default function Home() {
     return groups.map((group, i) => ({
       name: group,
       type: 'bar' as const,
+      legendHoverLink: false, // hovering a legend entry shouldn't highlight its bars
       stack: 'total',
       data: timeLabels.map(t => {
         const val = crossTab[t]?.[group] || 0;
@@ -1447,6 +1574,37 @@ export default function Home() {
       itemStyle: { color: colorMap?.[group] ?? CHART_COLORS[i % CHART_COLORS.length] },
     }));
   };
+  // Empty series for filtered-out legend entries, so they still appear (greyed out).
+  const excludedSeries = (names: string[], colorMap: { [group: string]: string }) =>
+    names.map(name => ({ name, type: 'bar' as const, stack: 'total', legendHoverLink: false, data: [], itemStyle: { color: colorMap[name] ?? '#9ca3af' } }));
+  const legendWithOff = (legend: object, on: string[], off: string[], rank: Map<string, number>) => {
+    const data = legendOrder([...on, ...off], rank);
+    return {
+      ...legend,
+      data,
+      right: legendRightOffset(data, `12px ${FONT_FAMILY}`),
+      selected: Object.fromEntries(off.map(n => [n, false])),
+    };
+  };
+
+  const legendRank = useMemo(() => {
+    const byFunder: Record<string, number> = {};
+    const byCategory: Record<string, number> = {};
+    for (const g of grants) {
+      const f = displayGrantmaker(g.grantmaker);
+      byFunder[f] = (byFunder[f] || 0) + g.amount;
+      const c = chartCategory(g.category) || 'Uncategorized';
+      byCategory[c] = (byCategory[c] || 0) + g.amount;
+    }
+    const rank = (totals: Record<string, number>) =>
+      new Map(Object.entries(totals).sort((a, b) => b[1] - a[1]).map(([name], i) => [name, i]));
+    return { funder: rank(byFunder), category: rank(byCategory) };
+    // displayGrantmaker / displayCategory are stable pure helpers.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [grants]);
+  const legendOrder = (names: string[], rank: Map<string, number>) =>
+    [...names].sort((a, b) =>
+      (a === SMALL_GM_LABEL ? 1e9 : rank.get(a) ?? 1e8) - (b === SMALL_GM_LABEL ? 1e9 : rank.get(b) ?? 1e8));
 
   // ECharts options (computed from filtered data)
   const getChartOption = () => {
@@ -1461,10 +1619,10 @@ export default function Home() {
     // percentage shrinks at narrower widths until the legend overlaps the plot.
     const gridYear = isMobile
       ? { left: '45px', right: '8px', top: '30px', bottom: '10%' }
-      : { left: '7%', right: '210px', top: '55px', bottom: '15%' };
+      : { left: '7%', right: `${LEGEND_COLUMN_PX}px`, top: '55px', bottom: '32px' };
     const gridMonth = isMobile
       ? { left: '45px', right: '8px', top: '30px', bottom: '18%' }
-      : { left: '7%', right: '210px', top: '55px', bottom: '20%' };
+      : { left: '7%', right: `${LEGEND_COLUMN_PX}px`, top: '55px', bottom: '62px' };
 
     // Calculate y-axis max that works for both nominal and inflation-adjusted
     // This ensures bars never shrink when inflation is toggled on
@@ -1477,7 +1635,7 @@ export default function Home() {
         nominalMax = Math.max(nominalMax, nominal);
         inflatedMax = Math.max(inflatedMax, inflated);
       });
-      return Math.max(nominalMax, inflatedMax) * 1.05; // 5% padding
+      return Math.max(nominalMax, inflatedMax);
     };
     const calcMonthMax = () => {
       let nominalMax = 0;
@@ -1489,7 +1647,7 @@ export default function Home() {
         nominalMax = Math.max(nominalMax, nominal);
         inflatedMax = Math.max(inflatedMax, inflated);
       });
-      return Math.max(nominalMax, inflatedMax) * 1.05;
+      return Math.max(nominalMax, inflatedMax);
     };
     const yearMax = calcYearMax();
     const monthMax = calcMonthMax();
@@ -1513,7 +1671,7 @@ export default function Home() {
                 .map(([g, v]) => [g, v * inflationMultiplier(p.name) / 1000000] as const)
                 .filter(([, v]) => v >= 0.005)
                 .sort((a, b) => b[1] - a[1]);
-              line += members.map(([g, v]) => `<br/><span style="padding-left:18px;color:#666">${g}: $${v.toFixed(2)}M</span>`).join('');
+              line += members.map(([g, v]) => `<br/><span style="padding-left:30px;color:#666">${g}: $${v.toFixed(2)}M</span>`).join('');
             }
             return line;
           });
@@ -1531,43 +1689,28 @@ export default function Home() {
       ? { show: false }
       : {
           type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20,
-          textStyle: { fontSize: 12, width: 150, overflow: 'truncate' as const },
-          tooltip: { show: true },
+          textStyle: { fontSize: 12, color: '#1f2937', width: LEGEND_TEXT_PX, overflow: 'truncate' as const },
+          tooltip: {
+            show: true,
+            // Full names on hover: a category's long name, and every member of the smaller-
+            // grantmakers group that isn't shown as its own series.
+            formatter: (p: { name: string }) => {
+              const categoryCode = allCategoryCodes.find(c => chartCategory(c) === p.name);
+              if (categoryCode) return escapeHtml(displayCategory(categoryCode));
+              if (p.name !== SMALL_GM_LABEL) return escapeHtml(p.name);
+              const members = smallGrantmakers.filter(gm => !pickedSmallGrantmakers.has(gm)).map(displayGrantmaker).sort();
+              return `<b>${SMALL_GM_LABEL}</b><br/>` + members.map(escapeHtml).join('<br/>');
+            },
+          },
         };
-    const niceMax = (value: number) => {
-      if (value <= 0) return 0;
-      const magnitude = Math.pow(10, Math.floor(Math.log10(value)));
-      const normalized = value / magnitude;
-      const step =
-        normalized <= 1 ? 1 :
-        normalized <= 1.2 ? 1.2 :
-        normalized <= 1.5 ? 1.5 :
-        normalized <= 2 ? 2 :
-        normalized <= 3 ? 3 :
-        normalized <= 4 ? 4 :
-        normalized <= 5 ? 5 :
-        normalized <= 6 ? 6 :
-        normalized <= 8 ? 8 : 10;
-      return step * magnitude;
-    };
-
-    const yAxisConfig = (max: number) => {
-      const buffer = isMobile ? 1.06 : 1.04;
-      const paddedMax = max * buffer;
+    const yAxisConfig = (dataMax: number) => {
+      const { showMaxLabel, ...range } = yAxisRange(dataMax);
       return {
-      type: 'value' as const,
-      name: isMobile ? '' : (adjustInflation ? '2025 USD ($M)' : 'Amount ($M)'),
-      max: niceMax(paddedMax), // Smaller padding so scale tracks bars more closely
-      nameTextStyle: { fontSize: 12 },
-      axisLabel: {
-        fontSize: isMobile ? 9 : 12,
-        formatter: function(val: number) {
-          if (val >= 1000) return (val / 1000).toFixed(1) + 'B';
-          if (val >= 10) return Math.round(val) + 'M';
-          const rounded = Math.round(val * 10) / 10;
-          return (rounded % 1 === 0 ? rounded.toFixed(0) : rounded.toFixed(1)) + 'M';
-        },
-      },
+        type: 'value' as const,
+        name: isMobile ? '' : (adjustInflation ? '2025 USD ($M)' : 'Amount ($M)'),
+        ...range,
+        nameTextStyle: { fontSize: 12 },
+        axisLabel: { fontSize: isMobile ? 11 : 12, showMaxLabel, formatter: formatMillions },
       };
     };
 
@@ -1580,10 +1723,13 @@ export default function Home() {
             animation: false,
             title: isMobile ? { show: false } : { text: 'Grants by Year (by Funder)', left: 'center', top: 8 },
             tooltip: makeBreakdownTooltip(yearSmallDetail),
-            legend: legendConfig,
+            legend: legendWithOff(legendConfig, funderGroups, excludedFunderEntries(), legendRank.funder),
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
             yAxis: yAxisConfig(yearMax),
-            series: buildStackedSeries(yearLabels, yearFunder, funderGroups, grantmakerDisplayColors),
+            series: [
+              ...buildStackedSeries(yearLabels, yearFunder, funderGroups, grantmakerDisplayColors),
+              ...excludedSeries(excludedFunderEntries(), grantmakerDisplayColors),
+            ],
             grid: gridYear,
           };
         }
@@ -1592,10 +1738,13 @@ export default function Home() {
             animation: false,
             title: isMobile ? { show: false } : { text: 'Grants by Year (by Category)', left: 'center', top: 8 },
             tooltip: breakdownTooltip,
-            legend: legendConfig,
+            legend: legendWithOff(legendConfig, categoryGroups, excludedCategoryEntries(), legendRank.category),
             xAxis: { type: 'category', data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
             yAxis: yAxisConfig(yearMax),
-            series: buildStackedSeries(yearLabels, yearCategory, categoryGroups, categoryDisplayColors),
+            series: [
+              ...buildStackedSeries(yearLabels, yearCategory, categoryGroups, categoryDisplayColors),
+              ...excludedSeries(excludedCategoryEntries(), categoryDisplayColors),
+            ],
             grid: gridYear,
           };
         }
@@ -1619,7 +1768,7 @@ export default function Home() {
             data: byYear.map(d => parseFloat((d.total * inflationMultiplier(String(d.year)) / 1000000).toFixed(2))),
             itemStyle: { color: '#10b981' },
           }],
-          grid: gridYear,
+          grid: { ...gridYear, right: isMobile ? gridYear.right : '24px' }, // no legend: use the full width
         };
       }
 
@@ -1636,10 +1785,13 @@ export default function Home() {
             animation: false,
             title: isMobile ? { show: false } : { text: 'Grants by Month (by Funder)', left: 'center', top: 8 },
             tooltip: makeBreakdownTooltip(monthSmallDetail),
-            legend: legendConfig,
+            legend: legendWithOff(legendConfig, funderGroups, excludedFunderEntries(), legendRank.funder),
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
             yAxis: yAxisConfig(monthMax),
-            series: buildStackedSeries(monthLabels, monthFunder, funderGroups, grantmakerDisplayColors),
+            series: [
+              ...buildStackedSeries(monthLabels, monthFunder, funderGroups, grantmakerDisplayColors),
+              ...excludedSeries(excludedFunderEntries(), grantmakerDisplayColors),
+            ],
             grid: gridMonth,
           };
         }
@@ -1648,10 +1800,13 @@ export default function Home() {
             animation: false,
             title: isMobile ? { show: false } : { text: 'Grants by Month (by Category)', left: 'center', top: 8 },
             tooltip: breakdownTooltip,
-            legend: legendConfig,
+            legend: legendWithOff(legendConfig, categoryGroups, excludedCategoryEntries(), legendRank.category),
             xAxis: { type: 'category', data: monthLabels, axisLabel: monthAxisLabel },
             yAxis: yAxisConfig(monthMax),
-            series: buildStackedSeries(monthLabels, monthCategory, categoryGroups, categoryDisplayColors),
+            series: [
+              ...buildStackedSeries(monthLabels, monthCategory, categoryGroups, categoryDisplayColors),
+              ...excludedSeries(excludedCategoryEntries(), categoryDisplayColors),
+            ],
             grid: gridMonth,
           };
         }
@@ -1674,7 +1829,7 @@ export default function Home() {
             data: byYearMonth.map(d => (d.total * inflationMultiplier(d.yearMonth) / 1000000).toFixed(2)),
             itemStyle: { color: '#3a6ea5' },
           }],
-          grid: gridMonth,
+          grid: { ...gridMonth, right: isMobile ? gridMonth.right : '24px' },
         };
       }
 
@@ -1684,6 +1839,12 @@ export default function Home() {
   };
 
   // Loading screen
+  const chartOptionRef = useRef<{ key: string; option: object } | null>(null);
+
+  const inflationDividerRef = useRef<HTMLSpanElement>(null);
+  const inflationToggleRef = useRef<HTMLLabelElement>(null);
+  useDividerHiddenOnWrap(inflationDividerRef, inflationToggleRef, [isLoading, isMobile]);
+
   if (isLoading || !metadata) {
     return (
       <>
@@ -1717,6 +1878,18 @@ export default function Home() {
     );
   }
 
+  // Keep the same option object while what the chart shows is unchanged. Its formatter
+  // functions are new every render, so otherwise every re-render rebuilds the chart, and a
+  // rebuild while the pointer is over it breaks ECharts' pending tooltip redisplay.
+  const nextChartOption = { textStyle: { fontFamily: FONT_FAMILY }, ...getChartOption() };
+  const chartOptionKey = JSON.stringify([
+    nextChartOption, chartData.yearSmallDetail, chartData.monthSmallDetail, [...pickedSmallGrantmakers],
+  ]);
+  if (chartOptionRef.current?.key !== chartOptionKey) {
+    chartOptionRef.current = { key: chartOptionKey, option: nextChartOption };
+  }
+  const chartOption = chartOptionRef.current.option;
+
   return (
     <>
       <Head>
@@ -1730,6 +1903,7 @@ export default function Home() {
           src="//gc.zgo.at/count.js"
         />
       </Head>
+      <HeroGlow rgb="191, 219, 254" x="88%" />
       <main style={{
         ...styles.main,
         padding: isPhonePortrait ? '12px 12px' : isMobile ? '16px 16px' : isTablet ? '20px 40px' : '20px 80px'
@@ -1737,7 +1911,7 @@ export default function Home() {
         <header style={{
           ...styles.header,
           minHeight: isMobile ? '196px' : '244px',
-          padding: isMobile ? '18px 16px' : '32px 36px',
+          padding: isMobile ? '18px 0' : '32px 0',
           marginBottom: isMobile ? '32px' : '40px'
         }}>
           <nav style={styles.nav}>
@@ -1831,7 +2005,7 @@ export default function Home() {
                               style={styles.smallGroupToggle}
                               aria-expanded={smallGmExpanded}
                             >
-                              {smallGmExpanded ? 'Hide' : 'Show'}
+                              <ShowHideLabel open={smallGmExpanded} />
                             </button>
                           </div>
                           {smallGmExpanded && (
@@ -1914,7 +2088,7 @@ export default function Home() {
                             style={styles.selectAllButton}
                             aria-expanded={smallFundsExpanded}
                           >
-                            {smallFundsExpanded ? 'Hide' : 'Show'}
+                            <ShowHideLabel open={smallFundsExpanded} />
                           </button>
                         </div>
                         {smallFundsExpanded && (
@@ -2124,25 +2298,8 @@ export default function Home() {
               >
                 {isMobile ? 'Category' : 'By Category'}
               </button>
-              {timeBreakdown === 'byFunder' && chartData.canGroupSmall && (
-                <label
-                  style={{
-                    ...styles.inflationToggle,
-                    ...(isMobile ? { fontSize: '13px', flexBasis: '100%', marginTop: '6px' } : { marginLeft: '8px' }),
-                  }}
-                  title={`Combine grantmakers with under $${((metadata?.smallGrantmakerThreshold ?? 15e6) / 1e6).toFixed(0)}M in total grants into one series`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={groupSmallFunders}
-                    onChange={() => setGroupSmallFunders(!groupSmallFunders)}
-                    style={{ cursor: 'pointer' }}
-                  />
-                  Group smaller grantmakers
-                </label>
-              )}
-              {!isMobile && <span style={styles.controlsDivider} />}
-              <label style={{
+              {!isMobile && <span ref={inflationDividerRef} style={styles.controlsDivider} />}
+              <label ref={inflationToggleRef} style={{
                 ...styles.inflationToggle,
                 ...(isMobile ? { fontSize: '13px', flexBasis: '100%', marginTop: '6px' } : {})
               }}>
@@ -2160,40 +2317,32 @@ export default function Home() {
             padding: isPhonePortrait ? '4px 0' : isMobile ? '4px 0' : '6px 0',
           }}>
             <div style={{ position: 'relative' }}>
-              {canOverlayChartTotal && (
-                <div style={styles.chartTotalOverlay}>
-                  Total: {'$'}
-                  {(filteredTotal / 1000000).toFixed(2)}M
-                </div>
-              )}
               <ReactECharts
-                option={getChartOption()}
+                option={chartOption}
                 notMerge={true}
-                lazyUpdate={true}
+                onEvents={chartEvents}
+                onChartReady={handleChartReady}
                 style={{ height: isPhonePortrait ? '260px' : isMobile ? '300px' : '400px', width: '100%' }}
                 opts={{ renderer: 'canvas' }}
               />
             </div>
             <div style={{ ...styles.chartDisclaimer, fontSize: isMobile ? '11px' : '12px', padding: '0 16px 8px' }}>
               2025 and 2026 data are partial and reflect only grants published to date.
-              Only publicly disclosed grants are included; grants made privately are not captured.
+              Only publicly disclosed grants are included.
               {hasNettedRegrants && (
-                <>{' '}Regrantor totals (BlueDot, Manifund) are counted net of the tracked grants
-                that funded them.</>
+                <>{' '}Regrantor totals are counted net of the grants that funded them.</>
               )}
             </div>
           </div>
-          {!canOverlayChartTotal && (
-            <div style={{
-              ...styles.chartMetaRow,
-              ...(isMobile ? { fontSize: '12px' } : {})
-            }}>
-              <div style={styles.chartTotal}>
-                Total: {'$'}
-                {(filteredTotal / 1000000).toFixed(2)}M
-              </div>
+          <div style={{
+            ...styles.chartMetaRow,
+            ...(isMobile ? { fontSize: '12px' } : {})
+          }}>
+            <div style={styles.chartTotal}>
+              Total: {'$'}
+              {(filteredTotal / 1000000).toFixed(2)}M
             </div>
-          )}
+          </div>
         </section>
 
         {/* Grants List with Virtualization */}
@@ -2394,14 +2543,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     maxWidth: '1400px',
     margin: '0 auto',
     padding: '20px 80px',
+    position: 'relative', // above the HeroGlow layer
+    zIndex: 1,
   },
-  header: {
-    textAlign: 'left',
-    marginBottom: '40px',
-    borderRadius: '16px',
-    border: '1px solid #e5e7eb',
-    background: 'radial-gradient(82% 150% at 88% 22%, #bfdbfe 0%, #f8fafc 88%)',
-  },
+  header: plainHeader,
   nav: {
     display: 'flex',
     justifyContent: 'flex-start',
@@ -2472,19 +2617,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     borderRadius: '4px',
     border: '1px solid #e5e7eb',
     position: 'relative',
-  },
-  chartTotalOverlay: {
-    position: 'absolute',
-    right: '12px',
-    bottom: '8px',
-    fontSize: '13px',
-    fontWeight: '700',
-    color: '#4b5563',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    border: '1px solid #e5e7eb',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    pointerEvents: 'none',
   },
   chartMetaRow: {
     display: 'flex',
@@ -3100,6 +3232,9 @@ const styles: { [key: string]: React.CSSProperties } = {
     lineHeight: '1.3',
   },
   grantAmountCol: {
+    // Tabular figures only where numbers line up in a column: Inter's tabular set also
+    // fixes the width of hyphens and dashes, which spaces out ordinary text.
+    fontVariantNumeric: 'tabular-nums',
     fontSize: '16px',
     fontWeight: '700',
     color: '#1a202c',
@@ -3108,6 +3243,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     paddingTop: '1px',
   },
   grantDateCol: {
+    fontVariantNumeric: 'tabular-nums',
     fontSize: '15px',
     fontWeight: '500',
     color: '#1a202c',

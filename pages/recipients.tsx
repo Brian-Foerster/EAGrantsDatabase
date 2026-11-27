@@ -1,8 +1,16 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
+import type { ECharts } from 'echarts';
+import { FONT_FAMILY } from '@/lib/fonts';
+import { HeroGlow, plainHeader } from '@/lib/hero';
+import { replaceUrl } from '@/lib/history';
+import { yAxisRange, formatMillions } from '@/lib/chart-axis';
+import {
+  LEGEND_COLUMN_PX, LEGEND_TEXT_PX, legendRightOffset, closeTooltipOnSecondTap, useDividerHiddenOnWrap,
+} from '@/lib/chart-shared';
 
 const BUILD_VERSION = process.env.NEXT_PUBLIC_BUILD_TIME || Date.now().toString();
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
@@ -97,9 +105,14 @@ const CATEGORY_DISPLAY: Record<string, string> = {
   GH: 'Global Health', LTXR: 'Long-Term / X-Risk', AW: 'Animal Welfare',
   Meta: 'EA Meta', Climate: 'Climate', Policy: 'Policy', Other: 'Other',
 };
+// Full names, as the grants database uses them; shown when hovering a legend entry.
+const CATEGORY_FULL_NAME: Record<string, string> = {
+  GH: 'Global Health & Development', LTXR: 'Long-Term & Existential Risk',
+  Meta: 'EA Community & Infrastructure',
+};
 
 const COUNTRY_DISPLAY: Record<string, string> = {
-  US: '🇺🇸 United States', GB: '🇬🇧 United Kingdom',
+  US: 'United States', GB: 'United Kingdom',
 };
 
 const CATEGORY_ORDER = ['GH', 'LTXR', 'AW', 'Meta', 'Climate', 'Policy', 'Other'];
@@ -141,9 +154,23 @@ function toUsd(amount: number, currency: string, year?: number): number {
   return amount * rate;
 }
 
+// An inferred bar stands in for a missing filing using that year's tracked grants. For a
+// financial year still in progress that is only the grants so far, which reads as a collapse
+// in income, so cards leave those years out (the grants still count in the aggregate chart).
+function shownOnCard(org: Org, f: Filing): boolean {
+  if (!f.inferred) return true;
+  const fyEnd = new Date(Date.UTC(f.year, org.fy_end_month ?? 12, 0, 23, 59, 59));
+  return fyEnd < new Date();
+}
+
 function orgUrl(org: Org): string | null {
   if (org.ein) return `https://projects.propublica.org/nonprofits/organizations/${org.ein}`;
-  if (org.cc_number) return `https://findthatcharity.uk/orgid/GB-CHC-${org.cc_number}`;
+  if (org.cc_number) {
+    return 'https://register-of-charities.charitycommission.gov.uk/charity-search'
+      + '?p_p_id=uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet&p_p_lifecycle=0&p_p_state=maximized&p_p_mode=view'
+      + `&_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_regId=${org.cc_number}`
+      + '&_uk_gov_ccew_onereg_charitydetails_web_portlet_CharityDetailsPortlet_subId=0';
+  }
   return null;
 }
 
@@ -243,10 +270,10 @@ function BarChartWithAxis({ entries, color, currency = 'USD', minYear, maxYear, 
           key={tick}
           x={CL - 4} y={tickY(tick) + 4}
           textAnchor="end"
-          fontSize={11}
+          fontSize={13}
           fontWeight={500}
           fill="#64748b"
-          fontFamily="system-ui, -apple-system, sans-serif"
+          fontFamily={FONT_FAMILY}
         >
           {formatYTick(tick, currency)}
         </text>
@@ -318,9 +345,9 @@ function BarChartWithAxis({ entries, color, currency = 'USD', minYear, maxYear, 
             key={year}
             x={lx} y={CVH - 4}
             textAnchor={anchor}
-            fontSize={10}
+            fontSize={12}
             fill="#94a3b8"
-            fontFamily="system-ui, -apple-system, sans-serif"
+            fontFamily={FONT_FAMILY}
           >
             {year}
           </text>
@@ -374,7 +401,7 @@ function OrgCard({ org, globalMinYear, globalMaxYear, globalMetric, cardRef, glo
   const isAnomaly = org.notes && /one-time|Vitalik|FTX|clawback|anomaly|unusual/i.test(org.notes);
 
   const getEntries = (m: Metric) => org.filings
-    .filter(f => f[m] != null && (f[m] as number) > 0)
+    .filter(f => shownOnCard(org, f) && f[m] != null && (f[m] as number) > 0)
     .sort((a, b) => a.year - b.year)
     .map(f => {
       const mult = adjustInflation ? cpiMultiplier(f.year, org.currency) : 1;
@@ -394,9 +421,10 @@ function OrgCard({ org, globalMinYear, globalMaxYear, globalMetric, cardRef, glo
   const sourceLabel = org.source === 'propublica'
     ? `EIN ${org.ein ? `${org.ein.slice(0, 2)}-${org.ein.slice(2)}` : '—'}`
     : `CC ${org.cc_number}`;
+  const sourceName = org.source === 'propublica' ? 'ProPublica' : 'Charity Commission';
 
   const availableMetrics = (['income', 'expenses', 'assets', 'liabilities'] as Metric[])
-    .filter(m => org.filings.some(f => f[m] != null && (f[m] as number) > 0));
+    .filter(m => org.filings.some(f => shownOnCard(org, f) && f[m] != null && (f[m] as number) > 0));
 
   return (
     <div
@@ -495,26 +523,27 @@ function OrgCard({ org, globalMinYear, globalMaxYear, globalMetric, cardRef, glo
       {/* Footer: cross-link to grants + data source */}
       <div style={{ marginTop: 'auto', paddingTop: '10px' }}>
         {org.grant_names && org.grant_names.length > 0 && (
-          <a href={`${BASE_PATH}/?org=${encodeURIComponent(org.name)}`} style={styles.crossLink}>
+          <Link href={`/?org=${encodeURIComponent(org.name)}`} style={styles.crossLink}>
             View EA grants to this org →
-          </a>
+          </Link>
         )}
         <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '8px' }}>
           {url
-            ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: '#3a6ea5', textDecoration: 'none' }}>{sourceLabel}</a>
-            : sourceLabel}
-          {' · '}
-          {org.source === 'propublica' ? 'ProPublica' : 'Charity Commission'}
+            ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: '#3a6ea5', textDecoration: 'none' }}>{sourceLabel} · {sourceName}</a>
+            : <>{sourceLabel} · {sourceName}</>}
         </div>
       </div>
     </div>
   );
 }
 
+// Loaded data outlives the page component, so coming back from another page skips the refetch.
+let loadedOrgs: { orgs: Org[]; lastUpdated: string } | null = null;
+
 export default function Recipients() {
-  const [orgs, setOrgs] = useState<Org[]>([]);
-  const [lastUpdated, setLastUpdated] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [orgs, setOrgs] = useState<Org[]>(() => loadedOrgs?.orgs ?? []);
+  const [lastUpdated, setLastUpdated] = useState<string>(() => loadedOrgs?.lastUpdated ?? '');
+  const [isLoading, setIsLoading] = useState(() => !loadedOrgs);
   const [loadError, setLoadError] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -553,7 +582,7 @@ export default function Recipients() {
     const url = new URL(window.location.href);
     if (url.searchParams.has('v')) {
       url.searchParams.delete('v');
-      window.history.replaceState({}, '', url.pathname + url.search + url.hash);
+      replaceUrl(url.pathname + url.search + url.hash);
     }
   }, []);
 
@@ -589,15 +618,18 @@ export default function Recipients() {
     if (showEAGrants) p.set('ea', '1');
     if (adjustInflation) p.set('infl', '1');
     const qs = p.toString();
-    window.history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
+    replaceUrl(window.location.pathname + (qs ? '?' + qs : '') + window.location.hash);
   }, [focusOrg, searchTerm, selectedCategories, selectedCountries, globalMetric, chartBreakdown, showEAGrants, adjustInflation]);
 
   useEffect(() => {
-    if (fetchAttempted.current) return;
+    if (fetchAttempted.current || loadedOrgs) return;
     fetchAttempted.current = true;
     fetch(`${BASE_PATH}/data/recipient-orgs.json?v=${BUILD_VERSION}`)
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
-      .then(d => { setOrgs(d.orgs || []); setLastUpdated(d.generated_at || ''); setIsLoading(false); })
+      .then(d => {
+        loadedOrgs = { orgs: d.orgs || [], lastUpdated: d.generated_at || '' };
+        setOrgs(loadedOrgs.orgs); setLastUpdated(loadedOrgs.lastUpdated); setIsLoading(false);
+      })
       .catch(() => { setLoadError(true); setIsLoading(false); });
   }, []);
 
@@ -634,8 +666,8 @@ export default function Recipients() {
   }, [hideForFocus]);
 
   const isPhonePortrait = windowWidth < 480;
-  const isMobile = windowWidth < 768;
-  const isTablet = windowWidth >= 768 && windowWidth < 1024;
+  const isMobile = windowWidth < 800;
+  const isTablet = windowWidth >= 800 && windowWidth < 1024;
 
   // Uniform sizing for chart-control tabs (matches the grants database), so they
   // shrink together on smaller screens and stay on one row as long as reasonable.
@@ -674,7 +706,7 @@ export default function Recipients() {
   const { globalMinYear, globalMaxYear } = useMemo(() => {
     let min = Infinity, max = -Infinity;
     filteredOrgs.forEach(o =>
-      o.filings.filter(f => f.income != null && f.income > 0).forEach(f => {
+      o.filings.filter(f => shownOnCard(o, f) && f.income != null && f.income > 0).forEach(f => {
         if (f.year < min) min = f.year;
         if (f.year > max) max = f.year;
       })
@@ -687,6 +719,42 @@ export default function Recipients() {
   const toggleCountry = (c: string) =>
     setSelectedCountries(prev => prev.includes(c) ? prev.filter(x => x !== c) : [...prev, c]);
   const clearFilters = () => { setSearchTerm(''); setSelectedCategories([]); setSelectedCountries([]); };
+
+  // The chart legend mirrors the Category filter: clicking an entry adds or removes it.
+  const toggleCategoryFromLegend = (name: string) => {
+    const code = categories.find(c => (CATEGORY_DISPLAY[c] || c) === name);
+    const keep = () => setSelectedCategories(prev => [...prev]);
+    if (!code) { keep(); return; }
+    let next: string[];
+    if (!selectedCategories.length || selectedCategories.includes(code)) {
+      next = (selectedCategories.length ? selectedCategories : categories).filter(c => c !== code);
+      // Turning off the last entry would read as "no filter" and bring everything back.
+      if (!next.length) { keep(); return; }
+    } else {
+      next = [...selectedCategories, code];
+      if (categories.every(c => next.includes(c))) next = [];
+    }
+    setSelectedCategories(next);
+  };
+  const legendClickRef = useRef(toggleCategoryFromLegend);
+  legendClickRef.current = toggleCategoryFromLegend;
+  const chartEvents = useMemo(
+    () => ({
+      // Apply on the next tick: ECharts' own handling of the click schedules a tooltip
+      // redisplay, and rebuilding the chart before it runs leaves it a removed tooltip.
+      legendselectchanged: (e: { name: string }) => { setTimeout(() => legendClickRef.current(e.name)); },
+    }),
+    [],
+  );
+  const isMobileRef = useRef(isMobile);
+  isMobileRef.current = isMobile;
+  const handleChartReady = useCallback(
+    (chart: ECharts) => closeTooltipOnSecondTap(chart, () => isMobileRef.current),
+    [],
+  );
+  const inflationDividerRef = useRef<HTMLSpanElement>(null);
+  const inflationToggleRef = useRef<HTMLLabelElement>(null);
+  useDividerHiddenOnWrap(inflationDividerRef, inflationToggleRef, [isLoading, isMobile]);
 
   const csvEscape = (value: string | number | boolean | null | undefined) => {
     if (value === null || value === undefined) return '';
@@ -753,24 +821,49 @@ export default function Recipients() {
     );
     const legendConfig = isMobile
       ? { show: false }
-      : { type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20 };
+      : {
+          type: 'scroll' as const, orient: 'vertical' as const, right: 10, top: 20, bottom: 20,
+          textStyle: { fontSize: 12, color: '#1f2937', width: LEGEND_TEXT_PX, overflow: 'truncate' as const },
+          tooltip: {
+            show: true,
+            formatter: (p: { name: string }) => {
+              const code = CATEGORY_ORDER.find(c => (CATEGORY_DISPLAY[c] || c) === p.name);
+              return (code && CATEGORY_FULL_NAME[code]) || p.name;
+            },
+          },
+        };
+    // Categories the filter excludes stay in the legend, greyed out, so they can be clicked back on.
+    const offCats = selectedCategories.length ? categories.filter(c => !selectedCategories.includes(c)) : [];
+    const categoryLegend = (activeCats: string[]) => {
+      const data = CATEGORY_ORDER.filter(c => activeCats.includes(c) || offCats.includes(c)).map(c => CATEGORY_DISPLAY[c] || c);
+      return {
+        ...legendConfig,
+        data,
+        right: legendRightOffset(data, `12px ${FONT_FAMILY}`),
+        selected: Object.fromEntries(offCats.map(c => [CATEGORY_DISPLAY[c] || c, false])),
+      };
+    };
+    const offSeries = offCats.map(c => ({
+      name: CATEGORY_DISPLAY[c] || c, type: 'bar' as const, stack: 'total', legendHoverLink: false,
+      data: [] as number[], itemStyle: { color: CATEGORY_COLORS[c] },
+    }));
 
     const grid = isMobile
       ? { left: '45px', right: '8px', top: '30px', bottom: '10%' }
-      : { left: '7%', right: '20%', top: '55px', bottom: '15%' };
+      : { left: '7%', right: `${LEGEND_COLUMN_PX}px`, top: '55px', bottom: '32px' };
 
     const yAxis = {
       type: 'value' as const,
       name: isMobile ? '' : (adjustInflation ? '2025 USD ($M)' : 'Amount ($M)'),
       nameTextStyle: { fontSize: 12 },
       axisLabel: {
-        fontSize: isMobile ? 10 : 13,
-        formatter: (val: number) => {
-          if (val >= 1000) return (val / 1000).toFixed(1) + 'B';
-          if (val >= 10) return Math.round(val) + 'M';
-          return (Math.round(val * 10) / 10) + 'M';
-        },
+        fontSize: isMobile ? 11 : 12,
+        formatter: formatMillions,
       },
+    };
+    const yAxisFor = (dataMax: number) => {
+      const { showMaxLabel, ...range } = yAxisRange(dataMax);
+      return { ...yAxis, ...range, axisLabel: { ...yAxis.axisLabel, showMaxLabel } };
     };
 
     const tooltip = {
@@ -804,8 +897,8 @@ export default function Recipients() {
               return `${p.name}<br/>${p.marker} Tracked EA Grants: $${p.value}M`;
             },
           },
-          xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 9 : 12 } },
-          yAxis: { ...yAxis, max: niceMax(maxVal * 1.05) },
+          xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
+          yAxis: yAxisFor(maxVal),
           series: [{ name: 'Tracked EA Grants', type: 'bar', data, itemStyle: { color: '#059669' } }],
           grid,
         };
@@ -831,16 +924,17 @@ export default function Recipients() {
         animation: false,
         title: isMobile ? { show: false } : { text: 'Tracked EA Grants by Year (by Category)', left: 'center', top: 8 },
         tooltip,
-        legend: legendConfig,
-        xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 9 : 12 } },
-        yAxis: { ...yAxis, max: niceMax(maxTotalG / 1e6 * 1.05) },
-        series: activeCatsG.map(cat => ({
+        legend: categoryLegend(activeCatsG),
+        xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
+        yAxis: yAxisFor(maxTotalG / 1e6),
+        series: [...activeCatsG.map(cat => ({
           name: CATEGORY_DISPLAY[cat] || cat,
           type: 'bar' as const,
           stack: 'total',
+          legendHoverLink: false,
           data: years.map(y => parseFloat(((catGrantTotals[cat][y] || 0) / 1e6).toFixed(2))),
           itemStyle: { color: CATEGORY_COLORS[cat] },
-        })),
+        })), ...offSeries],
         grid,
       };
     }
@@ -867,8 +961,8 @@ export default function Recipients() {
             return `${p.name}<br/>${p.marker} Total: $${p.value}M`;
           },
         },
-        xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 9 : 12 } },
-        yAxis: { ...yAxis, max: niceMax(maxVal * 1.05) },
+        xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
+        yAxis: yAxisFor(maxVal),
         series: [{ name: 'Total', type: 'bar', data, itemStyle: { color: '#10b981' } }],
         grid,
       };
@@ -892,6 +986,7 @@ export default function Recipients() {
       name: CATEGORY_DISPLAY[cat] || cat,
       type: 'bar' as const,
       stack: 'total',
+      legendHoverLink: false,
       data: years.map(y => parseFloat(((catYearTotals[cat][y] || 0) / 1e6).toFixed(2))),
       itemStyle: { color: CATEGORY_COLORS[cat] },
     }));
@@ -900,13 +995,15 @@ export default function Recipients() {
       animation: false,
       title: isMobile ? { show: false } : { text: 'Income by Year (by Category)', left: 'center', top: 8 },
       tooltip,
-      legend: legendConfig,
-      xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 9 : 12 } },
-      yAxis: { ...yAxis, max: niceMax(maxTotal / 1e6 * 1.05) },
-      series,
+      legend: categoryLegend(activeCats),
+      xAxis: { type: 'category' as const, data: yearLabels, axisLabel: { fontSize: isMobile ? 10 : 12 } },
+      yAxis: yAxisFor(maxTotal / 1e6),
+      series: [...series, ...offSeries],
       grid,
     };
-  }, [filteredOrgs, isMobile, chartBreakdown, showEAGrants, adjustInflation]);
+  }, [filteredOrgs, isMobile, chartBreakdown, showEAGrants, adjustInflation, selectedCategories, categories]);
+  // One stable object, so re-renders that don't change the chart don't rebuild it.
+  const chartOptionWithFont = useMemo(() => ({ textStyle: { fontFamily: FONT_FAMILY }, ...chartOption }), [chartOption]);
 
   if (isLoading) {
     return (
@@ -955,6 +1052,7 @@ export default function Recipients() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <script data-goatcounter="https://brian-foerster.goatcounter.com/count" async src="//gc.zgo.at/count.js" />
       </Head>
+      <HeroGlow rgb="167, 243, 208" x="92%" />
       <main style={{
         ...styles.main,
         padding: isPhonePortrait ? '12px 12px' : isMobile ? '16px 16px' : isTablet ? '20px 40px' : '20px 80px',
@@ -962,7 +1060,7 @@ export default function Recipients() {
         transition: 'opacity 0.2s ease',
       }}>
         {/* Header */}
-        <header style={{ ...styles.header, minHeight: isMobile ? '196px' : '244px', padding: isMobile ? '18px 16px' : '32px 36px', marginBottom: isMobile ? '20px' : '40px' }}>
+        <header style={{ ...styles.header, minHeight: isMobile ? '196px' : '244px', padding: isMobile ? '18px 0' : '32px 0', marginBottom: isMobile ? '20px' : '40px' }}>
           <nav style={styles.nav}>
             <Link href="/" style={styles.navLink}>Grants Database</Link>
             <Link href="/recipients" style={{ ...styles.navLink, ...styles.navLinkActive }}>Org Financials</Link>
@@ -1065,22 +1163,24 @@ export default function Recipients() {
             >
               Tracked EA Grants
             </button>
-            <label style={{ ...styles.inflationToggle, marginLeft: isPhonePortrait ? '0' : '8px' }}>
+            {!isMobile && <span ref={inflationDividerRef} style={styles.controlsDivider} />}
+            <label ref={inflationToggleRef} style={{ ...styles.inflationToggle, marginLeft: isMobile && !isPhonePortrait ? '8px' : '0' }}>
               <input
                 type="checkbox"
                 checked={adjustInflation}
                 onChange={() => setAdjustInflation(v => !v)}
                 style={{ cursor: 'pointer' }}
               />
-              {isMobile ? 'Inflation-adjusted' : 'Adjust for inflation (constant 2025 prices)'}
+              {isMobile ? 'Inflation-adjusted (2025$)' : 'Adjust for inflation (constant 2025 dollars)'}
             </label>
           </div>
           <div style={{ ...styles.chartContainer, padding: isPhonePortrait ? '4px 0' : '6px 0' }}>
             {Object.keys(chartOption).length > 0 ? (
               <ReactECharts
-                option={chartOption}
+                option={chartOptionWithFont}
                 notMerge={true}
-                lazyUpdate={true}
+                onEvents={chartEvents}
+                onChartReady={handleChartReady}
                 style={{ height: isPhonePortrait ? '260px' : isMobile ? '300px' : '400px', width: '100%' }}
                 opts={{ renderer: 'canvas' }}
               />
@@ -1213,8 +1313,8 @@ const styles: { [key: string]: React.CSSProperties } = {
   loadingSpinner: { width: '50px', height: '50px', border: '4px solid #e5e7eb', borderTop: '4px solid #3a6ea5', borderRadius: '50%', margin: '0 auto 20px', animation: 'spin 1s linear infinite' },
   loadingText: { fontSize: '16px', color: '#6b7280' },
   retryButton: { marginTop: '20px', padding: '12px 24px', fontSize: '16px', fontWeight: '600', color: 'white', backgroundColor: '#3a6ea5', border: 'none', borderRadius: '6px', cursor: 'pointer' },
-  main: { maxWidth: '1400px', margin: '0 auto', padding: '20px 80px' },
-  header: { textAlign: 'left', marginBottom: '40px', borderRadius: '16px', border: '1px solid #e5e7eb', background: 'radial-gradient(82% 150% at 95% 52%, #a7f3d0 0%, #f8fafc 88%)' },
+  main: { maxWidth: '1400px', margin: '0 auto', padding: '20px 80px', position: 'relative', zIndex: 1 }, // above the HeroGlow layer
+  header: plainHeader,
   nav: { display: 'flex', justifyContent: 'flex-start', gap: '8px', marginBottom: '18px', flexWrap: 'wrap' },
   navLink: { fontSize: '14px', fontWeight: '600', color: '#64748b', textDecoration: 'none', padding: '5px 10px', borderRadius: '6px' },
   navLinkActive: { color: '#0f172a', backgroundColor: 'rgba(15,23,42,0.06)' },
@@ -1239,6 +1339,7 @@ const styles: { [key: string]: React.CSSProperties } = {
   downloadButton: { fontSize: '14px', fontWeight: '600', color: '#111827', backgroundColor: '#f9fafb', border: '1px solid #d1d5db', borderRadius: '6px', padding: '10px 16px', cursor: 'pointer' },
   grantsHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', flexWrap: 'wrap', gap: '15px' },
   chartControlsRow: { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' },
+  controlsDivider: { width: '1px', height: '24px', backgroundColor: '#ddd', margin: '0 6px' },
   breakdownLabel: { fontSize: '14px', color: '#666', marginRight: '4px' },
   inflationToggle: { display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', color: '#555', cursor: 'pointer', userSelect: 'none' },
   breakdownTab: { padding: '7px 16px', fontSize: '14px', border: '1px solid #ddd', borderRadius: '4px', backgroundColor: 'white', cursor: 'pointer', color: '#333' },
