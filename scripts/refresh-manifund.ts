@@ -23,6 +23,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
+import { recordNoLongerPublic } from './no-longer-public';
 
 const API = 'https://manifund.org/api/v0/projects';
 const OUT = path.join(process.cwd(), 'data', 'raw', 'manifund-regrants.json');
@@ -168,9 +169,30 @@ async function main() {
     console.log('  ACX: every funded ACX-tagged project is already held.');
   }
 
-  if (!WRITE) { console.log('\n(dry run — pass --write to append these to data/raw/manifund-regrants.json)'); return; }
-  const out = existing.concat(additions);
+  // Held projects that dropped out of the public API: if the page now says "Access denied"
+  // the project was made private, so it leaves the public data (see no-longer-public.ts).
+  // Anything else (e.g. a renamed slug) is only reported, for a look by hand.
+  const publicSlugs = new Set(projects.map(p => (p.slug || '').toLowerCase()));
+  const slugOf = (r: Record_) => (r.url || '').split('/projects/')[1]?.split(/[/?#]/)[0]?.toLowerCase() || '';
+  const gone = existing.filter(r => slugOf(r) && !publicSlugs.has(slugOf(r)));
+  const madePrivate: Record_[] = [];
+  for (const r of gone) {
+    const res = await fetch(r.url!, { headers: { 'User-Agent': 'EAGrantsDatabase/1.0' } });
+    const text = (await res.text()).replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<[^>]+>/g, ' ');
+    if (/403\s+Access denied/.test(text)) madePrivate.push(r);
+    else console.log(`  NOT IN API (page still loads, check by hand): ${r.id} ${r.title} ${r.url}`);
+  }
+  if (madePrivate.length) {
+    const total = madePrivate.reduce((s, r) => s + r.amount, 0);
+    console.log(`\n  MADE PRIVATE: ${madePrivate.length} held project(s), $${total.toLocaleString()} — removed from the public data on --write:`);
+    madePrivate.forEach(r => console.log(`    ${r.date}  $${r.amount.toLocaleString().padStart(9)}  ${r.title.slice(0, 60)}`));
+  }
+
+  if (!WRITE) { console.log('\n(dry run — pass --write to apply these changes to data/raw/manifund-regrants.json)'); return; }
+  const privateIds = new Set(madePrivate.map(r => r.id));
+  const out = existing.filter(r => !privateIds.has(r.id)).concat(additions);
   fs.writeFileSync(OUT, JSON.stringify(out, null, 2));
+  recordNoLongerPublic('data/raw/manifund-regrants.json', 'Manifund project made private ("403 Access denied")', madePrivate);
   console.log(`\nmanifund-regrants.json: ${existing.length} -> ${out.length}`);
 }
 

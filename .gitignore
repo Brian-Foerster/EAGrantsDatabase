@@ -68,3 +68,6 @@ index-old.tsx
 !/public/data/.gitkeep
 !/public/data/agg/.gitkeep
 
+
+# Personal, local-only records (e.g. grants that stopped being public)
+/data/local/

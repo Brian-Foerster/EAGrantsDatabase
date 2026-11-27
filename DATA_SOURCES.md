@@ -240,7 +240,7 @@ the description. The page states its own grant count, which the scraper checks.
 | Field | Value |
 |-------|-------|
 | **Source** | bluedot.org tRPC API: `grants.getAllPublicRapidGrantees`, `grants.getCareerTransitionGrantStats` |
-| **Script** | `npm run refresh:bluedot -- --write` (append-only, like Manifund) |
+| **Script** | `npm run refresh:bluedot -- --write` (adds new grants, drops ones no longer public) |
 | **Data file** | `data/raw/bluedot-regrants.json` |
 | **Category** | LTXR |
 
@@ -468,6 +468,12 @@ npm run tag:subcats        # list NEW recipients needing sub-categories
 npm run build              # rebuild public/data + the site
 ```
 
+**Only currently public information is published.** When a source stops publishing a grant
+(a Manifund project made private, a grant dropped from a funder's database, a published total
+revised down), the refresh scripts remove it rather than keep the old figure, and append the
+dropped rows to `data/local/no-longer-public.json`. That folder is gitignored: it is a
+personal record on the machine that runs the refresh, never committed or deployed.
+
 **Automatic** (handled by `npm run scrape`): Coefficient Giving, EA Funds, SFF,
 ACE, Founders Pledge (fund pages), Sentinel Bio, CLR Fund, Cooperative AI Foundation, Lightcone Commons, and the residual
 computation. The source guard aborts
@@ -478,8 +484,8 @@ the run if any source returns zero or regresses more than 10%.
 | Source | How to refresh |
 |---|---|
 | **GiveWell** | No public API. Download the CSV from the Airtable shared view to `data/raw/givewell-grants.csv` (the file is gitignored), then re-scrape. This is the only step that cannot be automated. |
-| **Manifund** | `npm run refresh:manifund -- --write` — pages Manifund's own API. Do **not** import Manifund from Trace: our rows are project-level aggregates, while Trace stores the same money as per-donation rows keyed by individual donors, so a Trace import would double-count at the wrong granularity. |
-| **BlueDot** | `npm run refresh:bluedot -- --write` — BlueDot's own public API (Trace's copy lags by weeks). Append-only. |
+| **Manifund** | `npm run refresh:manifund -- --write` — pages Manifund's own API, adds new funded projects and drops held ones whose page now says "403 Access denied" (made private). Do **not** import Manifund from Trace: our rows are project-level aggregates, while Trace stores the same money as per-donation rows keyed by individual donors, so a Trace import would double-count at the wrong granularity. |
+| **BlueDot** | `npm run refresh:bluedot -- --write` — BlueDot's own public API (Trace's copy lags by weeks). Adds new rapid grants; drops held ones that neither BlueDot nor Trace still publishes; follows the published career-transition total up or down. |
 | **AISTOF** | `npm run refresh:aistof -- --write` after `refresh:manifund` — re-reads AISTOF's donations from Manifund project pages. |
 | **Longview Philanthropy** | The ECF is winding down (final round for donations received by 30 Sep 2026). Add any final report's grants to `data/raw/supplemental/longview-grants.json`. |
 | **Lightcone Commons** | Automatic, but after each round check the scrape log: the archive should gain a round, and the LTFF-overlap warning lists grants to net out by hand. New recipients need sub-category tags (`npm run tag:subcats`). |

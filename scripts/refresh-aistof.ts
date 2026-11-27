@@ -16,6 +16,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
+import { recordNoLongerPublic } from './no-longer-public';
 
 const AISTOF_PROFILE_ID = '5a39569a-b0d6-40c3-89bf-54925c7d5ea0';
 const MANIFUND = path.join(process.cwd(), 'data', 'raw', 'manifund-regrants.json');
@@ -100,9 +101,20 @@ async function main() {
   console.log(`AISTOF: ${out.length} projects, $${(total / 1e6).toFixed(2)}M`);
   for (const g of out) console.log(`  ${g.date}  $${String(g.amount).padStart(8)}  ${String(g.title).slice(0, 70)}`);
 
+  // Donations held before but no longer visible (e.g. the project was made private).
+  const previous: { manifund_id?: string; title?: string; amount?: number }[] =
+    fs.existsSync(OUT) ? JSON.parse(fs.readFileSync(OUT, 'utf8')) : [];
+  const nowIds = new Set(out.map(g => g.manifund_id));
+  const dropped = previous.filter(g => !nowIds.has(g.manifund_id));
+  if (dropped.length) {
+    console.log(`  no longer visible: ${dropped.length} donation(s), $${dropped.reduce((s, g) => s + (g.amount || 0), 0).toLocaleString()}`);
+    dropped.forEach(g => console.log(`    $${String(g.amount).padStart(8)}  ${String(g.title).slice(0, 70)}`));
+  }
+
   if (!WRITE) { console.log('\n(dry run — pass --write to save)'); return; }
   if (failed) { console.error('Not writing: some pages failed.'); process.exit(1); }
   fs.writeFileSync(OUT, JSON.stringify(out, null, 1) + '\n');
+  recordNoLongerPublic('data/raw/aistof-regrants.json', 'AISTOF donation no longer visible on its Manifund project page', dropped);
   console.log(`Wrote ${OUT}`);
 }
 

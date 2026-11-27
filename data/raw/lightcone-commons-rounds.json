@@ -17,7 +17,7 @@
     "SS",
     "ZM"
    ],
-   "scrapedAt": "2026-11-19T21:14:43.902Z",
+   "scrapedAt": "2026-11-27T04:51:20.331Z",
    "targets": [
     {
      "id": "a6d6aef0-cb19-4b62-80c4-d7db4917d175",
@@ -766,7 +766,7 @@
     },
     {
      "id": "c5af93ad-99b8-4cee-8cfe-dce37125ecc0",
-     "name": "Community Archive",
+     "name": "Building Tooling to Map how Ideas Spread",
      "type": "fiscally_sponsored_501c3",
      "amount": 50000,
      "evaluators": {

@@ -1,5 +1,25 @@
 [
  {
+  "id": "aistof-mf-01488",
+  "title": "Retroactive funding: agent-glovebox, open-source sandboxing for AI agents",
+  "recipient": "Retroactive funding: agent-glovebox, open-source sandboxing for AI agents",
+  "amount": 65836,
+  "currency": "USD",
+  "date": "2026-11-17",
+  "grantmaker": "AISTOF",
+  "description": "AISTOF's donation to this Manifund project ($65,836 of the project's $65,836); the rest stays under Manifund.",
+  "category": "LTXR",
+  "focus_area": "Science & technology, Technical AI safety",
+  "fund": "Via Manifund",
+  "url": "https://manifund.org/projects/retroactive-funding-agent-glovebox-open-source-sandboxing-for-ai-agents",
+  "regrant": true,
+  "regrant_of": [
+   "AI Safety Tactical Opportunities Fund",
+   "AISTOF"
+  ],
+  "manifund_id": "mf-01488"
+ },
+ {
   "id": "aistof-mf-01458",
   "title": "Living support for Pip Foweraker",
   "recipient": "Living support for Pip Foweraker",
@@ -500,26 +520,6 @@
   "manifund_id": "mf-00598"
  },
  {
-  "id": "aistof-mf-00588",
-  "title": "Seed Funding For Geodesic Research",
-  "recipient": "Seed Funding For Geodesic Research",
-  "amount": 200000,
-  "currency": "USD",
-  "date": "2026-02-02",
-  "grantmaker": "AISTOF",
-  "description": "AISTOF's donation to this Manifund project ($200,000 of the project's $201,000); the rest stays under Manifund.",
-  "category": "LTXR",
-  "focus_area": "Technical AI safety",
-  "fund": "Via Manifund",
-  "url": "https://manifund.org/projects/seed-funding-for-geodesic-research",
-  "regrant": true,
-  "regrant_of": [
-   "AI Safety Tactical Opportunities Fund",
-   "AISTOF"
-  ],
-  "manifund_id": "mf-00588"
- },
- {
   "id": "aistof-mf-00589",
   "title": "AI Crisis Convening at India AI Impact Summit 2026",
   "recipient": "AI Crisis Convening at India AI Impact Summit 2026",
@@ -678,26 +678,6 @@
    "AISTOF"
   ],
   "manifund_id": "mf-00714"
- },
- {
-  "id": "aistof-mf-01480",
-  "title": "Finish Video Game about AI Girlfriends and Social Peril",
-  "recipient": "Finish Video Game about AI Girlfriends and Social Peril",
-  "amount": 20000,
-  "currency": "USD",
-  "date": "2025-10-29",
-  "grantmaker": "AISTOF",
-  "description": "AISTOF's donation to this Manifund project ($20,000 of the project's $20,000); the rest stays under Manifund.",
-  "category": "LTXR",
-  "focus_area": "AI safety",
-  "fund": "Via Manifund",
-  "url": "https://manifund.org/projects/finish-video-game-about-ai-girlfriends-and-social-peril",
-  "regrant": true,
-  "regrant_of": [
-   "AI Safety Tactical Opportunities Fund",
-   "AISTOF"
-  ],
-  "manifund_id": "mf-01480"
  },
  {
   "id": "aistof-mf-00786",

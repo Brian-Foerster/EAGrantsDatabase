@@ -18,24 +18,6 @@
     ]
   },
   {
-    "id": "mf-00085",
-    "title": "Toward a Superhuman, Open-Ended Alignment Auditor",
-    "recipient": "Toward a Superhuman, Open-Ended Alignment Auditor",
-    "amount": 245000,
-    "currency": "USD",
-    "date": "2026-08-13",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety",
-    "category": "LTXR",
-    "focus_area": "Technical AI safety",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/toward-a-superhuman-open-ended-alignment-auditor",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-00088",
     "title": "Prediction of Inoculation Prompt Side Effects",
     "recipient": "Prediction of Inoculation Prompt Side Effects",
@@ -1008,24 +990,6 @@
     ]
   },
   {
-    "id": "mf-00300",
-    "title": "Discrete Language Modeling",
-    "recipient": "Discrete Language Modeling",
-    "amount": 10000,
-    "currency": "USD",
-    "date": "2026-06-25",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety, Leo’s microgrants",
-    "category": "LTXR",
-    "focus_area": "Technical AI safety, Leo’s microgrants",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/discrete-language-modeling",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-00305",
     "title": "Finding and Defending the Attention Circuits That Make LLMs Jailbreakable",
     "recipient": "Finding and Defending the Attention Circuits That Make LLMs Jailbreakable",
@@ -1110,24 +1074,6 @@
     "focus_area": "Technical AI safety, Leo’s microgrants",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/affine-event-prep",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
-    "id": "mf-00317",
-    "title": "AI Safety YouTube Channel",
-    "recipient": "AI Safety YouTube Channel",
-    "amount": 13300,
-    "currency": "USD",
-    "date": "2026-06-21",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety, AI governance, Global catastrophic risks",
-    "category": "LTXR",
-    "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/ai-safety-youtube-channel",
     "regrant": true,
     "regrant_of": [
       "Manifund"
@@ -1692,24 +1638,6 @@
     ]
   },
   {
-    "id": "mf-00539",
-    "title": "Integral Altruism",
-    "recipient": "Integral Altruism",
-    "amount": 67135,
-    "currency": "USD",
-    "date": "2026-03-09",
-    "grantmaker": "Manifund",
-    "description": "EA community, Global catastrophic risks",
-    "category": "LTXR",
-    "focus_area": "EA community, Global catastrophic risks",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/integral-altruism",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-00543",
     "title": "Mox: 2026 Fundraiser",
     "recipient": "Mox: 2026 Fundraiser",
@@ -1758,24 +1686,6 @@
     "focus_area": "Technical AI safety",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/agent-island-an-environment-for-interagent-cooperation-and-conflict",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
-    "id": "mf-00588",
-    "title": "Seed Funding For Geodesic Research",
-    "recipient": "Seed Funding For Geodesic Research",
-    "amount": 201000,
-    "currency": "USD",
-    "date": "2026-01-30",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety",
-    "category": "LTXR",
-    "focus_area": "Technical AI safety",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/seed-funding-for-geodesic-research",
     "regrant": true,
     "regrant_of": [
       "Manifund"
@@ -1884,24 +1794,6 @@
     "focus_area": "Technical AI safety, Global catastrophic risks",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/ambitious-ai-alignment-seminar",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
-    "id": "mf-00625",
-    "title": "Civitech Incubator",
-    "recipient": "Civitech Incubator",
-    "amount": 118000,
-    "currency": "USD",
-    "date": "2026-01-01",
-    "grantmaker": "Manifund",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "Manifund regrant",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/civitech-incubator",
     "regrant": true,
     "regrant_of": [
       "Manifund"
@@ -2520,24 +2412,6 @@
     ]
   },
   {
-    "id": "mf-00760",
-    "title": "Making God's Post-Production: Aiming for Netflix",
-    "recipient": "Making God's Post-Production: Aiming for Netflix",
-    "amount": 550,
-    "currency": "USD",
-    "date": "2025-08-18",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety, AI governance, Global catastrophic risks",
-    "category": "LTXR",
-    "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/making-gods-post-production-aiming-for-netflix",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-00764",
     "title": "Grow An AI Safety Tiktok Channel To Reach Ten Million People",
     "recipient": "Grow An AI Safety Tiktok Channel To Reach Ten Million People",
@@ -3096,24 +2970,6 @@
     ]
   },
   {
-    "id": "mf-00862",
-    "title": "AI Governance Exchange (focus on China, AI safety), Seed Funding",
-    "recipient": "AI Governance Exchange (focus on China, AI safety), Seed Funding",
-    "amount": 12365,
-    "currency": "USD",
-    "date": "2025-03-28",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety, AI governance, Global catastrophic risks",
-    "category": "LTXR",
-    "focus_area": "Technical AI safety, AI governance, Global catastrophic risks",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/ai-safety-bridge-in-china-seed-funding",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-00863",
     "title": "[Urgent] Top-up funding to present poster at the Tokyo AI Safety Conference ",
     "recipient": "[Urgent] Top-up funding to present poster at the Tokyo AI Safety Conference ",
@@ -3126,24 +2982,6 @@
     "focus_area": "Science & technology, Technical AI safety",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/urgent-top-up-funding-to-present-poster-at-the-tokyo-ai-safety-conference-",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
-    "id": "mf-00865",
-    "title": "Dads Against AGI Inc.",
-    "recipient": "Dads Against AGI Inc.",
-    "amount": 20181,
-    "currency": "USD",
-    "date": "2025-03-22",
-    "grantmaker": "Manifund",
-    "description": "AI governance, Global catastrophic risks",
-    "category": "LTXR",
-    "focus_area": "AI governance, Global catastrophic risks",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/for-humanity-an-ai-risk-podcast",
     "regrant": true,
     "regrant_of": [
       "Manifund"
@@ -3870,24 +3708,6 @@
     ]
   },
   {
-    "id": "mf-01001",
-    "title": "Funding for AI safety comms strategy & career transition support",
-    "recipient": "Funding for AI safety comms strategy & career transition support",
-    "amount": 38952,
-    "currency": "USD",
-    "date": "2024-08-26",
-    "grantmaker": "Manifund",
-    "description": "AI governance, Long-Term Future Fund, Global catastrophic risks",
-    "category": "LTXR",
-    "focus_area": "AI governance, Long-Term Future Fund, Global catastrophic risks",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/funding-for-ai-safety-comms-strategy--career-transition-support",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-01003",
     "title": "Act I: Exploring emergent behavior from multi-AI, multi-human interaction",
     "recipient": "Act I: Exploring emergent behavior from multi-AI, multi-human interaction",
@@ -4188,24 +4008,6 @@
     "focus_area": "EA Community Choice, EA community",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/effective-altruism-nz",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
-    "id": "mf-01035",
-    "title": "Impact Accelerator Program: Biggest career program for experienced professionals",
-    "recipient": "Impact Accelerator Program: Biggest career program for experienced professionals",
-    "amount": 978,
-    "currency": "USD",
-    "date": "2024-08-20",
-    "grantmaker": "Manifund",
-    "description": "EA Community Choice, EA community",
-    "category": "Meta",
-    "focus_area": "EA Community Choice, EA community",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/impact-accelerator-program-biggest-career-program-for-experienced-professionals-u20ul2jdzhq",
     "regrant": true,
     "regrant_of": [
       "Manifund"
@@ -4698,24 +4500,6 @@
     ]
   },
   {
-    "id": "mf-01075",
-    "title": "Teamwork - professional EA co-working space in Berlin",
-    "recipient": "Teamwork - professional EA co-working space in Berlin",
-    "amount": 1868,
-    "currency": "USD",
-    "date": "2024-08-15",
-    "grantmaker": "Manifund",
-    "description": "EA Community Choice, EA community",
-    "category": "Meta",
-    "focus_area": "EA Community Choice, EA community",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/teamwork---professional-ea-co-working-space-in-berlin",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-01077",
     "title": "Lost Ones in-person meetups",
     "recipient": "Lost Ones in-person meetups",
@@ -4872,24 +4656,6 @@
     "focus_area": "Science & technology, Technical AI safety, AI governance, Global catastrophic risks",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/pibbss---affiliate-program-funding-6-months-6-affiliates-or-more",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
-    "id": "mf-01097",
-    "title": "AI Policy Breakthroughs — Empowering Insiders",
-    "recipient": "AI Policy Breakthroughs — Empowering Insiders",
-    "amount": 20000,
-    "currency": "USD",
-    "date": "2024-07-03",
-    "grantmaker": "Manifund",
-    "description": "AI governance",
-    "category": "LTXR",
-    "focus_area": "AI governance",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/ai-policy-breakthroughs--empowering-insiders",
     "regrant": true,
     "regrant_of": [
       "Manifund"
@@ -6462,24 +6228,6 @@
     ]
   },
   {
-    "id": "mf-01382",
-    "title": " AI Alignment Research Lab for Africa",
-    "recipient": " AI Alignment Research Lab for Africa",
-    "amount": 2450,
-    "currency": "USD",
-    "date": "2023-07-21",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety",
-    "category": "LTXR",
-    "focus_area": "Technical AI safety",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/-ai-alignment-research-lab-for-africa",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-01385",
     "title": "Apollo Research: Scale up interpretability & behavioral model evals research",
     "recipient": "Apollo Research: Scale up interpretability & behavioral model evals research",
@@ -6966,24 +6714,6 @@
     ]
   },
   {
-    "id": "mf-01465",
-    "title": "Mycelium: AI alignment for nonhuman welfare",
-    "recipient": "Mycelium: AI alignment for nonhuman welfare",
-    "amount": 102000,
-    "currency": "USD",
-    "date": "2026-09-05",
-    "grantmaker": "Manifund",
-    "description": "Technical AI safety, Animal welfare, Falcon Fund, Digital minds",
-    "category": "AW",
-    "focus_area": "Technical AI safety, Animal welfare, Falcon Fund, Digital minds",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/mycelium-moral-patienthood-for-agi",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-01464",
     "title": "Principled Agents",
     "recipient": "Principled Agents",
@@ -7218,24 +6948,6 @@
     ]
   },
   {
-    "id": "mf-01451",
-    "title": "Undergrad Sole-author NeurIPS 2026 Main Track paper: travel to present in Sydney",
-    "recipient": "Undergrad Sole-author NeurIPS 2026 Main Track paper: travel to present in Sydney",
-    "amount": 1630,
-    "currency": "USD",
-    "date": "2026-10-13",
-    "grantmaker": "Manifund",
-    "description": "Science & technology",
-    "category": "Science",
-    "focus_area": "Science & technology",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/undergrad-sole-author-neurips-2026-main-track-paper-travel-to-present-in-sydney",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
     "id": "mf-01450",
     "title": "AI safety beyond English: send our 4-language paper (and me) to Sydney",
     "recipient": "AI safety beyond English: send our 4-language paper (and me) to Sydney",
@@ -7248,24 +6960,6 @@
     "focus_area": "EA community, AI safety advocacy",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/ai-safety-beyond-english-send-our-4-language-paper-and-me-to-sydney",
-    "regrant": true,
-    "regrant_of": [
-      "Manifund"
-    ]
-  },
-  {
-    "id": "mf-01480",
-    "title": "Finish Video Game about AI Girlfriends and Social Peril",
-    "recipient": "Finish Video Game about AI Girlfriends and Social Peril",
-    "amount": 20000,
-    "currency": "USD",
-    "date": "2025-10-27",
-    "grantmaker": "Manifund",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "",
-    "fund": "Regrants",
-    "url": "https://manifund.org/projects/finish-video-game-about-ai-girlfriends-and-social-peril",
     "regrant": true,
     "regrant_of": [
       "Manifund"
@@ -7302,6 +6996,240 @@
     "focus_area": "Technical AI safety, Forecasting, AI safety advocacy",
     "fund": "Regrants",
     "url": "https://manifund.org/projects/travel-for-undergrad-to-present-first-author-ai-security-paper-acml-2026-oral",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01493",
+    "title": "Robustifying Alignment Techniques to Survive RLVR and Continual Learning",
+    "recipient": "Robustifying Alignment Techniques to Survive RLVR and Continual Learning",
+    "amount": 10000,
+    "currency": "USD",
+    "date": "2026-09-18",
+    "grantmaker": "Manifund",
+    "description": "Science & technology, Technical AI safety",
+    "category": "LTXR",
+    "focus_area": "Science & technology, Technical AI safety",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/robustifying-alignment-techniques-to-survive-rlvr-and-continual-learning",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01492",
+    "title": "PauseAI Canada: national expansion & core operations",
+    "recipient": "PauseAI Canada: national expansion & core operations",
+    "amount": 12900,
+    "currency": "USD",
+    "date": "2026-10-16",
+    "grantmaker": "Manifund",
+    "description": "AI governance, Global catastrophic risks, AI safety advocacy",
+    "category": "LTXR",
+    "focus_area": "AI governance, Global catastrophic risks, AI safety advocacy",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/pauseai-canada-national-expansion--core-operations",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01491",
+    "title": "Support the Effective Altruism community in Somalia",
+    "recipient": "Support the Effective Altruism community in Somalia",
+    "amount": 3800,
+    "currency": "USD",
+    "date": "2026-10-25",
+    "grantmaker": "Manifund",
+    "description": "AI governance, Animal welfare, EA community",
+    "category": "AW",
+    "focus_area": "AI governance, Animal welfare, EA community",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/support-the-effective-altruism-community-in-somalia-",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01490",
+    "title": "AI Safety & Society Museum Pilot",
+    "recipient": "AI Safety & Society Museum Pilot",
+    "amount": 4290,
+    "currency": "USD",
+    "date": "2026-10-27",
+    "grantmaker": "Manifund",
+    "description": "AI governance, AI safety fieldbuilding, AI safety advocacy",
+    "category": "LTXR",
+    "focus_area": "AI governance, AI safety fieldbuilding, AI safety advocacy",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/ai-safety--society-museum-pilot",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01489",
+    "title": "Model genealogy hackathon",
+    "recipient": "Model genealogy hackathon",
+    "amount": 10000,
+    "currency": "USD",
+    "date": "2026-11-10",
+    "grantmaker": "Manifund",
+    "description": "Technical AI safety, AI governance, AI safety advocacy",
+    "category": "LTXR",
+    "focus_area": "Technical AI safety, AI governance, AI safety advocacy",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/constellation-model-genealogy-hackathon",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01488",
+    "title": "Retroactive funding: agent-glovebox, open-source sandboxing for AI agents",
+    "recipient": "Retroactive funding: agent-glovebox, open-source sandboxing for AI agents",
+    "amount": 65836,
+    "currency": "USD",
+    "date": "2026-11-13",
+    "grantmaker": "Manifund",
+    "description": "Science & technology, Technical AI safety",
+    "category": "LTXR",
+    "focus_area": "Science & technology, Technical AI safety",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/retroactive-funding-agent-glovebox-open-source-sandboxing-for-ai-agents",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01486",
+    "title": "How Far Do Instilled Values Generalise? Scaling Laws for SDF",
+    "recipient": "How Far Do Instilled Values Generalise? Scaling Laws for SDF",
+    "amount": 10000,
+    "currency": "USD",
+    "date": "2026-11-16",
+    "grantmaker": "Manifund",
+    "description": "Technical AI safety",
+    "category": "LTXR",
+    "focus_area": "Technical AI safety",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/how-far-do-instilled-values-generalise-scaling-laws-for-sdf",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01487",
+    "title": "Many Members, One Body",
+    "recipient": "Many Members, One Body",
+    "amount": 10550,
+    "currency": "USD",
+    "date": "2026-11-16",
+    "grantmaker": "Manifund",
+    "description": "Technical AI safety, Digital minds",
+    "category": "LTXR",
+    "focus_area": "Technical AI safety, Digital minds",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/many-members-one-body",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01484",
+    "title": "Forward Pass Institute - start-up costs",
+    "recipient": "Forward Pass Institute - start-up costs",
+    "amount": 10150,
+    "currency": "USD",
+    "date": "2026-11-17",
+    "grantmaker": "Manifund",
+    "description": "Science & technology, Technical AI safety, Epistemics",
+    "category": "LTXR",
+    "focus_area": "Science & technology, Technical AI safety, Epistemics",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/forward-pass-institute---start-up-costs",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01485",
+    "title": "The AI Girls Club: Bringing AI risk to women outside tech",
+    "recipient": "The AI Girls Club: Bringing AI risk to women outside tech",
+    "amount": 11630,
+    "currency": "USD",
+    "date": "2026-11-17",
+    "grantmaker": "Manifund",
+    "description": "Global catastrophic risks, AI safety fieldbuilding, AI safety advocacy",
+    "category": "LTXR",
+    "focus_area": "Global catastrophic risks, AI safety fieldbuilding, AI safety advocacy",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/the-ai-girls-club-bringing-ai-risk-to-women-outside-tech",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01483",
+    "title": "Tail End Films: 3 AI Risk Films for Streaming by 2027",
+    "recipient": "Tail End Films: 3 AI Risk Films for Streaming by 2027",
+    "amount": 5080,
+    "currency": "USD",
+    "date": "2026-11-19",
+    "grantmaker": "Manifund",
+    "description": "AI governance, Global catastrophic risks, AI safety advocacy",
+    "category": "LTXR",
+    "focus_area": "AI governance, Global catastrophic risks, AI safety advocacy",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/tail-end-films-3-ai-risk-films-for-streaming-by-2027",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01482",
+    "title": "1st time at NeurIPS 2026 travel funding proposal",
+    "recipient": "1st time at NeurIPS 2026 travel funding proposal",
+    "amount": 1300,
+    "currency": "USD",
+    "date": "2026-11-20",
+    "grantmaker": "Manifund",
+    "description": "Science & technology, Technical AI safety, AI safety fieldbuilding",
+    "category": "LTXR",
+    "focus_area": "Science & technology, Technical AI safety, AI safety fieldbuilding",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/presenting-spec-gap-and-connecting-with-ai-safety-researchers-at-neurips-2026-0nldkadkiic",
+    "regrant": true,
+    "regrant_of": [
+      "Manifund"
+    ]
+  },
+  {
+    "id": "mf-01481",
+    "title": "support a second year of TIAT",
+    "recipient": "support a second year of TIAT",
+    "amount": 2600,
+    "currency": "USD",
+    "date": "2026-11-21",
+    "grantmaker": "Manifund",
+    "description": "Science & technology, Technical AI safety, EA community",
+    "category": "LTXR",
+    "focus_area": "Science & technology, Technical AI safety, EA community",
+    "fund": "Regrants",
+    "url": "https://manifund.org/projects/support-a-second-year-of-tiat",
     "regrant": true,
     "regrant_of": [
       "Manifund"

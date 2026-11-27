@@ -26,6 +26,7 @@ import { scrapeFoundersPledge } from './scrapers/founders-pledge';
 import { scrapeCooperativeAI } from './scrapers/cooperative-ai';
 import { scrapeLightconeCommons } from './scrapers/lightcone-commons';
 import { deduplicateGrants } from './dedup';
+import { recordNoLongerPublic } from './no-longer-public';
 import { computeResiduals } from './residuals';
 import { isOutOfScope } from './scope';
 import { summarize, saveScrapeResult } from './scraper-utils';
@@ -169,6 +170,17 @@ async function main() {
 
   // Also save a lean version for the aggregator to use
   const leanPath = path.join(process.cwd(), 'lib', 'scraped-grants.json');
+  // Grants the previous run had that the sources no longer publish (removed, or renamed /
+  // revised so they no longer match) go to the local no-longer-public record. Residual rows
+  // are recomputed every run, so they're left out.
+  if (fs.existsSync(leanPath)) {
+    const key = (g: Grant) => [g.grantmaker, g.recipient, g.amount, g.date].join('|');
+    const now = new Set(finalGrants.map(key));
+    const previous = JSON.parse(fs.readFileSync(leanPath, 'utf8')) as Grant[];
+    const dropped = previous.filter(g => !g.is_residual && !now.has(key(g)));
+    if (dropped.length) console.log(`\n${dropped.length} grant(s) from the previous run are no longer in the sources as published.`);
+    recordNoLongerPublic('lib/scraped-grants.json', 'No longer in the source as published (removed, renamed or revised)', dropped);
+  }
   fs.writeFileSync(leanPath, JSON.stringify(finalGrants));
   fs.writeFileSync(
     path.join(process.cwd(), 'lib', 'out-of-scope-summary.json'),

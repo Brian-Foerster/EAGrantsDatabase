@@ -29,6 +29,7 @@
  */
 import * as fs from 'fs';
 import * as path from 'path';
+import { recordNoLongerPublic } from './no-longer-public';
 
 const API = 'https://bluedot.org/api/trpc';
 const OUT = path.join(process.cwd(), 'data', 'raw', 'bluedot-regrants.json');
@@ -75,11 +76,11 @@ async function main() {
   // ── Rapid grants ──────────────────────────────────────────────
   const rapid = await trpc<Rapid[]>('grants.getAllPublicRapidGrantees');
   console.log(`Rapid grants listed publicly: ${rapid.length}`);
-  const held = new Map<string, number>();
+  const held = new Map<string, Row[]>();
   for (const r of existing) {
     if (r.is_residual) continue;
     const k = keyOf(r.recipient, r.amount, r.date);
-    held.set(k, (held.get(k) || 0) + 1);
+    held.set(k, [...(held.get(k) || []), r]);
   }
   const additions: Row[] = [];
   let unparsable = 0;
@@ -89,8 +90,8 @@ async function main() {
     const name = (g.granteeName || '').trim();
     if (!date || !(amount > 0) || !name) { unparsable++; continue; }
     const k = keyOf(name, amount, date);
-    const n = held.get(k) || 0;
-    if (n > 0) { held.set(k, n - 1); continue; }
+    const matched = held.get(k);
+    if (matched?.length) { matched.pop(); continue; }
     const project = (g.projectTitle || '').replace(/\s+/g, ' ').trim();
     additions.push({
       id: '', // assigned after sorting
@@ -116,6 +117,32 @@ async function main() {
   const byMonth: Record<string, number> = {};
   for (const a of additions) byMonth[a.date.slice(0, 7)] = (byMonth[a.date.slice(0, 7)] || 0) + 1;
   if (additions.length) console.log(`  by month: ${JSON.stringify(byMonth)}`);
+  // Held rapid grants BlueDot no longer lists. Its list drops some grantees over time, but many
+  // of those stay public in Trace (where our earlier rows came from), so a grant only leaves the
+  // public data when neither source has it. Matching is loose (amount within 1%, month ±1)
+  // because Trace's copies differ slightly.
+  const notOnBlueDot = [...held.values()].flat();
+  const unlisted: Row[] = [];
+  if (notOnBlueDot.length) {
+    const trace = (await (await fetch('https://trace.manifund.org/grants.json', { headers: UA })).json()) as
+      { amountUsd?: number; amount?: number; date?: string; funderSlug?: string; funderName?: string }[];
+    const monthIdx = (ym: string) => { const [y, m] = ym.split('-').map(Number); return y * 12 + m; };
+    const candidates = [
+      ...trace.filter(g => /bluedot/i.test(`${g.funderSlug} ${g.funderName}`))
+        .map(g => ({ amount: Number(g.amountUsd ?? g.amount ?? 0), ym: String(g.date || '').slice(0, 7) })),
+      ...rapid.map(g => ({ amount: Number(g.amountUsd), ym: (monthToDate(g.monthLabel) || '').slice(0, 7) })),
+    ].filter(c => /^\d{4}-\d{2}$/.test(c.ym));
+    for (const r of notOnBlueDot) {
+      const stillPublic = candidates.some(c => Math.abs(c.amount - r.amount) <= Math.max(5, r.amount * 0.01)
+        && Math.abs(monthIdx(c.ym) - monthIdx(r.date.slice(0, 7))) <= 1);
+      if (!stillPublic) unlisted.push(r);
+    }
+    console.log(`  not on BlueDot's list but still public in Trace: ${notOnBlueDot.length - unlisted.length} (kept)`);
+  }
+  if (unlisted.length) {
+    console.log(`  NO LONGER PUBLIC: ${unlisted.length} held rapid grant(s), $${unlisted.reduce((s, r) => s + r.amount, 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} — removed on --write:`);
+    unlisted.forEach(r => console.log(`    ${r.date}  $${String(r.amount).padStart(8)}  ${r.title.slice(0, 60)}`));
+  }
 
   // ── Career transition grants (cumulative stats -> residual deltas) ──
   const ct = await trpc<{ count: number; totalAmountUsd: number }>('grants.getCareerTransitionGrantStats');
@@ -124,6 +151,7 @@ async function main() {
   const delta = Math.round((ct.totalAmountUsd - ctHeld) * 100) / 100;
   console.log(`Career transition (cumulative): ${ct.count} grants, $${Math.round(ct.totalAmountUsd).toLocaleString()} | already held: $${Math.round(ctHeld).toLocaleString()}`);
   const ctAdditions: Row[] = [];
+  let ctReplaced: Row[] = [];
   if (delta > 1) {
     const now = new Date();
     const first = ctRows.length === 0;
@@ -149,14 +177,30 @@ async function main() {
     });
     console.log(`  NEW career-transition residual row: $${delta.toLocaleString()} dated ${date}`);
   } else if (delta < -1) {
-    console.warn(`  WARNING: BlueDot's career-transition total fell below what we hold (by $${(-delta).toLocaleString()}); leaving rows unchanged.`);
+    // The published total went down: follow it, with one row holding the current total.
+    const now = new Date();
+    const asOf = now.toLocaleString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+    const firstDate = ctRows.map(r => r.date).sort()[0];
+    ctReplaced = ctRows;
+    ctAdditions.push({
+      ...ctRows.find(r => r.date === firstDate)!,
+      id: nextId(),
+      title: `Career Transition Grants to date (as of ${asOf})`,
+      amount: Math.round(ct.totalAmountUsd * 100) / 100,
+      description: `BlueDot funds people to move full-time into AI safety or biosecurity work. It publishes only cumulative totals for this program (${ct.count} grants, $${(ct.totalAmountUsd / 1e6).toFixed(2)}M as of ${asOf}), not individual amounts or dates, so this row represents all grants made before this date.`,
+      residual_note: `Cumulative program total $${(ct.totalAmountUsd / 1e6).toFixed(2)}M (${ct.count} grants) as of ${asOf}; BlueDot lowered its published total from $${(ctHeld / 1e6).toFixed(2)}M`,
+    });
+    console.log(`  career-transition total fell by $${(-delta).toLocaleString()}: on --write, ${ctRows.length} held row(s) become one row of $${Math.round(ct.totalAmountUsd).toLocaleString()}`);
   } else {
     console.log('  career-transition total unchanged');
   }
 
-  if (!WRITE) { console.log('\n(dry run — pass --write to append these to data/raw/bluedot-regrants.json)'); return; }
-  const out = existing.concat(additions, ctAdditions);
+  if (!WRITE) { console.log('\n(dry run — pass --write to apply these changes to data/raw/bluedot-regrants.json)'); return; }
+  const drop = new Set([...unlisted, ...ctReplaced]);
+  const out = existing.filter(r => !drop.has(r)).concat(additions, ctAdditions);
   fs.writeFileSync(OUT, JSON.stringify(out, null, 2));
+  recordNoLongerPublic('data/raw/bluedot-regrants.json', 'Rapid grant no longer listed on bluedot.org/grants/rapid', unlisted);
+  recordNoLongerPublic('data/raw/bluedot-regrants.json', `Career-transition rows replaced: BlueDot lowered its published total to $${Math.round(ct.totalAmountUsd).toLocaleString()} (${ct.count} grants)`, ctReplaced);
   console.log(`\nbluedot-regrants.json: ${existing.length} -> ${out.length}`);
 }
 

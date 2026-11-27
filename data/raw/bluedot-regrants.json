@@ -635,24 +635,6 @@
     ]
   },
   {
-    "id": "bd-00037",
-    "title": "Olivia Benoit — Elasticity, a working group of nine economists on economics of transformative AI. Bridge funding for our September seminar + working meeting, and an October venue deposit.",
-    "recipient": "Olivia Benoit",
-    "amount": 45100,
-    "currency": "USD",
-    "date": "2026-08-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://x.com/ElasticityInst",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00038",
     "title": "Dostonbek Bekmirzaev — Developing DNA synthesis-screening policy for Central Asia and the CIS",
     "recipient": "Dostonbek Bekmirzaev",
@@ -1327,23 +1309,6 @@
     "focus_area": "AI safety (BlueDot Rapid Grants)",
     "fund": "Rapid Grants",
     "url": "https://www.linkedin.com/in/afnan-alabdulwahab",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
-    "id": "bd-00077",
-    "title": "Seth Lifland — Conference for promising university students interested in AI governance. They will build context on choosing an impactful career, learn how to operate in DC, and network with professionals and peers.",
-    "recipient": "Seth Lifland",
-    "amount": 30000,
-    "currency": "USD",
-    "date": "2026-07-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
     "regrant": true,
     "regrant_of": [
       "BlueDot Impact"
@@ -2223,23 +2188,6 @@
     ]
   },
   {
-    "id": "bd-00128",
-    "title": "Arthur Burston — Scoping out an org to broker and derisk connections between biosecurity orgs and government by providing training, capacity and expertise to the UK government.",
-    "recipient": "Arthur Burston",
-    "amount": 8400,
-    "currency": "USD",
-    "date": "2026-07-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00129",
     "title": "Nanubala Gnana Sai — Testing collusion between biased actor and monitor models",
     "recipient": "Nanubala Gnana Sai",
@@ -2745,24 +2693,6 @@
     ]
   },
   {
-    "id": "bd-00158",
-    "title": "Anonymous — I'm pivoting to AI governance from a decade in global climate policy. I'm working on acquiring context, getting known in the field, and pilot fieldbuilding in middle power countries.",
-    "recipient": "Anonymous",
-    "amount": 12000,
-    "currency": "USD",
-    "date": "2026-07-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "Completing an AI governance orientation: mapping the field, publishing analysis and piloting middle-power fieldbuilding.",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://arpini.substack.com/",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00159",
     "title": "Jamilya Erkenova — I'm working on a project for Technical AI Safety Project Sprint. I'm expanding the idea from 'Can an adversary identify unlearned domains from a single open-weight model?' prompt proposed by Sam Dower",
     "recipient": "Jamilya Erkenova",
@@ -2856,23 +2786,6 @@
     "title": "Joseph Kostousov — Toronto AI Safety Initiative  + Summer Intensive Programming",
     "recipient": "Joseph Kostousov",
     "amount": 2500,
-    "currency": "USD",
-    "date": "2026-07-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
-    "id": "bd-00165",
-    "title": "Daniel Gerlei and Tim Farrelly — An AI analog of Event 201, bringing together senior decision makers for a public AI crisis simulation exercise",
-    "recipient": "Daniel Gerlei and Tim Farrelly",
-    "amount": 20000,
     "currency": "USD",
     "date": "2026-07-01",
     "grantmaker": "BlueDot Impact",
@@ -4831,24 +4744,6 @@
     ]
   },
   {
-    "id": "bd-00278",
-    "title": "Dani Ismailov — Evaluating the national security and societal risks from abliterated open-weights models, on offline, consumer hardware",
-    "recipient": "Dani Ismailov",
-    "amount": 18250,
-    "currency": "USD",
-    "date": "2026-06-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://crimsonflare.com/",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00279",
     "title": "Anonymous — Replicating and extending the Alignment Faking in LLMs paper to more recent Claude model(s) using more ambiguous user prompts",
     "recipient": "Anonymous",
@@ -5726,23 +5621,6 @@
     ]
   },
   {
-    "id": "bd-00331",
-    "title": "Anonymous — Travel to WAIC 2026 Shanghai to learn substantially about non-elite Chinese AI sentiments, outputting analytical memo and macrostrategy report for Western AI safety community.",
-    "recipient": "Anonymous",
-    "amount": 3700,
-    "currency": "USD",
-    "date": "2026-05-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "Attending WAIC Shanghai and producing reports on non-elite Chinese attitudes toward AI for Western AI strategy researchers.",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00332",
     "title": "Saurav Panigrahi — I work on AI safety research. I am currently seeking travel support to present my accepted paper on value alignment and cross-constitution drift at ICML'26 Pluralistic Alignment",
     "recipient": "Saurav Panigrahi",
@@ -6507,24 +6385,6 @@
     "focus_area": "AI safety (BlueDot Rapid Grants)",
     "fund": "Rapid Grants",
     "url": "https://aisafety.org.pl/",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
-    "id": "bd-00376",
-    "title": "Ettore Gran — Bridge stipend for the co-founder of EuroSafeAI, a research non-profit focused on multi-agent AI safety, democracy defence, and frontier AI safety",
-    "recipient": "Ettore Gran",
-    "amount": 7650,
-    "currency": "USD",
-    "date": "2026-05-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://eurosafe.ai.toronto.edu/",
     "regrant": true,
     "regrant_of": [
       "BlueDot Impact"
@@ -7933,24 +7793,6 @@
     "category": "LTXR",
     "focus_area": "AI safety (BlueDot Rapid Grants)",
     "fund": "Rapid Grants",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
-    "id": "bd-00457",
-    "title": "Phil Palmer, Joey Bream — Safely Bio: KYC infrastructure for the biotech industry as AGI approaches",
-    "recipient": "Phil Palmer, Joey Bream",
-    "amount": 7640,
-    "currency": "USD",
-    "date": "2026-04-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://safely.bio/",
     "regrant": true,
     "regrant_of": [
       "BlueDot Impact"
@@ -16385,24 +16227,6 @@
     ]
   },
   {
-    "id": "bd-00931",
-    "title": "Andrew Nelson — Costs paid for two of us to attend the Science of Physical AI Safety workshop at the CoRL conference in Austin for the purposes of networking and collaboration.",
-    "recipient": "Andrew Nelson",
-    "amount": 8100,
-    "currency": "USD",
-    "date": "2026-10-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://bluedot.org/grants/rapid",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00932",
     "title": "Leonie Ellerbrock — Attending Vision Weekend USA and connecting with the local founder ecosystem to start an AI safety organisation",
     "recipient": "Leonie Ellerbrock",
@@ -16871,24 +16695,6 @@
     ]
   },
   {
-    "id": "bd-00958",
-    "title": "Elisabeth Mira Rothweiler — An Oxford Biosecurity Hub: connecting science and technology communities with defence and security policy to reduce existential risk from AI-enabled biological weapons development.",
-    "recipient": "Elisabeth Mira Rothweiler",
-    "amount": 13365,
-    "currency": "USD",
-    "date": "2026-10-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://bluedot.org/grants/rapid",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00959",
     "title": "Kevin Wu — Making meaningful contributions to government and corporate regulatory frameworks for frontier AI as part of a career pivot",
     "recipient": "Kevin Wu",
@@ -16929,24 +16735,6 @@
     "title": "Egor Zverev — I am attending ERA Technical AI Governance Forum",
     "recipient": "Egor Zverev",
     "amount": 1100,
-    "currency": "USD",
-    "date": "2026-10-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://bluedot.org/grants/rapid",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
-    "id": "bd-00962",
-    "title": "Eitán Sprejer — Running an in-person cohort of BlueDot's Technical AI Safety course in Córdoba, Argentina, with BAISH and AI League for Good, Nov to Dec 2026.",
-    "recipient": "Eitán Sprejer",
-    "amount": 3450,
     "currency": "USD",
     "date": "2026-10-01",
     "grantmaker": "BlueDot Impact",
@@ -17465,24 +17253,6 @@
     ]
   },
   {
-    "id": "bd-00991",
-    "title": "Yernat Yestekov — Presenting research on autonomous AI agents defending critical infrastructure in cybersecurity competitions, including unexpected failures that reveal important challenges for AI safety",
-    "recipient": "Yernat Yestekov",
-    "amount": 2200,
-    "currency": "USD",
-    "date": "2026-10-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://bluedot.org/grants/rapid",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-00992",
     "title": "Nicholas Grabar — Continuation of unverbalized evaluation awareness research started at ERA",
     "recipient": "Nicholas Grabar",
@@ -17951,24 +17721,6 @@
     ]
   },
   {
-    "id": "bd-01018",
-    "title": "Nikita Antolovic — Pivoting my 15,500 subscriber YouTube channel to AI x-risk explainers making it concrete for a mainstream audience by recreating scenarios (e.g AI2027 and HuggingFace) in Minecraft",
-    "recipient": "Nikita Antolovic",
-    "amount": 3700,
-    "currency": "USD",
-    "date": "2026-10-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://bluedot.org/grants/rapid",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
     "id": "bd-01019",
     "title": "Andrew Cai — A field-building event for 12 policy-interested, EA students from the region to visit DC for a day and get high-context contact hours with policy professionals.",
     "recipient": "Andrew Cai",
@@ -18009,24 +17761,6 @@
     "title": "Shriyan Reyya — Carnegie AI Safety Initiative General Body Meeting #2: What the hell has been happening? And what's next?",
     "recipient": "Shriyan Reyya",
     "amount": 800,
-    "currency": "USD",
-    "date": "2026-10-01",
-    "grantmaker": "BlueDot Impact",
-    "description": "",
-    "category": "LTXR",
-    "focus_area": "AI safety (BlueDot Rapid Grants)",
-    "fund": "Rapid Grants",
-    "url": "https://bluedot.org/grants/rapid",
-    "regrant": true,
-    "regrant_of": [
-      "BlueDot Impact"
-    ]
-  },
-  {
-    "id": "bd-01022",
-    "title": "Tarun Dasari — RFE from Pathfinder fellows slack. AIS Careers panel and networking event to promote AIS Careers at UT Austin.",
-    "recipient": "Tarun Dasari",
-    "amount": 2250,
     "currency": "USD",
     "date": "2026-10-01",
     "grantmaker": "BlueDot Impact",
@@ -19247,14 +18981,770 @@
     ]
   },
   {
-    "id": "bd-01090",
+    "id": "bd-01091",
+    "title": "Nok Man, Chan — Present initial work on bootstrapping efforts to advance science of auditors and monitors in NeurIPS and finding collaborators",
+    "recipient": "Nok Man, Chan",
+    "amount": 3500,
+    "currency": "USD",
+    "date": "2026-10-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01092",
+    "title": "Gleb Maksimov — A $4,750 partial grant for essential living costs in November-December 2026 (Josh Landes asked me on Oct 31 to submit it), so I can finish the escalation experiments I lead in my SPAR project.",
+    "recipient": "Gleb Maksimov",
+    "amount": 4750,
+    "currency": "USD",
+    "date": "2026-10-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01093",
+    "title": "Raphael Khalid — Testing whether white-box monitors catch eval gaming on safety research, in an extension of Redwood’s AI control setup.",
+    "recipient": "Raphael Khalid",
+    "amount": 1000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01094",
+    "title": "Hunter Jay — API costs to continue running a daily AI safety digest (news.integuide.com)",
+    "recipient": "Hunter Jay",
+    "amount": 6000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01095",
+    "title": "Leo Qin — Funding for the GPT-4o judge and cloud GPU time needed to test, on Qwen2.5-14B, whether emergent misalignment models and generally misaligned models share internal directions for misaligned behaviour.",
+    "recipient": "Leo Qin",
+    "amount": 500,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01096",
+    "title": "Arathi Arivayutham — I’m requesting funding for GPU compute, storage and limited API use to test whether activation probes and persona directions can detect when a monitor model knowingly approves backdoored code.",
+    "recipient": "Arathi Arivayutham",
+    "amount": 250,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01097",
+    "title": "Edmund Bu — Travel to Coevolution Conference",
+    "recipient": "Edmund Bu",
+    "amount": 500,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01098",
+    "title": "Tim Farrelly — Buffer funding for AI Global Initiative's pilot event",
+    "recipient": "Tim Farrelly",
+    "amount": 5000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01099",
+    "title": "Tom Latkowski — Flights and incidentals to attend the AI Horizons Forum in SF in December (hotel is already covered by the conference itself)",
+    "recipient": "Tom Latkowski",
+    "amount": 1150,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01100",
+    "title": "Nathan Langley — To conduct my Bluedot Technical AI Safety project preliminary results on determining if coder models reduce or increase confidence in their answers after being corrected.",
+    "recipient": "Nathan Langley",
+    "amount": 50,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01101",
+    "title": "Rouven Jahnke — 6 months of Claude Ultra for my work on emergent misalignment as a student research assistant at the Lamarr Institute; students there have no access to frontier models.",
+    "recipient": "Rouven Jahnke",
+    "amount": 1450,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01102",
+    "title": "Chisom Chibuike — I am requesting for a $600 funding to pay for API credits and GPU costs for my research experiment on \"Belief to Goal transfer as a Mechanism of Misalignment in AI Agents\".",
+    "recipient": "Chisom Chibuike",
+    "amount": 600,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01103",
+    "title": "Moeen Razzaque — A low-cost bench prototype that measures AI compute through a GPU's liquid cooling loop and records signed, tamper-evident logs, to test whether cooling-based verification can help compute governance.",
+    "recipient": "Moeen Razzaque",
+    "amount": 6400,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01104",
+    "title": "Jaray Foo — Compute and API credits to test how models fine-tuned away from identifying as an AI behave, what sort of persona they adopt and whether this causes shifts in behaviors and preferences.",
+    "recipient": "Jaray Foo",
+    "amount": 3000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01105",
+    "title": "Bobby Faber — Persona Geology: bringing the blog post to paper-level science",
+    "recipient": "Bobby Faber",
+    "amount": 5000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01106",
+    "title": "Francesca Gomez — API credits to run a new evaluation testing whether AI agents will disclose a stolen API key rather than use this to access information they need for their task (org building)",
+    "recipient": "Francesca Gomez",
+    "amount": 1400,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01107",
+    "title": "Jord Nguyen — Travel support to the Bay Area to attend conferences",
+    "recipient": "Jord Nguyen",
+    "amount": 2800,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01108",
+    "title": "David Africa — Compute for side channels and hardware awareness research",
+    "recipient": "David Africa",
+    "amount": 19000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01109",
+    "title": "Andrés Camilo Casas Sánchez — Organizing an AI Safety Talk at my university",
+    "recipient": "Andrés Camilo Casas Sánchez",
+    "amount": 485,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01110",
+    "title": "Chang Shiau Huei — Travel, accommodation and compute to teach a hands-on AI security session to 50 top cybersecurity students from 10 countries at Global Cybersecurity Camp (GCC) 2027",
+    "recipient": "Chang Shiau Huei",
+    "amount": 850,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01111",
+    "title": "Alex Eftimiades — Compute to test whether rewarding a model for correctly reporting an impossible task, alongside the task reward, stops reinforcement learning from teaching it to exploit a buggy grader and hide it.",
+    "recipient": "Alex Eftimiades",
+    "amount": 2500,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01112",
+    "title": "Christian Copetti, Andrea Ferrari — The founding of the HEP4SAFETY initiative, aimed at building a community of high-energy and mathematical physicists who want to tackle big problems in AI Safety",
+    "recipient": "Christian Copetti, Andrea Ferrari",
+    "amount": 6000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01113",
+    "title": "Ilham Nugraha — Support for the first in-person AI Safety roundtable with social meetups and 1-on-1 meetings on AI misuse in Jakarta, Indonesia",
+    "recipient": "Ilham Nugraha",
+    "amount": 1150,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01114",
+    "title": "Jollen Dai — Three months of part-time research time and API credits to test whether the AI summaries that safety monitors read also hide collusion that agents come up with on their own, and to release a test.",
+    "recipient": "Jollen Dai",
+    "amount": 4000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01115",
+    "title": "Sam Ogden — Travel and Accommodation for EAGx Berlin",
+    "recipient": "Sam Ogden",
+    "amount": 350,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01116",
+    "title": "Rohan Barad — Keeping LIaiSE’s momentum going through January, so experienced generalists keep finding, learning and moving into AI safety.",
+    "recipient": "Rohan Barad",
+    "amount": 7000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01117",
+    "title": "Naomi Couriel — A professional-quality, long-form YouTube video explaining AI safety in Spanish, in the style of 80,000 Hours’ AI in Context, building on my channel @naointech (1.2M+ views in its first month).",
+    "recipient": "Naomi Couriel",
+    "amount": 8000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01118",
+    "title": "Mateus Carvalho — Accommodation costs",
+    "recipient": "Mateus Carvalho",
+    "amount": 200,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01119",
+    "title": "Jonathan Hind — A 3-month project to get Lab Canary’s standard for AI lab staff contracts reviewed by UK and US lawyers, so candidates and advocates can press labs to protect staff who raise safety concerns.",
+    "recipient": "Jonathan Hind",
+    "amount": 8850,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01120",
+    "title": "Osmani Redondo — First in person Women4AIS networking event that will take place in Spain (Madrid, 24 November 2026), presented by BlueDot Impact with the support of Codemotion España, at the Celonis offices.",
+    "recipient": "Osmani Redondo",
+    "amount": 2000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01121",
+    "title": "Jacob Woessner — Funds for supporting an AI Advocacy group at the University of Vermont.",
+    "recipient": "Jacob Woessner",
+    "amount": 1300,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01122",
+    "title": "Vanessa Huang — AI Safety Networking Night #2 @ Sydney NeurIPS",
+    "recipient": "Vanessa Huang",
+    "amount": 2400,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01123",
+    "title": "Rucha Agashe — Can workspace (Jacobian) lenses recover an answer a model deliberately withholds",
+    "recipient": "Rucha Agashe",
+    "amount": 500,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01124",
+    "title": "Emily Kelt — Paper about Defences against Abliteration in VLMs",
+    "recipient": "Emily Kelt",
+    "amount": 1300,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01125",
+    "title": "Peter-James H. Zushin — A laptop for local-model pretesting in my red-teaming study of AI co-scientists’ mechanistic drug-design hazards, culminating in an arXiv preprint and NeurIPS 2027 submission.",
+    "recipient": "Peter-James H. Zushin",
+    "amount": 3300,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01126",
+    "title": "Jonathan Poitz — A film viewing of \"The AI doc\" in Eberswalde to raise awareness for the importance of AI safety and to get people engaged in the topic.",
+    "recipient": "Jonathan Poitz",
+    "amount": 400,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01127",
+    "title": "Begüm Balat — A three-month stipend to build the Munich AI Safety Student Initiative (MAISSI)",
+    "recipient": "Begüm Balat",
+    "amount": 6000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01128",
+    "title": "Noga Aharony — A home workstation for my full-time remote work founding MAGENTA, an independent safety evaluator for biological AI models.",
+    "recipient": "Noga Aharony",
+    "amount": 2400,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01129",
+    "title": "Jordan Olmstead — An interactive research report landscaping opportunities for insurance companies to mitigate catastrophic AI risks with AI forecasting.",
+    "recipient": "Jordan Olmstead",
+    "amount": 15000,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01130",
+    "title": "Tsogt-Ochir Enkhbayar — Research in pragmatic interpretability and ambitious paradigm shifts.",
+    "recipient": "Tsogt-Ochir Enkhbayar",
+    "amount": 500,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01131",
+    "title": "Phoebe Lim — I want to extend my Neuron Lens project to larger models and base models to learn how scaling affects neuron interpretability, and whether training can be interpreted directly.",
+    "recipient": "Phoebe Lim",
+    "amount": 4200,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01132",
+    "title": "Andrew Cai — Yale Existential Risk Initiative events",
+    "recipient": "Andrew Cai",
+    "amount": 480,
+    "currency": "USD",
+    "date": "2026-11-01",
+    "grantmaker": "BlueDot Impact",
+    "description": "",
+    "category": "LTXR",
+    "focus_area": "AI safety (BlueDot Rapid Grants)",
+    "fund": "Rapid Grants",
+    "url": "https://bluedot.org/grants/rapid",
+    "regrant": true,
+    "regrant_of": [
+      "BlueDot Impact"
+    ]
+  },
+  {
+    "id": "bd-01133",
     "title": "Career Transition Grants to date (as of November 2026)",
     "recipient": "Various recipients",
-    "amount": 6228415,
+    "amount": 5595197,
     "currency": "USD",
     "date": "2026-07-01",
     "grantmaker": "BlueDot Impact",
-    "description": "BlueDot funds people to move full-time into AI safety or biosecurity work. It publishes only cumulative totals for this program (103 grants, $6.23M as of November 2026), not individual amounts or dates, so this row represents all grants made before this date.",
+    "description": "BlueDot funds people to move full-time into AI safety or biosecurity work. It publishes only cumulative totals for this program (89 grants, $5.60M as of November 2026), not individual amounts or dates, so this row represents all grants made before this date.",
     "category": "LTXR",
     "focus_area": "AI safety (BlueDot Career Transition Grants)",
     "fund": "Career Transition Grants (Unitemized)",
@@ -19264,6 +19754,6 @@
       "BlueDot Impact"
     ],
     "is_residual": true,
-    "residual_note": "Cumulative program total $6.23M (103 grants) as of November 2026; this row: $6.23M"
+    "residual_note": "Cumulative program total $5.60M (89 grants) as of November 2026; BlueDot lowered its published total from $6.23M"
   }
 ]
